@@ -1,0 +1,195 @@
+/* Dynamic Landing Page Styles */
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+.landing-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #666;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
+}
+
+.landing-container {
+  width: 100%;
+  max-width: 440px;
+  padding: 20px;
+}
+
+.landing-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px 32px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.landing-logo-area {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.landing-fake-logo {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.landing-logo-area h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.3;
+  color: inherit;
+}
+
+.landing-logo-area p {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  color: inherit;
+}
+
+.landing-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.landing-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.landing-input-group label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.landing-input-group input {
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  transition: border 0.2s;
+  background: white;
+  color: inherit;
+}
+
+.landing-input-group input:focus {
+  border-color: var(--l-primary);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.landing-submit-btn {
+  padding: 14px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
+  margin-top: 8px;
+}
+
+.landing-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.landing-submit-btn:disabled {
+  background: #999 !important;
+  cursor: not-allowed;
+}
+
+.landing-footer {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.landing-footer p {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  color: inherit;
+}
+
+/* Raw HTML Wrapper */
+.landing-raw-wrapper {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* =========================================
+   Theme Variations
+   ========================================= */
+
+/* Microsoft 365 Theme */
+.theme-microsoft365 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.theme-microsoft365 .landing-container { max-width: 460px; }
+.theme-microsoft365 .landing-card { border-radius: 0; padding: 48px; }
+.theme-microsoft365 .landing-logo-area { text-align: left; }
+.theme-microsoft365 .landing-logo-area h1 { font-size: 1.6rem; font-weight: 600; }
+.theme-microsoft365 .landing-logo-area p { text-align: left; }
+.theme-microsoft365 .landing-input-group input { 
+  border: none; 
+  border-bottom: 1px solid #666; 
+  border-radius: 0; 
+  padding: 8px 0; 
+}
+.theme-microsoft365 .landing-input-group input:focus {
+  border-bottom-color: var(--l-primary);
+  box-shadow: none;
+}
+.theme-microsoft365 .landing-submit-btn {
+  border-radius: 0;
+  align-self: flex-end;
+  padding: 10px 32px;
+}
+
+/* Google Workspace Theme */
+.theme-google {
+  font-family: 'Roboto', Arial, sans-serif;
+}
+.theme-google .landing-container { max-width: 480px; }
+.theme-google .landing-card { 
+  border: 1px solid #dadce0; 
+  border-radius: 8px; 
+  padding: 48px 40px 36px;
+  box-shadow: none;
+}
+.theme-google .landing-logo-area h1 { font-weight: 400; font-size: 1.5rem; }
+.theme-google .landing-submit-btn {
+  border-radius: 4px;
+  align-self: flex-end;
+  padding: 10px 24px;
+  margin-top: 16px;
+}
+
+/* Corporate Dark Theme */
+.theme-corporate_dark .landing-card {
+  background: #1a1f35;
+  border: 1px solid #2d3560;
+}
+.theme-corporate_dark .landing-input-group input {
+  background: #111827;
+  border-color: #2d3560;
+}
+.theme-corporate_dark .landing-input-group input:focus {
+  border-color: var(--l-primary);
+}

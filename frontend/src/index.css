@@ -1,0 +1,720 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ============================================
+   Design System — PhiSimulation
+   CYBERPUNK EDITION
+   ============================================ */
+
+:root {
+  /* Colors — Cyberpunk Neon */
+  --bg-primary: #060a14;
+  --bg-secondary: #0d1117;
+  --bg-card: rgba(13, 17, 23, 0.85);
+  --bg-card-hover: rgba(22, 27, 38, 0.95);
+  --bg-input: rgba(8, 12, 21, 0.95);
+  --bg-sidebar: rgba(8, 10, 18, 0.92);
+
+  --text-primary: #e0e6f0;
+  --text-secondary: #7a8ba8;
+  --text-muted: #4a5568;
+  --text-heading: #f0f4ff;
+
+  /* Neon Accents */
+  --neon-cyan: #00f0ff;
+  --neon-cyan-dim: #0099aa;
+  --neon-cyan-glow: rgba(0, 240, 255, 0.3);
+  --neon-magenta: #ff00aa;
+  --neon-magenta-glow: rgba(255, 0, 170, 0.25);
+  --neon-purple: #a855f7;
+  --neon-yellow: #ffcc00;
+  --neon-green: #39ff14;
+
+  /* Semantic — mapped to neon */
+  --accent-primary: var(--neon-cyan);
+  --accent-primary-hover: #33f5ff;
+  --accent-primary-glow: var(--neon-cyan-glow);
+
+  --accent-secondary: var(--neon-magenta);
+  --accent-secondary-glow: var(--neon-magenta-glow);
+
+  --danger: #ff3e3e;
+  --danger-soft: rgba(255, 62, 62, 0.15);
+  --warning: var(--neon-yellow);
+  --warning-soft: rgba(255, 204, 0, 0.12);
+  --success: var(--neon-green);
+  --success-soft: rgba(57, 255, 20, 0.12);
+  --info: var(--neon-cyan);
+  --info-soft: rgba(0, 240, 255, 0.12);
+
+  --border: rgba(0, 240, 255, 0.08);
+  --border-hover: rgba(0, 240, 255, 0.2);
+  --divider: rgba(0, 240, 255, 0.04);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #00f0ff 0%, #0070ff 100%);
+  --gradient-accent: linear-gradient(135deg, #ff00aa 0%, #00f0ff 100%);
+  --gradient-danger: linear-gradient(135deg, #ff3e3e 0%, #ff0066 100%);
+  --gradient-card: linear-gradient(160deg, rgba(13, 17, 23, 0.9) 0%, rgba(6, 10, 20, 0.95) 100%);
+  --gradient-text: linear-gradient(90deg, #00f0ff, #ff00aa);
+  --gradient-cyber: linear-gradient(135deg, #0d1117 0%, #060a14 50%, #0a0f1a 100%);
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Rajdhani', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 0.9375rem;
+  --font-size-md: 1.0625rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 1.875rem;
+  --font-size-3xl: 2.25rem;
+  --font-size-4xl: 3rem;
+  --font-size-5xl: 4rem;
+
+  /* Spacing */
+  --space-xs: 0.375rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4.5rem;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px var(--neon-cyan-glow);
+  --shadow-neon: 0 0 12px var(--neon-cyan-glow), 0 0 40px rgba(0, 240, 255, 0.08);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --sidebar-width: 270px;
+  --navbar-height: 60px;
+}
+
+/* ============================================
+   Reset & Base
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 0, 170, 0.02) 0%, transparent 50%);
+}
+
+a {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-primary-hover);
+  text-shadow: 0 0 8px var(--neon-cyan-glow);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-heading);
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   Scrollbar — Cyberpunk
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.15);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.3);
+}
+
+/* ============================================
+   Scanline & Grid Background Overlays
+   ============================================ */
+
+.scanline-overlay::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 240, 255, 0.012) 2px,
+    rgba(0, 240, 255, 0.012) 4px
+  );
+  z-index: 9999;
+}
+
+/* ============================================
+   Card System — Cyberpunk
+   ============================================ */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+.card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-neon);
+}
+
+.card-glow {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan-glow), transparent);
+}
+
+.card-glow::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--neon-cyan-glow), transparent);
+}
+
+.card-glow:hover {
+  border-color: rgba(0, 240, 255, 0.2);
+  box-shadow: var(--shadow-neon);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   Buttons — Cyberpunk
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 10px 22px;
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 0 16px var(--neon-cyan-glow);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px var(--neon-cyan-glow), 0 0 48px rgba(0, 240, 255, 0.15);
+  filter: brightness(1.15);
+}
+
+.btn-secondary {
+  background: rgba(0, 240, 255, 0.06);
+  color: var(--neon-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
+}
+
+.btn-danger {
+  background: var(--gradient-danger);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 16px var(--danger-soft);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.06);
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: var(--font-size-xs);
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: var(--font-size-base);
+}
+
+/* ============================================
+   Inputs — Cyberpunk
+   ============================================ */
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.input-group label {
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.input {
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  transition: all var(--transition-fast);
+  outline: none;
+  width: 100%;
+}
+
+.input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 0 2px var(--neon-cyan-glow), inset 0 0 8px rgba(0, 240, 255, 0.05);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+select.input {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3e%3cpath fill='%2300f0ff' d='M6 8.825L.35 3.175l.7-.7L6 7.425l4.95-4.95.7.7z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+/* ============================================
+   Badges — Cyberpunk
+   ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid transparent;
+}
+
+.badge-success {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: rgba(57, 255, 20, 0.2);
+}
+
+.badge-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+  border-color: rgba(255, 204, 0, 0.2);
+}
+
+.badge-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: rgba(255, 62, 62, 0.2);
+}
+
+.badge-info {
+  background: var(--info-soft);
+  color: var(--info);
+  border-color: rgba(0, 240, 255, 0.2);
+}
+
+.badge-default {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================
+   Tables — Cyberpunk
+   ============================================ */
+
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table thead {
+  background: rgba(0, 240, 255, 0.03);
+}
+
+table th {
+  padding: 14px 18px;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--neon-cyan-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+table td {
+  padding: 14px 18px;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--divider);
+}
+
+table td:last-child {
+  white-space: nowrap;
+}
+
+table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+table tbody tr:hover {
+  background: rgba(0, 240, 255, 0.03);
+}
+
+/* ============================================
+   Page Layout
+   ============================================ */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2xl);
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, var(--font-size-3xl));
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-header p {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  margin-top: 2px;
+  -webkit-text-fill-color: unset;
+}
+
+/* ============================================
+   Grid System
+   ============================================ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (max-width: 1024px) {
+  .grid-3 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+/* ============================================
+   Loading & Spinner — Cyberpunk
+   ============================================ */
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(0, 240, 255, 0.15);
+  border-top-color: var(--neon-cyan);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  box-shadow: 0 0 12px var(--neon-cyan-glow);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px var(--neon-cyan-glow); }
+  50% { box-shadow: 0 0 20px var(--neon-cyan-glow), 0 0 40px rgba(0, 240, 255, 0.1); }
+}
+
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(0, 240, 255, 0.1); }
+  50% { border-color: rgba(0, 240, 255, 0.25); }
+}
+
+@keyframes textFlicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  96% { opacity: 0.9; }
+  97% { opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.slide-up {
+  animation: slideUp 0.6s ease forwards;
+}
+
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* Text gradient utility */
+.text-gradient {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-neon {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan-glow);
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-3xl);
+  color: var(--text-muted);
+}
+
+.empty-state svg {
+  margin-bottom: var(--space-lg);
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+/* ============================================
+   Markdown Content Styling
+   ============================================ */
+
+.markdown-content {
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  color: var(--text-heading);
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-md);
+}
+
+.markdown-content p {
+  margin-bottom: var(--space-md);
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-bottom: var(--space-lg);
+  padding-left: var(--space-xl);
+}
+
+.markdown-content li {
+  margin-bottom: var(--space-xs);
+}
+
+.markdown-content table {
+  display: block;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin: var(--space-xl) 0;
+}
+
+.markdown-content strong {
+  color: var(--text-primary);
+}
+
+.markdown-content code {
+  font-family: var(--font-mono);
+  background: rgba(0, 240, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: var(--neon-cyan);
+}
