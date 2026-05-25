@@ -1,0 +1,101 @@
+.osint-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-xl);
+  min-height: 500px;
+}
+
+@media (max-width: 768px) {
+  .osint-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.osint-list {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.osint-content {
+  min-width: 0;
+}
+
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 600px;
+  padding-right: 5px;
+}
+
+.profile-item {
+  padding: 15px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-item:hover {
+  background: rgba(0, 243, 255, 0.05);
+  border-color: var(--neon-cyan);
+}
+
+.profile-item.active {
+  background: rgba(0, 243, 255, 0.1);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.profile-info strong {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.profile-info .role {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  color: var(--danger);
+  background: rgba(255, 68, 68, 0.1);
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
+}
+
+.osint-detail {
+  padding: var(--space-xl);
+}

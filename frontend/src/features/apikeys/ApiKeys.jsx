@@ -185,7 +185,8 @@ export default function ApiKeys() {
                         padding: '4px 8px', 
                         borderRadius: '4px',
                         fontFamily: 'monospace',
-                        color: 'var(--text-secondary)'
+                        color: 'var(--text-secondary)',
+                        whiteSpace: 'nowrap'
                       }}>
                         {maskKey(ak.key)}
                       </code>

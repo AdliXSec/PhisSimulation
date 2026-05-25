@@ -11,12 +11,15 @@ import {
   HiOutlineXMark,
   HiOutlineKey,
   HiOutlineUser,
+  HiOutlineGlobeAlt
 } from 'react-icons/hi2';
 import './Sidebar.css';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: HiOutlineHome },
   { path: '/dashboard/campaigns', label: 'Kampanye', icon: HiOutlineEnvelope },
+  { path: '/dashboard/osint', label: 'OSINT & SocEng', icon: HiOutlineGlobeAlt },
+  { path: '/dashboard/intel', label: 'Threat Intel', icon: HiOutlineShieldCheck },
   { path: '/dashboard/employees', label: 'Karyawan', icon: HiOutlineUserGroup },
   { path: '/dashboard/departments', label: 'Departemen', icon: HiOutlineBuildingOffice2 },
   { path: '/dashboard/reports', label: 'Laporan', icon: HiOutlineChartBarSquare },

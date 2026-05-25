@@ -11,6 +11,8 @@ import Departments from './features/departments/Departments';
 import Reports from './features/reports/Reports';
 import ApiKeys from './features/apikeys/ApiKeys';
 import Profile from './features/profile/Profile';
+import PasswordIntel from './features/intel/PasswordIntel';
+import Osint from './features/osint/Osint';
 import LandingPage from './features/tracking/LandingPage';
 import EducationPage from './features/tracking/EducationPage';
 import LandingHome from './features/public/LandingHome';
@@ -54,6 +56,8 @@ function AppRoutes() {
         <Route path="reports/:campaignId" element={<Reports />} />
         <Route path="api-keys" element={<ApiKeys />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="intel" element={<PasswordIntel />} />
+        <Route path="osint" element={<Osint />} />
       </Route>
 
       {/* Catch all */}

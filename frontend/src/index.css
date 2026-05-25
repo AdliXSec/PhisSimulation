@@ -152,6 +152,13 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.02em;
 }
 
+pre, code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
 /* ============================================
    Scrollbar — Cyberpunk
    ============================================ */
@@ -209,6 +216,12 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
 }
 
+@media (max-width: 768px) {
+  .card {
+    padding: var(--space-md);
+  }
+}
+
 .card:hover {
   border-color: var(--border-hover);
   box-shadow: var(--shadow-neon);
@@ -225,6 +238,12 @@ h1, h2, h3, h4, h5, h6 {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .card-glow {
+    padding: var(--space-md);
+  }
 }
 
 .card-glow::before {
@@ -496,9 +515,9 @@ table tbody tr:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-xl);
   flex-wrap: wrap;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .page-header h1 {
@@ -543,18 +562,38 @@ table tbody tr:hover {
   gap: var(--space-lg);
 }
 
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (max-width: 1200px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 1024px) {
-  .grid-3 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .grid-2, .grid-3, .grid-4 { 
+    grid-template-columns: 1fr; 
+    gap: var(--space-md);
+  }
   .page-header {
     flex-direction: column;
     align-items: flex-start;
   }
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
 

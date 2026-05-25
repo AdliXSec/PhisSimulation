@@ -206,8 +206,9 @@ export default function LandingHome() {
 
       {/* ── Navbar ── */}
       <nav style={{
-        padding: '14px 32px',
+        padding: '14px clamp(16px, 4vw, 32px)',
         display: 'flex',
+        flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderBottom: '1px solid rgba(0, 240, 255, 0.1)',
@@ -242,12 +243,12 @@ export default function LandingHome() {
             PHI<span style={{ color: 'var(--neon-cyan)', textShadow: '0 0 8px var(--neon-cyan-glow)' }}>SIM</span>
           </span>
         </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <Link to="/login" className="btn btn-ghost" style={{ fontSize: '0.8rem', padding: '8px 16px', fontWeight: 600, letterSpacing: '0.05em' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <Link to="/login" className="btn btn-ghost" style={{ fontSize: '0.75rem', padding: '8px 12px', fontWeight: 600, letterSpacing: '0.05em' }}>
             LOGIN
           </Link>
-          <Link to="/register" className="btn btn-primary" style={{ fontSize: '0.8rem', padding: '10px 20px', fontWeight: 600, letterSpacing: '0.05em', boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)' }}>
-            DAFTAR GRATIS
+          <Link to="/register" className="btn btn-primary" style={{ fontSize: '0.75rem', padding: '8px 16px', fontWeight: 600, letterSpacing: '0.05em', boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)' }}>
+            DAFTAR
           </Link>
         </div>
       </nav>
@@ -287,10 +288,10 @@ export default function LandingHome() {
 
           <h1 style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2.2rem, 7vw, 5rem)',
+            fontSize: 'clamp(2rem, 6.5vw, 5rem)',
             fontWeight: 700,
             marginBottom: '24px',
-            lineHeight: 1.0,
+            lineHeight: 1.1,
             letterSpacing: '0.02em',
           }}>
             <span style={{ color: 'var(--text-heading)' }}>Uji Ketahanan Tim</span>

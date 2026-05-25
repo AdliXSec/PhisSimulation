@@ -1,0 +1,59 @@
+async def analyze_osint_profile(target_name: str, target_role: str, public_data: str) -> dict:
+    """Use AI to analyze OSINT data and generate a spear phishing vector."""
+    system_prompt = (
+        "Anda adalah seorang White-Hat Social Engineering Expert. "
+        "Anda HARUS menghasilkan output dalam format JSON yang valid. "
+        "Jangan tambahkan teks atau penjelasan di luar JSON. "
+        "Jangan gunakan markdown code block. Langsung berikan JSON."
+    )
+
+    user_prompt = f"""Lakukan analisis 'OSINT & Spear Phishing Profiling' terhadap profil berikut untuk tujuan edukasi Security Awareness:
+
+- Nama Target: {target_name}
+- Jabatan: {target_role}
+- Data Jejak Digital (OSINT/Publik): {public_data}
+
+Instruksi:
+1. Evaluasi tingkat risiko (LOW, MEDIUM, HIGH, CRITICAL) berdasarkan sensitivitas data yang dibagikan.
+2. Jelaskan mengapa data tersebut rentan dieksploitasi oleh peretas (vulnerability summary).
+3. Buat 3 skenario/vektor serangan Spear Phishing yang sangat terpersonalisasi berdasarkan data tersebut.
+4. Buat 1 contoh draf email phishing yang mematikan dan meyakinkan berdasarkan vektor terbaik.
+
+Output format JSON:
+{{
+    "risk_level": "CRITICAL",
+    "vulnerability_summary": "Penjelasan detail mengapa data ini berbahaya...",
+    "attack_vectors": [
+        "Vektor 1: Penjelasan strategi...",
+        "Vektor 2: Penjelasan strategi...",
+        "Vektor 3: Penjelasan strategi..."
+    ],
+    "example_phishing_email": {{
+        "subject": "Subjek yang memancing klik",
+        "sender": "nama@domain-palsu.com",
+        "body": "Isi draf email yang sangat persuasif dan personal..."
+    }}
+}}"""
+
+    raw_response = await _call_openrouter(system_prompt, user_prompt)
+
+    try:
+        cleaned = raw_response.strip()
+        if cleaned.startswith("```json"):
+            cleaned = cleaned[7:]
+        if cleaned.startswith("```"):
+            cleaned = cleaned[3:]
+        if cleaned.endswith("```"):
+            cleaned = cleaned[:-3]
+        cleaned = cleaned.strip()
+
+        result = json.loads(cleaned)
+    except json.JSONDecodeError:
+        start = raw_response.find("{")
+        end = raw_response.rfind("}") + 1
+        if start != -1 and end > start:
+            result = json.loads(raw_response[start:end])
+        else:
+            raise ValueError(f"AI response is not valid JSON: {raw_response[:200]}")
+
+    return result

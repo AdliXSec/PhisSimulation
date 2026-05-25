@@ -25,8 +25,8 @@ export function AuthProvider({ children }) {
     return userData;
   };
 
-  const googleLogin = async (credential) => {
-    const res = await api.post('/auth/google', { credential });
+  const googleLogin = async (tokenData) => {
+    const res = await api.post('/auth/google', tokenData);
     const { access_token, user: userData } = res.data;
     localStorage.setItem('phisim_token', access_token);
     localStorage.setItem('phisim_user', JSON.stringify(userData));

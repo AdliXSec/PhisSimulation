@@ -6,6 +6,7 @@ from app.models.campaign_template import CampaignTemplate
 from app.models.campaign_target import CampaignTarget
 from app.models.campaign_log import CampaignLog
 from app.models.employee_risk import EmployeeRiskProfile
+from app.models.osint import OsintProfile
 from app.models.landing_page_template import LandingPageTemplate
 from app.models.api_key import ApiKey
 

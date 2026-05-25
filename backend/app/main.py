@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 
 # Import routers
-from app.api.v1 import auth, departments, employees, campaigns, tracking, reports, landing_pages, api_keys, receive
+from app.api.v1 import auth, departments, employees, campaigns, tracking, reports, landing_pages, api_keys, receive, intel, osint
 
 
 @asynccontextmanager
@@ -43,6 +43,8 @@ app.include_router(reports.router, prefix=f"{settings.API_V1_PREFIX}/reports", t
 app.include_router(landing_pages.router, prefix=f"{settings.API_V1_PREFIX}/landing-pages", tags=["Landing Pages"])
 app.include_router(api_keys.router, prefix=f"{settings.API_V1_PREFIX}/api-keys", tags=["API Keys"])
 app.include_router(receive.router, prefix=f"{settings.API_V1_PREFIX}/receive", tags=["External Receive"])
+app.include_router(intel.router, prefix=f"{settings.API_V1_PREFIX}/intel", tags=["Threat Intel"])
+app.include_router(osint.router, prefix=f"{settings.API_V1_PREFIX}/osint", tags=["OSINT"])
 
 
 @app.get("/", tags=["Health"])

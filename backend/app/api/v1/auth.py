@@ -31,7 +31,8 @@ class RegisterRequest(BaseModel):
 
 
 class GoogleLoginRequest(BaseModel):
-    credential: str
+    credential: str | None = None
+    access_token: str | None = None
 
 
 class TokenResponse(BaseModel):
@@ -53,17 +54,38 @@ class UserResponse(BaseModel):
 @router.post("/google", response_model=TokenResponse)
 async def google_login(request: GoogleLoginRequest, db: AsyncSession = Depends(get_db)):
     """Authenticate or register user via Google OAuth2 token."""
-    try:
-        # Verify the token with Google
-        idinfo = id_token.verify_oauth2_token(
-            request.credential, 
-            requests.Request(), 
-            settings.GOOGLE_CLIENT_ID
-        )
+    import httpx
 
-        email = idinfo.get('email')
-        name = idinfo.get('name')
+    try:
+        email = None
+        name = None
+
+        if request.credential:
+            # Verify the token with Google
+            idinfo = id_token.verify_oauth2_token(
+                request.credential, 
+                requests.Request(), 
+                settings.GOOGLE_CLIENT_ID
+            )
+            email = idinfo.get('email')
+            name = idinfo.get('name')
         
+        elif request.access_token:
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(
+                    "https://www.googleapis.com/oauth2/v3/userinfo",
+                    headers={"Authorization": f"Bearer {request.access_token}"}
+                )
+                if resp.status_code != 200:
+                    raise ValueError("Akses token tidak valid")
+                
+                idinfo = resp.json()
+                email = idinfo.get('email')
+                name = idinfo.get('name')
+        
+        else:
+            raise ValueError("Token tidak ditemukan")
+
         if not email:
             raise ValueError("Token does not contain email")
 
