@@ -1,0 +1,179 @@
+/* ============================================
+   Wizard Stepper — Multi-Step Form Design
+   ============================================ */
+
+.wizard-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: var(--space-2xl);
+  padding: 0 var(--space-lg);
+}
+
+.wizard-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.wizard-step:hover {
+  background: rgba(0, 240, 255, 0.04);
+}
+
+.wizard-step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  border: 2px solid var(--border);
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.wizard-step.active .wizard-step-number {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.1);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.wizard-step.completed .wizard-step-number {
+  border-color: #10b981;
+  color: #fff;
+  background: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.wizard-step-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.wizard-step.active .wizard-step-label {
+  color: var(--neon-cyan);
+  font-weight: 600;
+}
+
+.wizard-step.completed .wizard-step-label {
+  color: #10b981;
+}
+
+.wizard-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  min-width: 24px;
+  max-width: 80px;
+  transition: background 0.3s ease;
+}
+
+.wizard-connector.completed {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+}
+
+/* Wizard Content Area */
+.wizard-content {
+  animation: wizardSlideIn 0.3s ease;
+}
+
+@keyframes wizardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Wizard Navigation Buttons */
+.wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--divider);
+  gap: var(--space-md);
+}
+
+.wizard-nav-left,
+.wizard-nav-right {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* Step Info Header */
+.wizard-step-header {
+  margin-bottom: var(--space-xl);
+}
+
+.wizard-step-header h3 {
+  font-size: var(--font-size-xl);
+  color: var(--text-heading);
+  margin-bottom: 4px;
+}
+
+.wizard-step-header p {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .wizard-stepper {
+    padding: 0;
+  }
+
+  .wizard-step {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .wizard-step-number {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+
+  .wizard-step-label {
+    display: none;
+  }
+
+  .wizard-connector {
+    min-width: 16px;
+  }
+
+  .wizard-nav {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .wizard-nav-left,
+  .wizard-nav-right {
+    width: 100%;
+  }
+
+  .wizard-nav-left .btn,
+  .wizard-nav-right .btn {
+    flex: 1;
+  }
+}

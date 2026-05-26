@@ -1,7 +1,18 @@
+import asyncio
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from app.core.limiter import limiter
+
+# Fix for Playwright/Subprocess on Windows:
+# Use ProactorEventLoop instead of SelectorEventLoop
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 # Import routers
 from app.api.v1 import auth, departments, employees, campaigns, tracking, reports, landing_pages, api_keys, receive, intel, osint
@@ -23,6 +34,11 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+# Add rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 # CORS middleware
 app.add_middleware(

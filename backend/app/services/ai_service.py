@@ -1,6 +1,27 @@
 import json
 import httpx
+import hashlib
 from app.core.config import settings
+from app.core.redis import redis_client
+
+
+async def _get_cache(key: str) -> dict | None:
+    """Retrieve data from Redis cache."""
+    try:
+        data = await redis_client.get(key)
+        if data:
+            return json.loads(data)
+    except Exception:
+        pass
+    return None
+
+
+async def _set_cache(key: str, data: dict, expire: int = 86400):
+    """Save data to Redis cache (default 24h)."""
+    try:
+        await redis_client.set(key, json.dumps(data), ex=expire)
+    except Exception:
+        pass
 
 
 async def _call_openrouter(system_prompt: str, user_prompt: str) -> str:
@@ -31,11 +52,15 @@ async def generate_phishing_template(
     difficulty: str,
     target_departments: list[int],
     external_url: str | None = None,
+    ai_instructions: str | None = None,
 ) -> dict:
-    """Use AI to generate a spear-phishing email template.
+    """Use AI to generate a spear-phishing email template."""
+    # Try cache first
+    cache_key = f"ai:email:{hashlib.md5(f'{theme}:{difficulty}:{target_departments}:{external_url}:{ai_instructions}'.encode()).hexdigest()}"
+    cached = await _get_cache(cache_key)
+    if cached:
+        return cached
 
-    Returns dict with: subject, body_html, sender_name, sender_email, department_target, metadata
-    """
     difficulty_map = {
         "LOW": "Rendah — email mudah dikenali sebagai phishing, banyak red flag yang terlihat",
         "MEDIUM": "Menengah — email cukup meyakinkan, ada beberapa red flag halus",
@@ -54,6 +79,11 @@ async def generate_phishing_template(
         if external_url else ""
     )
 
+    admin_instruction = (
+        f"\nInstruksi Tambahan dari Admin (WAJIB dipatuhi, gunakan detail berikut dalam email):\n{ai_instructions}"
+        if ai_instructions else ""
+    )
+
     user_prompt = f"""Buat satu template email spear-phishing dalam bahasa Indonesia untuk simulasi keamanan internal perusahaan.
 
 Parameter:
@@ -66,7 +96,7 @@ Instruksi:
 - Gunakan manipulasi psikologis yang sesuai tingkat kesulitan (urgensi, otoritas, kelangkaan)
 - Sertakan call-to-action yang mengarahkan target untuk klik link{external_instruction}
 - Gunakan placeholder {{{{tracking_link}}}} untuk atribut href pada link (jangan taruh link asli di href).
-- Jangan gunakan kata-kata kasar atau mengancam secara berlebihan
+- Jangan gunakan kata-kata kasar atau mengancam secara berlebihan{admin_instruction}
 
 Output format JSON:
 {{
@@ -103,7 +133,7 @@ Output format JSON:
         else:
             raise ValueError(f"AI response is not valid JSON: {raw_response[:200]}")
 
-    return {
+    result_data = {
         "subject": result.get("subject", ""),
         "body_html": result.get("body_html", ""),
         "sender_name": result.get("sender_name", ""),
@@ -115,6 +145,10 @@ Output format JSON:
             "model": settings.OPENROUTER_MODEL,
         },
     }
+
+    # Save to cache
+    await _set_cache(cache_key, result_data)
+    return result_data
 
 
 async def generate_campaign_analysis(stats_summary: str) -> str:
@@ -145,10 +179,13 @@ async def generate_landing_page_config(
     difficulty: str,
     brand_context: str | None = None,
 ) -> dict:
-    """Use AI to generate a dynamic landing page configuration.
+    """Use AI to generate a dynamic landing page configuration."""
+    # Try cache first
+    cache_key = f"ai:landing:{hashlib.md5(f'{theme}:{difficulty}:{brand_context}'.encode()).hexdigest()}"
+    cached = await _get_cache(cache_key)
+    if cached:
+        return cached
 
-    Returns dict with visual config for a phishing decoy landing page.
-    """
     system_prompt = (
         "Anda adalah SecOps UI Expert AI yang merancang halaman landing page tiruan untuk simulasi phishing. "
         "Anda HARUS menghasilkan output dalam format JSON yang valid. "
@@ -219,7 +256,7 @@ Output format JSON:
             return _get_default_landing_config(theme)
 
     # Ensure all required keys exist with defaults
-    return {
+    result_data = {
         "title": result.get("title", "Account Verification"),
         "subtitle": result.get("subtitle", "Please sign in to continue"),
         "logo_emoji": result.get("logo_emoji", "🔒"),
@@ -236,6 +273,10 @@ Output format JSON:
         "footer_text": result.get("footer_text", ""),
         "theme_style": result.get("theme_style", "generic"),
     }
+
+    # Save to cache
+    await _set_cache(cache_key, result_data)
+    return result_data
 
 
 def _get_default_landing_config(theme: str) -> dict:
@@ -299,6 +340,12 @@ def _get_default_landing_config(theme: str) -> dict:
 
 async def analyze_osint_profile(target_name: str, target_role: str, public_data: str) -> dict:
     """Use AI to analyze OSINT data and generate a spear phishing vector."""
+    # Try cache first
+    cache_key = f"ai:osint:{hashlib.md5(f'{target_name}:{target_role}:{public_data}'.encode()).hexdigest()}"
+    cached = await _get_cache(cache_key)
+    if cached:
+        return cached
+
     system_prompt = (
         "Anda adalah seorang White-Hat Social Engineering Expert. "
         "Anda HARUS menghasilkan output dalam format JSON yang valid. "
@@ -355,4 +402,6 @@ Output format JSON:
         else:
             raise ValueError(f"AI response is not valid JSON: {raw_response[:200]}")
 
+    # Save to cache
+    await _set_cache(cache_key, result)
     return result

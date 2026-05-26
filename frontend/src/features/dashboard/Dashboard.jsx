@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
+import usePolling from '../../hooks/usePolling';
 import {
   HiOutlineUserGroup,
   HiOutlineEnvelope,
@@ -34,9 +35,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { loadStats(); }, []);
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       const res = await api.get('/reports/dashboard');
       setStats(res.data);
@@ -45,7 +44,12 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => { loadStats(); }, [loadStats]);
+
+  // Real-time polling every 5 seconds
+  usePolling(loadStats, 5000);
 
   if (loading) {
     return (

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import usePolling from '../../hooks/usePolling';
 import { HiOutlineSparkles } from 'react-icons/hi2';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ReactMarkdown from 'react-markdown';
@@ -14,21 +15,32 @@ export default function Reports() {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
 
+  const loadReport = useCallback(async () => {
+    if (!campaignId) return;
+    try {
+      const res = await api.get(`/reports/campaigns/${campaignId}`);
+      setReport(res.data);
+    } catch (err) {
+      if (loading) toast.error('Gagal memuat laporan');
+    } finally {
+      setLoading(false);
+    }
+  }, [campaignId, loading]);
+
   useEffect(() => {
     if (campaignId) loadReport();
     else setLoading(false);
   }, [campaignId]);
 
-  const loadReport = async () => {
-    try {
-      const res = await api.get(`/reports/campaigns/${campaignId}`);
-      setReport(res.data);
-    } catch (err) {
-      toast.error('Gagal memuat laporan');
-    } finally {
-      setLoading(false);
+  // Load saved AI analysis when report data is loaded
+  useEffect(() => {
+    if (report?.ai_analysis && !aiAnalysis) {
+      setAiAnalysis(report.ai_analysis);
     }
-  };
+  }, [report]);
+
+  // Real-time polling every 5 seconds (only when viewing a campaign report)
+  usePolling(loadReport, 5000, !!campaignId);
 
   const generateAnalysis = async () => {
     setAnalyzing(true);

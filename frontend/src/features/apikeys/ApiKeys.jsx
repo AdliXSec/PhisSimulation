@@ -1,7 +1,14 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
-import { HiOutlinePlus, HiOutlineTrash, HiOutlineClipboardDocument, HiOutlineKey, HiOutlineLink, HiOutlineCodeBracket } from 'react-icons/hi2';
+import usePolling from '../../hooks/usePolling';
+import StepWizard from '../../components/wizard/StepWizard';
+import { HiOutlinePlus, HiOutlineTrash, HiOutlineClipboardDocument, HiOutlineKey, HiOutlineLink, HiOutlineCodeBracket, HiOutlineArrowRight, HiOutlineArrowLeft } from 'react-icons/hi2';
+
+const WIZARD_STEPS = [
+  { label: 'Informasi Dasar' },
+  { label: 'Kampanye Terkait' },
+];
 
 export default function ApiKeys() {
   const [apiKeys, setApiKeys] = useState([]);
@@ -10,12 +17,9 @@ export default function ApiKeys() {
   const [showForm, setShowForm] = useState(false);
   const [showExample, setShowExample] = useState(null); // API key id to show example for
   const [form, setForm] = useState({ name: '', campaign_id: '' });
+  const [step, setStep] = useState(0);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const [keysRes, campRes] = await Promise.all([
         api.get('/api-keys'),
@@ -24,11 +28,16 @@ export default function ApiKeys() {
       setApiKeys(keysRes.data);
       setCampaigns(campRes.data);
     } catch (err) {
-      toast.error('Gagal memuat data');
+      if (loading) toast.error('Gagal memuat data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading]);
+
+  useEffect(() => { loadData(); }, []);
+
+  // Real-time polling every 5 seconds
+  usePolling(loadData, 5000);
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -37,6 +46,7 @@ export default function ApiKeys() {
       toast.success('API Key berhasil dibuat!');
       setShowForm(false);
       setForm({ name: '', campaign_id: '' });
+      setStep(0);
       loadData();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Gagal membuat API Key');
@@ -73,6 +83,12 @@ export default function ApiKeys() {
     return key.substring(0, 8) + '••••••••' + key.substring(key.length - 8);
   };
 
+  const openNewForm = () => {
+    setForm({ name: '', campaign_id: '' });
+    setStep(0);
+    setShowForm(!showForm);
+  };
+
   if (loading) return <div className="loading-center"><div className="spinner"></div></div>;
 
   return (
@@ -82,7 +98,7 @@ export default function ApiKeys() {
           <h1>API Keys</h1>
           <p>Kelola integrasi dengan web phishing eksternal</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+        <button className="btn btn-primary" onClick={openNewForm}>
           <HiOutlinePlus size={18} /> Buat API Key
         </button>
       </div>
@@ -118,35 +134,73 @@ export default function ApiKeys() {
           <h3 style={{ marginBottom: 'var(--space-lg)', borderBottom: '1px solid var(--divider)', paddingBottom: 'var(--space-sm)' }}>
             Buat API Key Baru
           </h3>
-          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
-            <div className="input-group">
-              <label>Nama / Label</label>
-              <input 
-                className="input" 
-                placeholder="Misal: Web BCA Clone, Landing Page Bank Mandiri" 
-                value={form.name} 
-                onChange={e => setForm({ ...form, name: e.target.value })} 
-                required 
-              />
-            </div>
-            <div className="input-group">
-              <label>Kampanye Terkait</label>
-              <select 
-                className="input" 
-                value={form.campaign_id} 
-                onChange={e => setForm({ ...form, campaign_id: e.target.value })} 
-                required
-              >
-                <option value="">-- Pilih Kampanye --</option>
-                {campaigns.map(c => (
-                  <option key={c.id} value={c.id}>{c.name} ({c.status})</option>
-                ))}
-              </select>
-            </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button type="submit" className="btn btn-primary">Buat API Key</button>
-              <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-            </div>
+
+          <StepWizard steps={WIZARD_STEPS} currentStep={step} onStepClick={(i) => { if (i <= step) setStep(i); }} />
+
+          <form onSubmit={handleCreate}>
+            {/* ===== STEP 1: Nama / Label ===== */}
+            {step === 0 && (
+              <div className="wizard-content" key="step-0">
+                <div className="wizard-step-header">
+                  <h3>🏷️ Nama atau Label</h3>
+                  <p>Berikan nama untuk API Key Anda agar mudah diidentifikasi</p>
+                </div>
+                <div className="input-group">
+                  <label>Nama / Label</label>
+                  <input 
+                    className="input" 
+                    placeholder="Misal: Web BCA Clone, Landing Page Bank Mandiri" 
+                    value={form.name} 
+                    onChange={e => setForm({ ...form, name: e.target.value })} 
+                    required 
+                  />
+                </div>
+                <div className="wizard-nav">
+                  <div className="wizard-nav-left">
+                    <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  </div>
+                  <div className="wizard-nav-right">
+                    <button type="button" className="btn btn-primary" disabled={!form.name.trim()} onClick={() => setStep(1)}>
+                      Selanjutnya <HiOutlineArrowRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ===== STEP 2: Kampanye Terkait ===== */}
+            {step === 1 && (
+              <div className="wizard-content" key="step-1">
+                <div className="wizard-step-header">
+                  <h3>🎯 Kampanye Terkait</h3>
+                  <p>Pilih kampanye yang akan menerima data dari API Key ini</p>
+                </div>
+                <div className="input-group">
+                  <label>Kampanye</label>
+                  <select 
+                    className="input" 
+                    value={form.campaign_id} 
+                    onChange={e => setForm({ ...form, campaign_id: e.target.value })} 
+                    required
+                  >
+                    <option value="">-- Pilih Kampanye --</option>
+                    {campaigns.map(c => (
+                      <option key={c.id} value={c.id}>{c.name} ({c.status})</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="wizard-nav">
+                  <div className="wizard-nav-left">
+                    <button type="button" className="btn btn-secondary" onClick={() => setStep(0)}>
+                      <HiOutlineArrowLeft size={16} /> Sebelumnya
+                    </button>
+                  </div>
+                  <div className="wizard-nav-right">
+                    <button type="submit" className="btn btn-primary" disabled={!form.campaign_id}>Buat API Key</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
         </div>
       )}
@@ -168,8 +222,8 @@ export default function ApiKeys() {
             {apiKeys.length === 0 ? (
               <tr><td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Belum ada API Key</td></tr>
             ) : apiKeys.map(ak => (
-              <>
-                <tr key={ak.id}>
+              <React.Fragment key={ak.id}>
+                <tr>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <HiOutlineKey size={16} style={{ color: ak.is_active ? 'var(--accent-primary)' : 'var(--text-muted)' }} />
@@ -360,7 +414,7 @@ curl_close($ch);
                     </td>
                   </tr>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </tbody>
         </table>

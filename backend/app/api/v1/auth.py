@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel, EmailStr
@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.core.security import hash_password, verify_password, create_access_token
 from app.api.deps import get_current_user
 from app.models.user import User
+from app.core.limiter import limiter
 
 
 router = APIRouter()
@@ -28,6 +29,7 @@ class RegisterRequest(BaseModel):
     email: str
     password: str
     full_name: str | None = None
+    registration_secret: str | None = None
 
 
 class GoogleLoginRequest(BaseModel):
@@ -52,7 +54,8 @@ class UserResponse(BaseModel):
 # ---- Endpoints ----
 
 @router.post("/google", response_model=TokenResponse)
-async def google_login(request: GoogleLoginRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute")
+async def google_login(request: Request, login_data: GoogleLoginRequest, db: AsyncSession = Depends(get_db)):
     """Authenticate or register user via Google OAuth2 token."""
     import httpx
 
@@ -60,21 +63,21 @@ async def google_login(request: GoogleLoginRequest, db: AsyncSession = Depends(g
         email = None
         name = None
 
-        if request.credential:
+        if login_data.credential:
             # Verify the token with Google
             idinfo = id_token.verify_oauth2_token(
-                request.credential, 
+                login_data.credential, 
                 requests.Request(), 
                 settings.GOOGLE_CLIENT_ID
             )
             email = idinfo.get('email')
             name = idinfo.get('name')
         
-        elif request.access_token:
+        elif login_data.access_token:
             async with httpx.AsyncClient() as client:
                 resp = await client.get(
                     "https://www.googleapis.com/oauth2/v3/userinfo",
-                    headers={"Authorization": f"Bearer {request.access_token}"}
+                    headers={"Authorization": f"Bearer {login_data.access_token}"}
                 )
                 if resp.status_code != 200:
                     raise ValueError("Akses token tidak valid")
@@ -100,6 +103,14 @@ async def google_login(request: GoogleLoginRequest, db: AsyncSession = Depends(g
     user = result.scalar_one_or_none()
 
     if not user:
+        # Check domain restriction
+        if settings.ALLOWED_AUTH_DOMAIN:
+            if not email.endswith(f"@{settings.ALLOWED_AUTH_DOMAIN}"):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"Hanya email dari domain @{settings.ALLOWED_AUTH_DOMAIN} yang diizinkan."
+                )
+
         # Auto register new user
         # Generate a complex random password hash since they use Google to login
         random_password = secrets.token_urlsafe(32)
@@ -147,12 +158,13 @@ async def google_login(request: GoogleLoginRequest, db: AsyncSession = Depends(g
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute")
+async def login(request: Request, login_data: LoginRequest, db: AsyncSession = Depends(get_db)):
     """Authenticate admin and return JWT token."""
-    result = await db.execute(select(User).where(User.username == request.username))
+    result = await db.execute(select(User).where(User.username == login_data.username))
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(request.password, user.password_hash):
+    if not user or not verify_password(login_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Username atau password salah",
@@ -179,23 +191,32 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit("3/minute")
+async def register(request: Request, reg_data: RegisterRequest, db: AsyncSession = Depends(get_db)):
     """Register a new admin user."""
+    # Check registration secret if configured
+    if settings.REGISTRATION_SECRET:
+        if reg_data.registration_secret != settings.REGISTRATION_SECRET:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Token registrasi tidak valid atau tidak ditemukan."
+            )
+
     # Check duplicate username
-    existing = await db.execute(select(User).where(User.username == request.username))
+    existing = await db.execute(select(User).where(User.username == reg_data.username))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Username sudah digunakan")
 
     # Check duplicate email
-    existing = await db.execute(select(User).where(User.email == request.email))
+    existing = await db.execute(select(User).where(User.email == reg_data.email))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email sudah digunakan")
 
     user = User(
-        username=request.username,
-        email=request.email,
-        password_hash=hash_password(request.password),
-        full_name=request.full_name,
+        username=reg_data.username,
+        email=reg_data.email,
+        password_hash=hash_password(reg_data.password),
+        full_name=reg_data.full_name,
     )
     db.add(user)
     await db.flush()

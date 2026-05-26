@@ -1,3 +1,18 @@
-untuk saat ini website saya hanya bisa melihat siapa yang subbmit, saya ingin membuat agar saya bisa melihat data yang mereka masukkan ke dalam web phising yang sudah di share
+Untuk saat ini bagian campaign hanya bisa men generate template email yang di minta pada tema, misal tema google, maka ai akan meng generate template google namun namanya asal contoh nama ceo (alex) nama alamat masih asal dan tidak tahu itu siapa, buat form instruksi tambahan untuk menambahkan detail perintah misal di dalam form di isi
 
-kemudian saya ingin agar saya bisa integrasikan dengan web lain, misal saya punya url http://webphisinglain.com/ dan terdapat login yang mengarah pada http://api.websayasaatini.com/receive?key=123123 maka saya akan bisa melihat data data yang di kirim, jadi web phising yang di kirim dari email tidak selalu mengandalkan web ini untuk mengambil data, namun saya juga bisa kerja sama dengan pihak lain untuk membuat web phising yang nyata dan kemudian terhubung dengan web ini, simpelnya jika web phising milik pihak lain melakukan post data ke url api web saya maka saya bisa mengambil data tersebut, agar karyawan lebih susah untuk mendeteksi bahwa ini adalah web phising, dengan begitu saya bisa mengadakan pelatihan
+nama: adli
+konteks dia adalah ceo yang membangun perusahaan di alamat abc
+
+kemudian improvisasi lanjutan adalah soal design, buat agar design sangat mudah di fahami oleh anak bayi maupun kakek kakek umur 80, buat pendekatan design yang lebih mudah di fahami, bukan form rumit seperti itu, contoh design form yang mudah di fahami
+
+tahap 1 ---- tahap 2 ---- tahap 3
+
+tahap 1      tahap 2                                       tahap 3
+tentukan     tentukan                                      tentukan
+nama         Tujuan Tautan Phishing                        Desain Landing Page
+tema         Pengaturan Email (beserta form instruksi)
+departemen   
+dificult
+
+design tersebut sangat mudah difahami, daripada menjadikan 1 pada 1 form yang besar dan lebar, alangkah baiknya untuk memisahkan tahapan per page.
+implementasikan pada semua page dengan design seperti tersebut

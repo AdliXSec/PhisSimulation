@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   HiOutlineGlobeAlt, 
   HiOutlineTrash, 
   HiOutlinePlus,
-  HiOutlineEye
+  HiOutlineArrowRight,
+  HiOutlineArrowLeft
 } from 'react-icons/hi2';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import usePolling from '../../hooks/usePolling';
+import StepWizard from '../../components/wizard/StepWizard';
 import './Osint.css';
+
+const WIZARD_STEPS = [
+  { label: 'Data Target' },
+  { label: 'Data OSINT' },
+];
 
 export default function Osint() {
   const [profiles, setProfiles] = useState([]);
@@ -19,24 +27,26 @@ export default function Osint() {
   const [osintUrl, setOsintUrl] = useState('');
   const [isOsintLoading, setIsOsintLoading] = useState(false);
   const [isScraping, setIsScraping] = useState(false);
+  const [step, setStep] = useState(0);
   
   // State for detail view
   const [selectedProfile, setSelectedProfile] = useState(null);
 
-  useEffect(() => {
-    loadProfiles();
-  }, []);
-
-  const loadProfiles = async () => {
+  const loadProfiles = useCallback(async () => {
     try {
       const res = await api.get('/osint');
       setProfiles(res.data);
     } catch (err) {
-      toast.error('Gagal memuat profil OSINT');
+      if (loading) toast.error('Gagal memuat profil OSINT');
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading]);
+
+  useEffect(() => { loadProfiles(); }, []);
+
+  // Real-time polling every 5 seconds
+  usePolling(loadProfiles, 5000);
 
   const handleOsintScrape = async () => {
     if (!osintUrl) return toast.error("Masukkan URL terlebih dahulu");
@@ -69,6 +79,7 @@ export default function Osint() {
       setOsintForm({ target_name: '', target_role: '', public_data: '' });
       setSelectedProfile(res.data);
       setShowForm(false);
+      setStep(0);
       loadProfiles(); // Refresh list
     } catch (err) {
       toast.error(err.response?.data?.detail || "Gagal melakukan analisis", { id: 'osint' });
@@ -154,7 +165,7 @@ export default function Osint() {
           <p>Kumpulkan jejak digital target dan simulasikan serangan *Social Engineering*</p>
         </div>
         {!showForm && (
-          <button className="btn btn-primary" onClick={() => { setShowForm(true); setSelectedProfile(null); }}>
+          <button className="btn btn-primary" onClick={() => { setShowForm(true); setSelectedProfile(null); setStep(0); setOsintForm({ target_name: '', target_role: '', public_data: '' }); }}>
             <HiOutlinePlus size={18} /> Profil Baru
           </button>
         )}
@@ -164,51 +175,91 @@ export default function Osint() {
         <div className="card card-glow slide-down">
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-lg)' }}>
             <h2>Buat Profil OSINT Baru</h2>
-            <button className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
           </div>
           
           <p style={{ marginBottom: 'var(--space-lg)', color: 'var(--text-secondary)' }}>
             Simulasikan bagaimana peretas mengumpulkan jejak digital (OSINT) untuk menyusun serangan <i>Spear Phishing</i> yang sangat terpersonalisasi.
           </p>
 
-          <form onSubmit={handleOsintAnalyze} className="osint-form" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-            <div className="grid-2">
-              <div className="input-group">
-                <label>Nama Target</label>
-                <input type="text" className="input" placeholder="Misal: Budi Santoso" value={osintForm.target_name} onChange={e => setOsintForm({...osintForm, target_name: e.target.value})} required />
-              </div>
-              <div className="input-group">
-                <label>Jabatan Target</label>
-                <input type="text" className="input" placeholder="Misal: Manager HRD" value={osintForm.target_role} onChange={e => setOsintForm({...osintForm, target_role: e.target.value})} />
-              </div>
-            </div>
-            
-            <div className="input-group">
-              <label>URL Scraping (Opsional)</label>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <input type="url" className="input" placeholder="Masukkan URL publik untuk di-scrape..." value={osintUrl} onChange={e => setOsintUrl(e.target.value)} />
-                <button type="button" className="btn btn-secondary" onClick={handleOsintScrape} disabled={isScraping || !osintUrl}>
-                  {isScraping ? '...' : 'Scrape'}
-                </button>
-              </div>
-              <small style={{ color: 'var(--text-muted)', marginTop: '5px' }}>Gunakan untuk mengambil teks dari artikel berita, blog, atau profil publik.</small>
-            </div>
+          <StepWizard steps={WIZARD_STEPS} currentStep={step} onStepClick={(i) => { if (i <= step) setStep(i); }} />
 
-            <div className="input-group">
-              <label>Data Jejak Digital (Manual / Hasil Scrape)</label>
-              <textarea 
-                className="input" 
-                rows="6" 
-                placeholder="Masukkan postingan terakhir di medsos, hobi, masalah yang sedang dihadapi, atau hasil scraping..." 
-                value={osintForm.public_data} 
-                onChange={e => setOsintForm({...osintForm, public_data: e.target.value})}
-                required
-              ></textarea>
-            </div>
+          <form onSubmit={handleOsintAnalyze} className="osint-form">
+            {/* ===== STEP 1: Data Target ===== */}
+            {step === 0 && (
+              <div className="wizard-content" key="step-0">
+                <div className="wizard-step-header">
+                  <h3>🎯 Data Target</h3>
+                  <p>Masukkan informasi dasar mengenai target Anda</p>
+                </div>
+                <div className="grid-2">
+                  <div className="input-group">
+                    <label>Nama Target</label>
+                    <input type="text" className="input" placeholder="Misal: Budi Santoso" value={osintForm.target_name} onChange={e => setOsintForm({...osintForm, target_name: e.target.value})} required />
+                  </div>
+                  <div className="input-group">
+                    <label>Jabatan Target</label>
+                    <input type="text" className="input" placeholder="Misal: Manager HRD" value={osintForm.target_role} onChange={e => setOsintForm({...osintForm, target_role: e.target.value})} />
+                  </div>
+                </div>
 
-            <button type="submit" className="btn btn-primary btn-lg" disabled={isOsintLoading}>
-              {isOsintLoading ? <span className="spinner"></span> : '>> SIMPAN & JALANKAN AI PROFILER'}
-            </button>
+                <div className="wizard-nav">
+                  <div className="wizard-nav-left">
+                    <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  </div>
+                  <div className="wizard-nav-right">
+                    <button type="button" className="btn btn-primary" disabled={!osintForm.target_name.trim()} onClick={() => setStep(1)}>
+                      Selanjutnya <HiOutlineArrowRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ===== STEP 2: Data OSINT ===== */}
+            {step === 1 && (
+              <div className="wizard-content" key="step-1">
+                <div className="wizard-step-header">
+                  <h3>🕵️‍♂️ Data OSINT</h3>
+                  <p>Kumpulkan dan masukkan jejak digital target</p>
+                </div>
+
+                <div className="input-group">
+                  <label>URL Scraping (Opsional)</label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input type="url" className="input" placeholder="Masukkan URL publik untuk di-scrape..." value={osintUrl} onChange={e => setOsintUrl(e.target.value)} />
+                    <button type="button" className="btn btn-secondary" onClick={handleOsintScrape} disabled={isScraping || !osintUrl}>
+                      {isScraping ? '...' : 'Scrape'}
+                    </button>
+                  </div>
+                  <small style={{ color: 'var(--text-muted)', marginTop: '5px' }}>Gunakan untuk mengambil teks dari artikel berita, blog, atau profil publik.</small>
+                </div>
+
+                <div className="input-group">
+                  <label>Data Jejak Digital (Manual / Hasil Scrape)</label>
+                  <textarea 
+                    className="input" 
+                    rows="6" 
+                    placeholder="Masukkan postingan terakhir di medsos, hobi, masalah yang sedang dihadapi, atau hasil scraping..." 
+                    value={osintForm.public_data} 
+                    onChange={e => setOsintForm({...osintForm, public_data: e.target.value})}
+                    required
+                  ></textarea>
+                </div>
+
+                <div className="wizard-nav">
+                  <div className="wizard-nav-left">
+                    <button type="button" className="btn btn-secondary" onClick={() => setStep(0)}>
+                      <HiOutlineArrowLeft size={16} /> Sebelumnya
+                    </button>
+                  </div>
+                  <div className="wizard-nav-right">
+                    <button type="submit" className="btn btn-primary" disabled={isOsintLoading || !osintForm.public_data.trim()}>
+                      {isOsintLoading ? <span className="spinner"></span> : '>> JALANKAN AI PROFILER'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
         </div>
       ) : (

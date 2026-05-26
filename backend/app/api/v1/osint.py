@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from pydantic import BaseModel
@@ -10,6 +10,7 @@ from app.api.deps import get_current_user, get_db
 from app.models.user import User
 from app.models.osint import OsintProfile
 from app.services.ai_service import analyze_osint_profile
+from app.core.limiter import limiter
 
 router = APIRouter()
 
@@ -105,38 +106,29 @@ async def delete_osint_profile(
     await db.commit()
     return {"status": "success"}
 
+from app.services.scraper_service import scrape_target_url
+
 @router.post("/scrape")
-async def scrape_url(request: OsintScrapeRequest, current_user: User = Depends(get_current_user)):
-    url = request.url
+@limiter.limit("10/minute")
+async def scrape_url(
+    request: Request,
+    scrape_data: OsintScrapeRequest, 
+    current_user: User = Depends(get_current_user)
+):
+    url = scrape_data.url
     try:
-        jina_url = f"https://r.jina.ai/{url}"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-            "Accept": "text/event-stream"
-        }
-        
-        async with httpx.AsyncClient(follow_redirects=True, verify=False, timeout=20.0) as client:
-            resp = await client.get(jina_url, headers=headers)
-            if resp.status_code == 451:
-                raise ValueError("LinkedIn dan beberapa situs sosial secara hukum melarang scraping. Silakan copy-paste manual dari situs tersebut.")
-            if resp.status_code == 200:
-                text = resp.text
-                if len(text) > 8000:
-                    text = text[:8000] + "... [TRUNCATED]"
-                return {"text": text}
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
             
-            resp = await client.get(url, headers=headers, timeout=10.0)
-            if resp.status_code != 200:
-                raise ValueError(f"HTTP Status {resp.status_code}")
-                
-            soup = BeautifulSoup(resp.text, "html.parser")
-            for script in soup(["script", "style"]):
-                script.extract()
-                
-            text = soup.get_text(separator=" ", strip=True)
-            if len(text) > 8000:
-                text = text[:8000] + "... [TRUNCATED]"
-            return {"text": text}
+        text = await scrape_target_url(url)
+        
+        if not text or len(text.strip()) < 50:
+            raise ValueError("Tidak dapat menemukan teks yang cukup pada URL tersebut. Halaman mungkin kosong atau diproteksi dengan ketat.")
+            
+        if len(text) > 8000:
+            text = text[:8000] + "... [TRUNCATED]"
+            
+        return {"text": text}
             
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))

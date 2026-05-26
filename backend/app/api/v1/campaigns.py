@@ -15,6 +15,60 @@ from app.models.campaign_log import CampaignLog
 from app.models.employee import Employee
 from app.services.ai_service import generate_phishing_template, generate_landing_page_config
 from app.services.email_service import send_campaign_emails
+from app.core.database import async_session
+
+async def process_ai_generation(campaign_id: str):
+    """Background task to generate AI content for campaign."""
+    async with async_session() as db:
+        try:
+            result = await db.execute(select(Campaign).where(Campaign.id == campaign_id))
+            campaign = result.scalar_one_or_none()
+            if not campaign:
+                return
+
+            # Get existing template
+            result_tmpl = await db.execute(select(CampaignTemplate).where(CampaignTemplate.campaign_id == campaign.id))
+            template = result_tmpl.scalar_one_or_none()
+
+            if not template:
+                # Fallback if somehow it wasn't created
+                template = CampaignTemplate(campaign_id=campaign.id, landing_page_mode="ai", subject="[AI DRAFT]", body_html="[AI DRAFT]", sender_name="IT Support")
+                db.add(template)
+
+            # Generate Email if it's in AI mode
+            if template.subject == "[AI DRAFT]":
+                external_url = None
+                if template.landing_page_mode == "external" and template.landing_page_config:
+                    external_url = template.landing_page_config.get("url")
+
+                ai_result = await generate_phishing_template(
+                    theme=campaign.theme or "Peringatan Keamanan",
+                    difficulty=campaign.difficulty,
+                    target_departments=campaign.target_departments,
+                    external_url=external_url,
+                    ai_instructions=campaign.ai_instructions,
+                )
+                template.subject = ai_result["subject"]
+                template.body_html = ai_result["body_html"]
+                template.sender_name = ai_result["sender_name"]
+                template.sender_email = ai_result.get("sender_email")
+                template.department_target = ai_result.get("department_target")
+                template.ai_metadata = ai_result.get("metadata", {})
+
+            # Generate Landing Page if it's in AI mode
+            if template.landing_page_mode == "ai" and not template.landing_page_config:
+                landing_config = await generate_landing_page_config(
+                    theme=campaign.theme or "Peringatan Keamanan",
+                    difficulty=campaign.difficulty,
+                )
+                template.landing_page_config = landing_config
+
+            campaign.status = "READY"
+            await db.commit()
+        except Exception as e:
+            print(f"Error in background AI generation: {e}")
+            campaign.status = "DRAFT"
+            await db.commit()
 
 
 router = APIRouter()
@@ -38,6 +92,7 @@ class CampaignCreate(BaseModel):
     email_mode: str = "ai" # 'ai' or 'custom'
     email_subject: str | None = None
     email_sender: str | None = None
+    ai_instructions: str | None = None
     email_body: str | None = None
 
 
@@ -46,6 +101,7 @@ class CampaignUpdate(BaseModel):
     description: str | None = None
     difficulty: str | None = None
     theme: str | None = None
+    landing_page_mode: str | None = None
     external_url: str | None = None
 
 
@@ -77,6 +133,8 @@ async def list_campaigns(
             "difficulty": c.difficulty,
             "theme": c.theme,
             "target_count": count,
+            "processed_count": c.processed_count,
+            "error_count": c.error_count,
             "created_at": c.created_at.isoformat(),
             "started_at": c.started_at.isoformat() if c.started_at else None,
             "ended_at": c.ended_at.isoformat() if c.ended_at else None,
@@ -98,6 +156,7 @@ async def create_campaign(
         difficulty=data.difficulty,
         theme=data.theme,
         target_departments=data.target_departments,
+        ai_instructions=data.ai_instructions,
         created_by=current_user.id,
     )
     db.add(campaign)
@@ -179,6 +238,8 @@ async def get_campaign(
         "difficulty": campaign.difficulty,
         "theme": campaign.theme,
         "target_departments": campaign.target_departments,
+        "processed_count": campaign.processed_count,
+        "error_count": campaign.error_count,
         "templates": [
             {
                 "id": str(t.id),
@@ -201,10 +262,11 @@ async def get_campaign(
 @router.post("/{campaign_id}/generate")
 async def generate_template(
     campaign_id: str,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Use AI to generate phishing email template for the campaign."""
+    """Use AI to generate phishing email template for the campaign in background."""
     result = await db.execute(select(Campaign).where(Campaign.id == campaign_id, Campaign.created_by == current_user.id))
     campaign = result.scalar_one_or_none()
     if not campaign:
@@ -214,63 +276,12 @@ async def generate_template(
         raise HTTPException(status_code=400, detail="Kampanye tidak dalam status DRAFT/READY")
 
     campaign.status = "GENERATING"
-    await db.flush()
+    await db.commit()
 
-    try:
-        # Get existing template
-        result_tmpl = await db.execute(select(CampaignTemplate).where(CampaignTemplate.campaign_id == campaign.id))
-        template = result_tmpl.scalar_one_or_none()
+    # Schedule background AI generation
+    background_tasks.add_task(process_ai_generation, str(campaign.id))
 
-        if not template:
-            # Fallback if somehow it wasn't created
-            template = CampaignTemplate(campaign_id=campaign.id, landing_page_mode="ai", subject="[AI DRAFT]", body_html="[AI DRAFT]", sender_name="IT Support")
-            db.add(template)
-
-        # Generate Email if it's in AI mode
-        if template.subject == "[AI DRAFT]":
-            external_url = None
-            if template.landing_page_mode == "external" and template.landing_page_config:
-                external_url = template.landing_page_config.get("url")
-
-            ai_result = await generate_phishing_template(
-                theme=campaign.theme or "Peringatan Keamanan",
-                difficulty=campaign.difficulty,
-                target_departments=campaign.target_departments,
-                external_url=external_url,
-            )
-            template.subject = ai_result["subject"]
-            template.body_html = ai_result["body_html"]
-            template.sender_name = ai_result["sender_name"]
-            template.sender_email = ai_result.get("sender_email")
-            template.department_target = ai_result.get("department_target")
-            template.ai_metadata = ai_result.get("metadata", {})
-
-        # Generate Landing Page if it's in AI mode
-        if template.landing_page_mode == "ai" and not template.landing_page_config:
-            landing_config = await generate_landing_page_config(
-                theme=campaign.theme or "Peringatan Keamanan",
-                difficulty=campaign.difficulty,
-            )
-            template.landing_page_config = landing_config
-
-        campaign.status = "READY"
-        await db.flush()
-
-        return {
-            "message": "Template berhasil diproses",
-            "template": {
-                "id": str(template.id),
-                "subject": template.subject,
-                "body_html": template.body_html,
-                "sender_name": template.sender_name,
-                "landing_page_config": template.landing_page_config,
-                "landing_page_mode": template.landing_page_mode,
-            },
-        }
-    except Exception as e:
-        campaign.status = "DRAFT"
-        await db.flush()
-        raise HTTPException(status_code=500, detail=f"Gagal generate template: {str(e)}")
+    return {"message": "AI sedang merancang kampanye Anda...", "status": "GENERATING"}
 
 
 @router.post("/{campaign_id}/launch")
@@ -340,19 +351,18 @@ async def update_campaign(
     if data.theme is not None:
         campaign.theme = data.theme
 
-    if data.external_url is not None:
+    if data.landing_page_mode is not None or data.external_url is not None:
         template_result = await db.execute(select(CampaignTemplate).where(CampaignTemplate.campaign_id == campaign.id))
         template = template_result.scalar_one_or_none()
         if template:
-            # Pastikan mode-nya external
-            template.landing_page_mode = "external"
-            # Update config (jsonb field)
-            # Karena jsonb di sqlalchemy, kadang butuh flag modified atau assignment baru
-            config = template.landing_page_config or {}
-            # Copy to avoid dict mutation issues with SQLAlchemy
-            new_config = dict(config)
-            new_config["url"] = data.external_url
-            template.landing_page_config = new_config
+            if data.landing_page_mode is not None:
+                template.landing_page_mode = data.landing_page_mode
+            if data.external_url is not None:
+                # Update config (jsonb field)
+                config = template.landing_page_config or {}
+                new_config = dict(config)
+                new_config["url"] = data.external_url
+                template.landing_page_config = new_config
 
     await db.flush()
     return {"message": "Kampanye diperbarui"}

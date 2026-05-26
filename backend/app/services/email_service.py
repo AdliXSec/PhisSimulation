@@ -53,7 +53,7 @@ def _inject_tracking(body_html: str, token: str) -> str:
 
 
 async def send_campaign_emails(campaign_id: str):
-    """Background task: send phishing emails to all campaign targets."""
+    """Background task: send phishing emails to all campaign targets with retry logic."""
     async with async_session() as db:
         try:
             # Get campaign
@@ -62,6 +62,11 @@ async def send_campaign_emails(campaign_id: str):
             if not campaign:
                 logger.error(f"Campaign {campaign_id} not found")
                 return
+
+            # Reset counts for new launch
+            campaign.processed_count = 0
+            campaign.error_count = 0
+            await db.commit()
 
             # Get template
             tmpl_result = await db.execute(
@@ -87,52 +92,75 @@ async def send_campaign_emails(campaign_id: str):
                 )
             )
             targets = targets_result.all()
+            total_targets = len(targets)
 
             sent_count = 0
+            error_count = 0
+            
             for target, employee in targets:
-                try:
-                    # Inject tracking into email body
-                    personalized_html = _inject_tracking(template.body_html, target.token)
+                # Per-target retry logic
+                max_retries = 3
+                retry_count = 0
+                success = False
+                
+                while retry_count < max_retries and not success:
+                    try:
+                        # Inject tracking into email body
+                        personalized_html = _inject_tracking(template.body_html, target.token)
 
-                    if fast_mail:
-                        message = MessageSchema(
-                            subject=template.subject,
-                            recipients=[employee.email],
-                            body=personalized_html,
-                            subtype=MessageType.html,
-                        )
-                        await fast_mail.send_message(message)
-                    else:
-                        # Mock mode — just log it
-                        logger.info(f"[MOCK EMAIL] To: {employee.email} | Subject: {template.subject}")
+                        if fast_mail:
+                            message = MessageSchema(
+                                subject=template.subject,
+                                recipients=[employee.email],
+                                body=personalized_html,
+                                subtype=MessageType.html,
+                            )
+                            await fast_mail.send_message(message)
+                        else:
+                            # Mock mode
+                            logger.info(f"[MOCK EMAIL] To: {employee.email} | Subject: {template.subject}")
 
-                    # Update target status
-                    target.status = "SENT"
-                    target.email_sent_at = datetime.now(timezone.utc)
-                    target.template_id = template.id
+                        # Update target status
+                        target.status = "SENT"
+                        target.email_sent_at = datetime.now(timezone.utc)
+                        target.template_id = template.id
+                        success = True
+                        sent_count += 1
 
-                    # Log the event
-                    log = CampaignLog(
-                        target_id=target.id,
-                        event_type="EMAIL_SENT",
-                        metadata_={"recipient": employee.email},
-                    )
-                    db.add(log)
-                    sent_count += 1
-                    
-                    # Add delay to prevent SMTP rate limiting
-                    import asyncio
-                    await asyncio.sleep(1.5)
+                    except Exception as e:
+                        retry_count += 1
+                        logger.warning(f"Attempt {retry_count} failed for {employee.email}: {e}")
+                        if retry_count < max_retries:
+                            import asyncio
+                            await asyncio.sleep(2 * retry_count) # Exponential backoff
+                        else:
+                            logger.error(f"Final failure for {employee.email}")
+                            target.status = "FAILED"
+                            error_count += 1
 
-                except Exception as e:
-                    logger.error(f"Failed to send email to {employee.email}: {e}")
+                # Update progress in DB every email (for real-time dashboard)
+                campaign.processed_count = sent_count
+                campaign.error_count = error_count
+                
+                # Log the event
+                log = CampaignLog(
+                    target_id=target.id,
+                    event_type="EMAIL_SENT" if success else "EMAIL_FAILED",
+                    metadata_={"recipient": employee.email, "retries": retry_count},
+                )
+                db.add(log)
+                await db.commit()
+                
+                # Prevent SMTP rate limiting
+                import asyncio
+                await asyncio.sleep(1.2)
 
             # Update campaign status
-            campaign.status = "ACTIVE"
+            campaign.status = "ACTIVE" if sent_count > 0 else "FAILED"
             await db.commit()
 
-            logger.info(f"Campaign {campaign_id}: sent {sent_count}/{len(targets)} emails")
+            logger.info(f"Campaign {campaign_id}: sent {sent_count}, failed {error_count} of {total_targets}")
 
         except Exception as e:
-            logger.error(f"Campaign email sending failed: {e}")
+            logger.error(f"Campaign email sending system failure: {e}")
             await db.rollback()

@@ -182,6 +182,7 @@ async def get_campaign_report(
             for target, name, email, dept_name in targets
         ],
         "external_submissions": external_submissions,
+        "ai_analysis": campaign.ai_analysis,
     }
 
 
@@ -219,6 +220,9 @@ async def get_ai_analysis(
 
     try:
         analysis = await generate_campaign_analysis(stats_summary)
+        # Save to database for persistence
+        campaign.ai_analysis = analysis
+        await db.flush()
         return {"analysis": analysis}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal generate analisis: {str(e)}")

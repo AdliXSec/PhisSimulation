@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://phisim_admin:phisim_secret_2026@localhost:5432/phisimulation"
+    DATABASE_URL: str = "postgresql+asyncpg://phisim_admin:phisim_secret_2026@localhost:5433/phisimulation"
 
     # JWT
     JWT_SECRET_KEY: str = "change-me-in-production"
@@ -43,6 +43,8 @@ class Settings(BaseSettings):
 
     # Auth
     GOOGLE_CLIENT_ID: str = "996912080865-20do3327g536bga5ae5duthqvvgr3dpj.apps.googleusercontent.com"
+    ALLOWED_AUTH_DOMAIN: Optional[str] = None  # e.g., "company.com"
+    REGISTRATION_SECRET: str = ""  # If set, required to register via API
 
     class Config:
         env_file = ".env"
