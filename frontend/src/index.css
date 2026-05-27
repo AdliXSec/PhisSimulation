@@ -570,6 +570,17 @@ table tbody tr:hover {
   background: rgba(0, 240, 255, 0.03);
 }
 
+@media (max-width: 768px) {
+  .truncate-mobile {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
 /* ============================================
    Page Layout
    ============================================ */
