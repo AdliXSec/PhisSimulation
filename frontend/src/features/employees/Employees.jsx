@@ -104,8 +104,8 @@ export default function Employees() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Karyawan</h1>
-          <p>Kelola data karyawan target simulasi</p>
+          <h1>Daftar Karyawan</h1>
+          <p>Kelola daftar karyawan yang akan menjadi target simulasi phishing. Anda dapat menambah, mengedit, atau menghapus data karyawan di sini.</p>
         </div>
         <button className="btn btn-primary" onClick={openNewForm}>
           <HiOutlinePlus size={18} /> Tambah Karyawan
@@ -125,8 +125,8 @@ export default function Employees() {
             {step === 0 && (
               <div className="wizard-content" key="step-0">
                 <div className="wizard-step-header">
-                  <h3>👤 Data Pribadi</h3>
-                  <p>Masukkan nama dan email karyawan</p>
+                  <h3>👤 Langkah 1: Data Pribadi</h3>
+                  <p>Masukkan nama lengkap dan alamat email aktif karyawan.</p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
@@ -157,8 +157,8 @@ export default function Employees() {
             {step === 1 && (
               <div className="wizard-content" key="step-1">
                 <div className="wizard-step-header">
-                  <h3>🏢 Data Organisasi</h3>
-                  <p>Tentukan departemen dan jabatan karyawan</p>
+                  <h3>🏢 Langkah 2: Data Organisasi</h3>
+                  <p>Tentukan di departemen mana karyawan ini bekerja agar Anda dapat memfilter laporan berdasarkan departemen.</p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>

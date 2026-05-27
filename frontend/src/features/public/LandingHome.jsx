@@ -12,7 +12,12 @@ import {
   HiOutlineEye,
   HiOutlineLockClosed,
   HiOutlineCommandLine,
+  HiOutlineSun,
+  HiOutlineMoon,
+  HiOutlineGlobeAlt,
+  HiOutlineKey,
 } from 'react-icons/hi2';
+import { useTheme } from '../../context/ThemeContext';
 
 /* ── Animated counter ── */
 function useAnimatedCount(target, duration = 2000) {
@@ -178,16 +183,37 @@ const features = [
   {
     icon: HiOutlineCpuChip,
     title: 'Custom HTML Engine',
-    desc: 'Mau pakai desain sendiri? Upload kode HTML kustom (misal tiruan PayPal). Formulirnya diproses otomatis.',
+    desc: 'Punya desain sendiri? Upload file HTML tiruan Anda dan sistem akan memproses formulir login secara otomatis.',
     color: 'var(--neon-magenta)',
     emoji: '🎨',
   },
   {
     icon: HiOutlineChartBar,
     title: 'Real-Time Analytics',
-    desc: 'Siapa yang buka email? Klik link? Input password? Semua terpantau live. Dapatkan skor risiko per karyawan.',
+    desc: 'Pantau siapa yang membuka email, mengklik tautan, atau memasukkan data sensitif langsung dari dashboard interaktif.',
     color: 'var(--neon-yellow)',
     emoji: '📊',
+  },
+  {
+    icon: HiOutlineGlobeAlt,
+    title: 'OSINT & Profiling',
+    desc: 'Gunakan alat bantu intelijen open-source untuk meneliti target Anda secara mendalam sebelum melancarkan simulasi.',
+    color: 'var(--neon-green)',
+    emoji: '🔍',
+  },
+  {
+    icon: HiOutlineShieldCheck,
+    title: 'Threat Intelligence',
+    desc: 'Periksa apakah email karyawan pernah bocor dalam insiden kebocoran data global (data breach) di masa lalu.',
+    color: 'var(--neon-purple)',
+    emoji: '🛡️',
+  },
+  {
+    icon: HiOutlineKey,
+    title: 'API Integration',
+    desc: 'Hubungkan platform ini dengan tool phishing eksternal atau sistem perusahaan Anda melalui REST API yang aman.',
+    color: 'var(--info)',
+    emoji: '🔑',
   },
 ];
 
@@ -200,6 +226,7 @@ const steps = [
 
 export default function LandingHome() {
   const [hoveredFeature, setHoveredFeature] = useState(null);
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', overflow: 'hidden' }}>
@@ -211,14 +238,14 @@ export default function LandingHome() {
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottom: '1px solid rgba(0, 240, 255, 0.1)',
-        background: 'rgba(6, 10, 20, 0.75)',
+        borderBottom: '1px solid var(--border)',
+        background: 'var(--bg-sidebar)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+        boxShadow: 'var(--shadow-sm)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
           <div style={{
@@ -244,10 +271,18 @@ export default function LandingHome() {
           </span>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button
+            onClick={toggleTheme}
+            className="btn btn-ghost"
+            style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          >
+            {theme === 'dark' ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
+          </button>
           <Link to="/login" className="btn btn-ghost" style={{ fontSize: '0.75rem', padding: '8px 12px', fontWeight: 600, letterSpacing: '0.05em' }}>
             LOGIN
           </Link>
-          <Link to="/register" className="btn btn-primary" style={{ fontSize: '0.75rem', padding: '8px 16px', fontWeight: 600, letterSpacing: '0.05em', boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)' }}>
+          <Link to="/register" className="btn btn-primary" style={{ fontSize: '0.75rem', padding: '8px 16px', fontWeight: 600, letterSpacing: '0.05em' }}>
             DAFTAR
           </Link>
         </div>

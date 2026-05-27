@@ -94,7 +94,7 @@ class CampaignCreate(BaseModel):
     email_sender: str | None = None
     ai_instructions: str | None = None
     email_body: str | None = None
-
+    use_qr_code: bool = False
 
 class CampaignUpdate(BaseModel):
     name: str | None = None
@@ -157,6 +157,7 @@ async def create_campaign(
         theme=data.theme,
         target_departments=data.target_departments,
         ai_instructions=data.ai_instructions,
+        use_qr_code=data.use_qr_code,
         created_by=current_user.id,
     )
     db.add(campaign)

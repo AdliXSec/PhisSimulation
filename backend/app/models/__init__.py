@@ -9,6 +9,7 @@ from app.models.employee_risk import EmployeeRiskProfile
 from app.models.osint import OsintProfile
 from app.models.landing_page_template import LandingPageTemplate
 from app.models.api_key import ApiKey
+from app.models.saved_template import SavedTemplate
 
 __all__ = [
     "User",
@@ -21,4 +22,5 @@ __all__ = [
     "EmployeeRiskProfile",
     "LandingPageTemplate",
     "ApiKey",
+    "SavedTemplate",
 ]

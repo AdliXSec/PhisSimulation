@@ -19,6 +19,7 @@ class Campaign(Base):
     target_departments: Mapped[list] = mapped_column(JSONB, default=list)
     ai_instructions: Mapped[str | None] = mapped_column(Text)
     ai_analysis: Mapped[str | None] = mapped_column(Text)
+    use_qr_code: Mapped[bool] = mapped_column(default=False)
     scheduled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

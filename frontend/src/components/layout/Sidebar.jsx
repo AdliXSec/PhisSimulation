@@ -1,23 +1,28 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import {
   HiOutlineHome,
   HiOutlineUserGroup,
   HiOutlineBuildingOffice2,
   HiOutlineEnvelope,
+  HiOutlineEnvelopeOpen,
   HiOutlineChartBarSquare,
   HiOutlineShieldCheck,
   HiOutlineArrowRightOnRectangle,
   HiOutlineXMark,
   HiOutlineKey,
   HiOutlineUser,
-  HiOutlineGlobeAlt
+  HiOutlineGlobeAlt,
+  HiOutlineSun,
+  HiOutlineMoon,
 } from 'react-icons/hi2';
 import './Sidebar.css';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: HiOutlineHome },
   { path: '/dashboard/campaigns', label: 'Kampanye', icon: HiOutlineEnvelope },
+  { path: '/dashboard/templates', label: 'Galeri Template', icon: HiOutlineEnvelopeOpen },
   { path: '/dashboard/osint', label: 'OSINT & SocEng', icon: HiOutlineGlobeAlt },
   { path: '/dashboard/intel', label: 'Threat Intel', icon: HiOutlineShieldCheck },
   { path: '/dashboard/employees', label: 'Karyawan', icon: HiOutlineUserGroup },
@@ -29,6 +34,7 @@ const navItems = [
 
 export default function Sidebar({ isOpen, onClose }) {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
   return (
@@ -75,6 +81,14 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
         <button className="btn-ghost logout-btn" onClick={logout} title="Logout">
           <HiOutlineArrowRightOnRectangle size={20} />
+        </button>
+        <button
+          className="btn-ghost logout-btn"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          style={{ color: 'var(--neon-cyan)' }}
+        >
+          {theme === 'dark' ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
         </button>
       </div>
     </aside>

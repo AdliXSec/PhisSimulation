@@ -24,6 +24,7 @@ const INITIAL_FORM = {
   ai_instructions: '',
   link_mode: 'internal',
   external_url: '',
+  use_qr_code: false,
   landing_page_mode: 'ai',
   landing_page_config: { theme_style: 'ai' },
 };
@@ -35,6 +36,7 @@ export default function Campaigns() {
   const [editId, setEditId] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [templates, setTemplates] = useState([]);
+  const [savedTemplates, setSavedTemplates] = useState([]);
   const [form, setForm] = useState({ ...INITIAL_FORM });
   const [step, setStep] = useState(0);
 
@@ -63,14 +65,16 @@ export default function Campaigns() {
 
   const loadData = async () => {
     try {
-      const [campRes, deptRes, tmplRes] = await Promise.all([
+      const [campRes, deptRes, tmplRes, savedTmplRes] = await Promise.all([
         api.get('/campaigns'),
         api.get('/departments'),
-        api.get('/landing-pages').catch(() => ({ data: [] }))
+        api.get('/landing-pages').catch(() => ({ data: [] })),
+        api.get('/saved-templates').catch(() => ({ data: [] }))
       ]);
       setCampaigns(campRes.data);
       setDepartments(deptRes.data);
       setTemplates(tmplRes.data);
+      setSavedTemplates(savedTmplRes.data);
     } catch (err) {
       toast.error('Gagal memuat data');
     } finally {
@@ -98,6 +102,13 @@ export default function Campaigns() {
           payload.landing_page_mode = 'external';
           payload.landing_page_config = { url: payload.external_url };
         }
+        
+        if (payload.email_mode === 'template') {
+          payload.email_mode = 'custom';
+        }
+        
+        // Ensure use_qr_code is sent
+        payload.use_qr_code = form.use_qr_code;
 
         await api.post('/campaigns', payload);
         toast.success('Kampanye berhasil dibuat!');
@@ -213,8 +224,8 @@ export default function Campaigns() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Kampanye Phishing</h1>
-          <p>Kelola simulasi phishing dan pantau hasilnya</p>
+          <h1>Kampanye Simulasi Phishing</h1>
+          <p>Kelola skenario serangan palsu untuk melatih kewaspadaan karyawan Anda. Buat kampanye baru atau pantau hasil yang sedang berjalan.</p>
         </div>
         <button className="btn btn-primary" onClick={openNewForm}>
           <HiOutlinePlus size={18} /> Buat Kampanye
@@ -239,8 +250,8 @@ export default function Campaigns() {
             {step === 0 && (
               <div className="wizard-content" key="step-0">
                 <div className="wizard-step-header">
-                  <h3>📋 Informasi Dasar</h3>
-                  <p>Tentukan identitas dan target kampanye Anda</p>
+                  <h3>📋 Langkah 1: Informasi Dasar</h3>
+                  <p>Berikan nama untuk simulasi ini dan pilih grup karyawan mana yang ingin Anda uji.</p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
@@ -250,8 +261,9 @@ export default function Campaigns() {
                   </div>
                   <div className="grid-2">
                     <div className="input-group">
-                      <label>Tema</label>
-                      <input className="input" placeholder="Misal: Peringatan Keamanan Google" value={form.theme} onChange={e => setForm({ ...form, theme: e.target.value })} />
+                      <label>Tema Phishing (Khusus AI)</label>
+                      <input className="input" placeholder="Misal: Reset Password IT Support, Promo Akhir Tahun" value={form.theme} onChange={e => setForm({ ...form, theme: e.target.value })} />
+                      <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>AI akan membuat email dan halaman palsu berdasarkan tema ini.</small>
                     </div>
                     <div className="input-group">
                       <label>Tingkat Kesulitan</label>
@@ -293,8 +305,8 @@ export default function Campaigns() {
             {step === 1 && (
               <div className="wizard-content" key="step-1">
                 <div className="wizard-step-header">
-                  <h3>📧 Pengaturan Email & Tautan</h3>
-                  <p>Konfigurasi email phishing dan tujuan tautan</p>
+                  <h3>✉️ Langkah 2: Pengaturan Email & Tautan</h3>
+                  <p>Tentukan bagaimana email palsu akan dikirim dan ke mana tautannya akan mengarah.</p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
@@ -321,6 +333,33 @@ export default function Campaigns() {
                     </div>
                   )}
 
+                  {/* Quishing Option */}
+                  {!editId && (
+                    <div className="input-group" style={{ 
+                      flexDirection: 'row', 
+                      alignItems: 'center', 
+                      gap: '12px', 
+                      background: 'rgba(255, 0, 170, 0.05)', 
+                      padding: '12px 16px', 
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid rgba(255, 0, 170, 0.2)' 
+                    }}>
+                      <input 
+                        type="checkbox" 
+                        id="use_qr_code"
+                        checked={form.use_qr_code} 
+                        onChange={e => setForm({...form, use_qr_code: e.target.checked})} 
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      />
+                      <label htmlFor="use_qr_code" style={{ cursor: 'pointer', margin: 0, display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ color: 'var(--neon-magenta)', fontWeight: 600, fontSize: '1rem' }}>🔲 Gunakan QR Code (Quishing)</span>
+                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 400, marginTop: '2px' }}>
+                          Sistem akan men-generate gambar QR Code secara dinamis ke dalam email untuk menguji apakah karyawan memindai kode tanpa curiga.
+                        </span>
+                      </label>
+                    </div>
+                  )}
+
                   {/* Email Mode */}
                   {!editId && (
                     <div className="input-group" style={{ paddingTop: 'var(--space-md)', borderTop: '1px solid var(--divider)' }}>
@@ -332,6 +371,51 @@ export default function Campaigns() {
                         <button type="button" className={`lpb-tab ${form.email_mode === 'custom' ? 'active' : ''}`} onClick={() => setForm({...form, email_mode: 'custom'})}>
                           ✏️ Custom Email
                         </button>
+                        <button type="button" className={`lpb-tab ${form.email_mode === 'template' ? 'active' : ''}`} onClick={() => setForm({...form, email_mode: 'template'})}>
+                          📚 Dari Galeri
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Note for templates */}
+                  {!editId && form.email_mode === 'template' && (
+                    <div className="input-group" style={{ background: 'rgba(255, 255, 255, 0.03)', padding: 'var(--space-lg)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                      <label>Pilih Template dari Galeri</label>
+                      <select 
+                        className="input" 
+                        onChange={e => {
+                          const t = savedTemplates.find(x => x.id === e.target.value);
+                          if (t) {
+                            setForm({
+                              ...form,
+                              email_sender: t.email_sender_name || '',
+                              email_subject: t.email_subject || '',
+                              email_body: t.email_body_html || '',
+                            });
+                          }
+                        }}
+                        style={{ marginBottom: 'var(--space-md)' }}
+                      >
+                        <option value="">-- Pilih Template --</option>
+                        {savedTemplates.map(t => (
+                          <option key={t.id} value={t.id}>{t.name} ({t.email_subject})</option>
+                        ))}
+                      </select>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                        <div className="input-group">
+                          <label>Sender Name</label>
+                          <input className="input" value={form.email_sender} onChange={e => setForm({...form, email_sender: e.target.value})} required />
+                        </div>
+                        <div className="input-group">
+                          <label>Email Subject</label>
+                          <input className="input" value={form.email_subject} onChange={e => setForm({...form, email_subject: e.target.value})} required />
+                        </div>
+                        <div className="input-group">
+                          <label>Email Body (HTML)</label>
+                          <textarea className="input" rows="6" value={form.email_body} onChange={e => setForm({...form, email_body: e.target.value})} required />
+                        </div>
                       </div>
                     </div>
                   )}
@@ -416,8 +500,8 @@ export default function Campaigns() {
             {step === 2 && !editId && (
               <div className="wizard-content" key="step-2">
                 <div className="wizard-step-header">
-                  <h3>🎨 Desain Landing Page</h3>
-                  <p>Tentukan tampilan halaman phishing yang akan dilihat target</p>
+                  <h3>🌐 Langkah 3: Desain Halaman Palsu (Landing Page)</h3>
+                  <p>Ini adalah halaman yang akan dilihat karyawan jika mereka mengklik tautan di email.</p>
                 </div>
 
                 <div className="input-group">

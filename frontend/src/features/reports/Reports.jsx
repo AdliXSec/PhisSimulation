@@ -62,13 +62,13 @@ export default function Reports() {
       <div className="fade-in">
         <div className="page-header">
           <div>
-            <h1>Laporan</h1>
-            <p>Pilih kampanye dari halaman Kampanye untuk melihat laporan detail</p>
+            <h1>Hasil Laporan</h1>
+            <p>Pilih kampanye yang ingin Anda lihat laporannya melalui menu Kampanye.</p>
           </div>
         </div>
         <div className="empty-state">
-          <h3>Pilih kampanye untuk melihat laporan</h3>
-          <p>Buka halaman Kampanye dan klik "Detail" pada salah satu kampanye</p>
+          <h3>Belum ada kampanye yang dipilih</h3>
+          <p>Silakan buka halaman <strong>Kampanye</strong> lalu klik tombol <strong>Detail</strong> pada kampanye yang ingin Anda lihat hasilnya.</p>
         </div>
       </div>
     );
@@ -87,15 +87,35 @@ export default function Reports() {
       <div className="page-header">
         <div>
           <h1>Laporan: {report?.campaign?.name}</h1>
-          <p>
+          <p style={{ marginTop: '8px' }}>
+            Lihat performa kampanye dan analisis tingkat kerentanan target.
+            <br />
             Status: <span className="badge badge-info">{report?.campaign?.status}</span>
-            {' '} | Kesulitan: {report?.campaign?.difficulty} | Tema: {report?.campaign?.theme}
+            {' '} | Tema: {report?.campaign?.theme}
           </p>
         </div>
-        <button className="btn btn-primary" onClick={generateAnalysis} disabled={analyzing}>
-          <HiOutlineSparkles size={18} />
-          {analyzing ? 'Menganalisis...' : 'Generate Analisis AI'}
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button 
+            className="btn btn-secondary" 
+            onClick={async () => {
+              if(!report?.templates?.[0]) return toast.error('Template tidak ditemukan');
+              const name = prompt('Masukkan nama untuk menyimpan template ini:');
+              if(!name) return;
+              try {
+                await api.post(`/saved-templates/from-campaign/${report.templates[0].id}?name=${encodeURIComponent(name)}`);
+                toast.success('Template berhasil disimpan ke Galeri');
+              } catch(e) {
+                toast.error('Gagal menyimpan template');
+              }
+            }}
+          >
+            💾 Simpan Template
+          </button>
+          <button className="btn btn-primary" onClick={generateAnalysis} disabled={analyzing}>
+            <HiOutlineSparkles size={18} />
+            {analyzing ? 'Menganalisis...' : 'Generate Analisis AI'}
+          </button>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -196,6 +216,16 @@ export default function Reports() {
                                 <span style={{ fontFamily: 'monospace', color: 'var(--danger)', wordBreak: 'break-all' }}>{String(val)}</span>
                               </div>
                             ))}
+                            {sub.fingerprint && Object.keys(sub.fingerprint).length > 0 && (
+                              <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed rgba(255, 255, 255, 0.1)' }}>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--neon-green)', marginBottom: '4px' }}>🛡️ Device Fingerprint:</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                  OS: {sub.fingerprint.os}<br/>
+                                  Browser: {sub.fingerprint.userAgent?.split(' ')[0]}...<br/>
+                                  Resolusi: {sub.fingerprint.screenResolution}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

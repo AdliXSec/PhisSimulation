@@ -33,14 +33,32 @@ except Exception as e:
     fast_mail = None
 
 
-def _inject_tracking(body_html: str, token: str) -> str:
-    """Inject tracking pixel and replace tracking link placeholder."""
+import qrcode
+import io
+import base64
+
+def _inject_tracking(body_html: str, token: str, use_qr_code: bool = False) -> str:
+    """Inject tracking pixel, link, and optionally a QR code."""
     backend_url = settings.BACKEND_URL
     api_prefix = settings.API_V1_PREFIX
 
-    # Replace tracking link placeholder
+    # Tracking link
     tracking_link = f"{backend_url}{api_prefix}/track/click/{token}"
     body_html = body_html.replace("{{tracking_link}}", tracking_link)
+
+    # Optional QR Code Generation (Quishing)
+    if use_qr_code:
+        qr_url = f"{backend_url}{api_prefix}/track/qr/{token}"
+        qr_img_tag = f'<div style="text-align: center; margin: 20px 0;"><img src="{qr_url}" alt="Scan QR Code" style="max-width: 200px; border-radius: 8px; border: 1px solid #ccc; padding: 10px; background: #fff;" /><p style="font-size: 12px; color: #666; margin-top: 8px;">Scan QR Code ini dengan HP Anda</p></div>'
+        
+        # Inject QR code before the button or at the end of content
+        if "<!-- QR_CODE_PLACEHOLDER -->" in body_html:
+            body_html = body_html.replace("<!-- QR_CODE_PLACEHOLDER -->", qr_img_tag)
+        elif "</a>" in body_html:
+             # Try to place it near the first link/button
+             body_html = body_html.replace("</a>", f"</a><br/>{qr_img_tag}", 1)
+        else:
+             body_html += qr_img_tag
 
     # Inject tracking pixel before </body> or at the end
     pixel_tag = f'<img src="{backend_url}{api_prefix}/track/pixel/{token}" width="1" height="1" style="display:none" />'
@@ -106,7 +124,11 @@ async def send_campaign_emails(campaign_id: str):
                 while retry_count < max_retries and not success:
                     try:
                         # Inject tracking into email body
-                        personalized_html = _inject_tracking(template.body_html, target.token)
+                        personalized_html = _inject_tracking(
+                            template.body_html, 
+                            target.token,
+                            use_qr_code=getattr(campaign, 'use_qr_code', False)
+                        )
 
                         if fast_mail:
                             message = MessageSchema(

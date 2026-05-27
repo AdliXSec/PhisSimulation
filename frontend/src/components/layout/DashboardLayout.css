@@ -30,7 +30,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-sm) var(--space-lg);
-  background: rgba(6, 10, 20, 0.92);
+  background: var(--bg-sidebar);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);

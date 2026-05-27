@@ -86,8 +86,8 @@ export default function Departments() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Departemen</h1>
-          <p>Kelola departemen perusahaan</p>
+          <h1>Daftar Departemen</h1>
+          <p>Kelompokkan karyawan berdasarkan departemen untuk mempermudah pengiriman simulasi dan analisis laporan.</p>
         </div>
         <button className="btn btn-primary" onClick={openNewForm}>
           <HiOutlinePlus size={18} /> Tambah Departemen
@@ -107,8 +107,8 @@ export default function Departments() {
             {step === 0 && (
               <div className="wizard-content" key="step-0">
                 <div className="wizard-step-header">
-                  <h3>🏢 Nama Departemen</h3>
-                  <p>Tentukan nama departemen yang akan dibuat</p>
+                  <h3>🏢 Langkah 1: Nama Departemen</h3>
+                  <p>Masukkan nama departemen (contoh: Keuangan, HRD, IT).</p>
                 </div>
 
                 <div className="input-group">
@@ -133,8 +133,8 @@ export default function Departments() {
             {step === 1 && (
               <div className="wizard-content" key="step-1">
                 <div className="wizard-step-header">
-                  <h3>📝 Detail & Deskripsi</h3>
-                  <p>Tambahkan deskripsi untuk departemen <strong>{form.name}</strong></p>
+                  <h3>📝 Langkah 2: Deskripsi (Opsional)</h3>
+                  <p>Tambahkan deskripsi singkat tentang departemen ini jika diperlukan.</p>
                 </div>
 
                 <div className="input-group">

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Login from './features/auth/Login';
 import Register from './features/auth/Register';
@@ -16,6 +17,7 @@ import Osint from './features/osint/Osint';
 import LandingPage from './features/tracking/LandingPage';
 import EducationPage from './features/tracking/EducationPage';
 import LandingHome from './features/public/LandingHome';
+import TemplateLibrary from './features/templates/TemplateLibrary';
 import './index.css';
 
 function ProtectedRoute({ children }) {
@@ -52,6 +54,7 @@ function AppRoutes() {
         <Route path="campaigns" element={<Campaigns />} />
         <Route path="employees" element={<Employees />} />
         <Route path="departments" element={<Departments />} />
+        <Route path="templates" element={<TemplateLibrary />} />
         <Route path="reports" element={<Reports />} />
         <Route path="reports/:campaignId" element={<Reports />} />
         <Route path="api-keys" element={<ApiKeys />} />
@@ -69,23 +72,25 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ThemeProvider>
       <AuthProvider>
         <AppRoutes />
         <Toaster
           position="top-right"
           toastOptions={{
             style: {
-              background: 'rgba(6, 10, 20, 0.95)',
-              color: '#e0e6f0',
-              border: '1px solid rgba(0, 240, 255, 0.12)',
+              background: 'var(--bg-card)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
               borderRadius: '8px',
               fontFamily: "'Inter', sans-serif",
               fontSize: '0.875rem',
-              boxShadow: '0 0 20px rgba(0, 0, 0, 0.4)',
+              boxShadow: 'var(--shadow-md)',
             },
           }}
         />
       </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

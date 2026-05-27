@@ -11,6 +11,7 @@ from app.models.campaign_log import CampaignLog
 from app.models.employee import Employee
 from app.models.employee_risk import EmployeeRiskProfile
 from app.models.department import Department
+from app.models.campaign_template import CampaignTemplate
 from app.services.ai_service import generate_campaign_analysis
 
 
@@ -104,11 +105,15 @@ async def get_campaign_report(
         select(CampaignLog)
         .where(
             CampaignLog.target_id.in_(target_ids),
-            CampaignLog.event_type.in_(["DATA_SUBMITTED", "EXTERNAL_SUBMITTED"]),
+            CampaignLog.event_type.in_(["DATA_SUBMITTED", "EXTERNAL_SUBMITTED", "DEVICE_FINGERPRINTED"]),
         )
         .order_by(CampaignLog.created_at.desc())
     )
     logs = logs_result.scalars().all()
+
+    # Get templates for the campaign so they can be saved
+    tmpl_result = await db.execute(select(CampaignTemplate).where(CampaignTemplate.campaign_id == campaign.id))
+    templates = tmpl_result.scalars().all()
 
     # Map target_id -> list of internal submissions
     submissions_by_target = {}
@@ -124,6 +129,7 @@ async def get_campaign_report(
         sub_info = {
             "event_type": log.event_type,
             "submitted_data": log.metadata_.get("submitted_data", {}),
+            "fingerprint": log.metadata_.get("fingerprint", {}),
             "source": source,
             "api_key_name": log.metadata_.get("api_key_name"),
             "ip": log.metadata_.get("ip", "unknown"),
@@ -137,6 +143,10 @@ async def get_campaign_report(
             sub_info["matched_employee"] = emp_name
             sub_info["matched_email"] = log.metadata_.get("matched_email", emp_email)
             external_submissions.append(sub_info)
+        elif log.event_type == "DEVICE_FINGERPRINTED":
+            if tid not in submissions_by_target:
+                submissions_by_target[tid] = []
+            submissions_by_target[tid].append(sub_info)
         else:
             if tid not in submissions_by_target:
                 submissions_by_target[tid] = []
@@ -183,6 +193,15 @@ async def get_campaign_report(
         ],
         "external_submissions": external_submissions,
         "ai_analysis": campaign.ai_analysis,
+        "templates": [
+            {
+                "id": str(t.id),
+                "subject": t.subject,
+                "body_html": t.body_html,
+                "sender_name": t.sender_name,
+            }
+            for t in templates
+        ] if 'templates' in locals() else []
     }
 
 

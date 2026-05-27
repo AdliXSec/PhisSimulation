@@ -14,8 +14,7 @@ from app.core.limiter import limiter
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-# Import routers
-from app.api.v1 import auth, departments, employees, campaigns, tracking, reports, landing_pages, api_keys, receive, intel, osint
+from app.api.v1 import auth, departments, employees, campaigns, tracking, reports, landing_pages, api_keys, receive, intel, osint, saved_templates
 
 
 @asynccontextmanager
@@ -59,8 +58,8 @@ app.include_router(reports.router, prefix=f"{settings.API_V1_PREFIX}/reports", t
 app.include_router(landing_pages.router, prefix=f"{settings.API_V1_PREFIX}/landing-pages", tags=["Landing Pages"])
 app.include_router(api_keys.router, prefix=f"{settings.API_V1_PREFIX}/api-keys", tags=["API Keys"])
 app.include_router(receive.router, prefix=f"{settings.API_V1_PREFIX}/receive", tags=["External Receive"])
-app.include_router(intel.router, prefix=f"{settings.API_V1_PREFIX}/intel", tags=["Threat Intel"])
 app.include_router(osint.router, prefix=f"{settings.API_V1_PREFIX}/osint", tags=["OSINT"])
+app.include_router(saved_templates.router, prefix=f"{settings.API_V1_PREFIX}/saved-templates", tags=["Saved Templates"])
 
 
 @app.get("/", tags=["Health"])

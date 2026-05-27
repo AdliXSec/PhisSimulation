@@ -1,0 +1,1 @@
+saya merasa design masih terlalu susah dioahami dan sedikit boring, tolong bantu saya sedikit redesign pada halaman dashboard agar sangat mudah di fahami oleh kalangan non teknis, ubah juga halaman landing page agar menampilkan fitur fitur unggulan dan mengapa harus menggunakan software ini, terakhir bantu saya menambahkan fitur light mode dan dark mode pada aplikasi.

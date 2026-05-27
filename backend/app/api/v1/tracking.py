@@ -48,6 +48,58 @@ def _extract_metadata(request: Request) -> dict:
     }
 
 
+import qrcode
+import io
+
+@router.get("/qr/{token}")
+async def track_qr(
+    token: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    """Serve a dynamically generated QR code for Quishing campaigns."""
+    # We log the opening of the QR code (this happens when the email client loads images)
+    # The actual "click/scan" will be tracked by the URL embedded in the QR code.
+    
+    result = await db.execute(
+        select(CampaignTarget).where(CampaignTarget.token == token)
+    )
+    target = result.scalar_one_or_none()
+
+    if target:
+        meta = _extract_metadata(request)
+        meta["source"] = "email_qr_load"
+        
+        log = CampaignLog(
+            target_id=target.id,
+            event_type="EMAIL_OPENED",
+            metadata_=meta,
+        )
+        db.add(log)
+        
+        if target.status == "SENT":
+            target.status = "OPENED"
+        
+        await db.commit()
+
+    # Generate QR Code image dynamically
+    tracking_link = f"{settings.BACKEND_URL}{settings.API_V1_PREFIX}/track/click/{token}"
+    
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(tracking_link)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    buffered = io.BytesIO()
+    img.save(buffered, format="PNG")
+    
+    return Response(content=buffered.getvalue(), media_type="image/png")
+
 @router.get("/pixel/{token}")
 async def track_pixel(
     token: str,
@@ -195,3 +247,42 @@ async def track_submit(
     # Redirect to education page
     education_url = f"{settings.FRONTEND_URL}/education/{token}"
     return RedirectResponse(url=education_url, status_code=303)
+
+
+@router.post("/fingerprint/{token}")
+async def track_fingerprint(
+    token: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    """Device fingerprint tracker — logs DEVICE_FINGERPRINTED with extracted device details."""
+    result = await db.execute(
+        select(CampaignTarget).where(CampaignTarget.token == token)
+    )
+    target = result.scalar_one_or_none()
+
+    if target:
+        try:
+            fingerprint_data = await request.json()
+        except Exception:
+            fingerprint_data = {}
+            
+        meta = _extract_metadata(request)
+        meta["fingerprint"] = fingerprint_data
+        
+        # Check if already fingerprinted to avoid duplicates
+        existing_log_result = await db.execute(
+            select(CampaignLog).where(
+                CampaignLog.target_id == target.id,
+                CampaignLog.event_type == "DEVICE_FINGERPRINTED"
+            )
+        )
+        if not existing_log_result.first():
+            log = CampaignLog(
+                target_id=target.id,
+                event_type="DEVICE_FINGERPRINTED",
+                metadata_=meta,
+            )
+            db.add(log)
+            
+    return {"status": "ok"}
