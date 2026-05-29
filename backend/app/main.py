@@ -59,6 +59,7 @@ app.include_router(landing_pages.router, prefix=f"{settings.API_V1_PREFIX}/landi
 app.include_router(api_keys.router, prefix=f"{settings.API_V1_PREFIX}/api-keys", tags=["API Keys"])
 app.include_router(receive.router, prefix=f"{settings.API_V1_PREFIX}/receive", tags=["External Receive"])
 app.include_router(osint.router, prefix=f"{settings.API_V1_PREFIX}/osint", tags=["OSINT"])
+app.include_router(intel.router, prefix=f"{settings.API_V1_PREFIX}/intel", tags=["Threat Intel"])
 app.include_router(saved_templates.router, prefix=f"{settings.API_V1_PREFIX}/saved-templates", tags=["Saved Templates"])
 
 
