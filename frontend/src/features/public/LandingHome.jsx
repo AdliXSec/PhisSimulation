@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import Rocket3D from '../../components/3d/Rocket3D';
 import {
   HiOutlineShieldCheck,
   HiOutlineSparkles,
@@ -172,67 +175,36 @@ function StatCounter({ value, label, suffix = '', icon: Icon }) {
   );
 }
 
-const features = [
-  {
-    icon: HiOutlineSparkles,
-    title: 'AI Email Generator',
-    desc: 'Cukup tentukan tema — AI akan membuatkan email phishing realistis lengkap dengan landing page tiruannya. Zero effort.',
-    color: 'var(--neon-cyan)',
-    emoji: '🤖',
-  },
-  {
-    icon: HiOutlineCpuChip,
-    title: 'Custom HTML Engine',
-    desc: 'Punya desain sendiri? Upload file HTML tiruan Anda dan sistem akan memproses formulir login secara otomatis.',
-    color: 'var(--neon-magenta)',
-    emoji: '🎨',
-  },
-  {
-    icon: HiOutlineChartBar,
-    title: 'Real-Time Analytics',
-    desc: 'Pantau siapa yang membuka email, mengklik tautan, atau memasukkan data sensitif langsung dari dashboard interaktif.',
-    color: 'var(--neon-yellow)',
-    emoji: '📊',
-  },
-  {
-    icon: HiOutlineGlobeAlt,
-    title: 'OSINT & Profiling',
-    desc: 'Gunakan alat bantu intelijen open-source untuk meneliti target Anda secara mendalam sebelum melancarkan simulasi.',
-    color: 'var(--neon-green)',
-    emoji: '🔍',
-  },
-  {
-    icon: HiOutlineShieldCheck,
-    title: 'Threat Intelligence',
-    desc: 'Periksa apakah email karyawan pernah bocor dalam insiden kebocoran data global (data breach) di masa lalu.',
-    color: 'var(--neon-purple)',
-    emoji: '🛡️',
-  },
-  {
-    icon: HiOutlineKey,
-    title: 'API Integration',
-    desc: 'Hubungkan platform ini dengan tool phishing eksternal atau sistem perusahaan Anda melalui REST API yang aman.',
-    color: 'var(--info)',
-    emoji: '🔑',
-  },
+const featuresVisuals = [
+  { icon: HiOutlineSparkles, color: 'var(--neon-cyan)', emoji: '🤖' },
+  { icon: HiOutlineCpuChip, color: 'var(--neon-magenta)', emoji: '🎨' },
+  { icon: HiOutlineChartBar, color: 'var(--neon-yellow)', emoji: '📊' },
+  { icon: HiOutlineGlobeAlt, color: 'var(--neon-green)', emoji: '🔍' },
+  { icon: HiOutlineShieldCheck, color: 'var(--neon-purple)', emoji: '🛡️' },
+  { icon: HiOutlineKey, color: 'var(--info)', emoji: '🔑' },
 ];
 
-const steps = [
-  { icon: HiOutlineCommandLine, title: 'Buat Kampanye', desc: 'Tentukan nama, tema, dan level kesulitan. Pilih departemen target.', color: 'var(--neon-cyan)' },
-  { icon: HiOutlineSparkles, title: 'Generate atau Upload', desc: 'Biarkan AI membuat template, atau upload HTML kustom Anda sendiri.', color: 'var(--neon-magenta)' },
-  { icon: HiOutlineRocketLaunch, title: 'Luncurkan!', desc: 'Satu klik — email phishing terkirim ke seluruh target secara otomatis.', color: 'var(--neon-yellow)' },
-  { icon: HiOutlineEye, title: 'Pantau & Analisis', desc: 'Lihat dashboard real-time: siapa yang terjebak, siapa yang waspada.', color: 'var(--neon-green)' },
+const stepsVisuals = [
+  { icon: HiOutlineCommandLine, color: 'var(--neon-cyan)' },
+  { icon: HiOutlineSparkles, color: 'var(--neon-magenta)' },
+  { icon: HiOutlineRocketLaunch, color: 'var(--neon-yellow)' },
+  { icon: HiOutlineEye, color: 'var(--neon-green)' },
 ];
 
 export default function LandingHome() {
+  const { t, i18n } = useTranslation();
   const [hoveredFeature, setHoveredFeature] = useState(null);
   const { theme, toggleTheme } = useTheme();
 
-  return (
-    <div className="fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', overflow: 'hidden' }}>
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'id' : 'en';
+    i18n.changeLanguage(newLang);
+  };
 
+  return (
+    <>
       {/* ── Navbar ── */}
-      <nav style={{
+      <nav className="fade-in" style={{
         padding: '14px clamp(16px, 4vw, 32px)',
         display: 'flex',
         flexWrap: 'wrap',
@@ -242,9 +214,10 @@ export default function LandingHome() {
         background: 'var(--bg-sidebar)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        position: 'sticky',
+        position: 'fixed',
+        width: '100%',
         top: 0,
-        zIndex: 100,
+        zIndex: 9999,
         boxShadow: 'var(--shadow-sm)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
@@ -272,6 +245,14 @@ export default function LandingHome() {
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button
+            onClick={toggleLanguage}
+            className="btn btn-ghost"
+            style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: 700 }}
+            title="Ubah Bahasa / Change Language"
+          >
+            {i18n.language === 'en' ? 'ID' : 'EN'}
+          </button>
+          <button
             onClick={toggleTheme}
             className="btn btn-ghost"
             style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -280,13 +261,15 @@ export default function LandingHome() {
             {theme === 'dark' ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
           </button>
           <Link to="/login" className="btn btn-ghost" style={{ fontSize: '0.75rem', padding: '8px 12px', fontWeight: 600, letterSpacing: '0.05em' }}>
-            LOGIN
+            {t('landing.nav.login')}
           </Link>
           <Link to="/register" className="btn btn-primary" style={{ fontSize: '0.75rem', padding: '8px 16px', fontWeight: 600, letterSpacing: '0.05em' }}>
-            DAFTAR
+            {t('landing.nav.register')}
           </Link>
         </div>
       </nav>
+
+      <div className="fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', overflow: 'hidden' }}>
 
       {/* ── Hero ── */}
       <header style={{
@@ -294,12 +277,30 @@ export default function LandingHome() {
         padding: 'clamp(4rem, 10vw, 7rem) 1.5rem clamp(3rem, 8vw, 5rem)',
         textAlign: 'center',
         overflow: 'hidden',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
       }}>
         <Particles count={35} />
 
         {/* Gradient orbs */}
         <div style={{ position: 'absolute', top: '5%', left: '10%', width: '500px', height: '500px', background: 'var(--neon-cyan)', filter: 'blur(220px)', opacity: 0.07, borderRadius: '50%' }} />
         <div style={{ position: 'absolute', bottom: '5%', right: '10%', width: '600px', height: '600px', background: 'var(--neon-magenta)', filter: 'blur(220px)', opacity: 0.05, borderRadius: '50%' }} />
+
+        {/* 3D Rocket Component */}
+        <div id="rocket-canvas-container" style={{ 
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          width: '100%', 
+          height: '100%', 
+          zIndex: 0,
+          pointerEvents: 'none',
+          opacity: 0.9
+        }}>
+          <Rocket3D />
+        </div>
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '900px', margin: '0 auto' }}>
           {/* Fun badge */}
@@ -318,7 +319,7 @@ export default function LandingHome() {
             letterSpacing: '0.05em',
           }}>
             <span style={{ animation: 'glowPulse 2s ease infinite' }}>⚡</span>
-            PLATFORM SIMULASI PHISHING BERTENAGA AI
+            {t('landing.hero.badge')}
           </div>
 
           <h1 style={{
@@ -329,9 +330,9 @@ export default function LandingHome() {
             lineHeight: 1.1,
             letterSpacing: '0.02em',
           }}>
-            <span style={{ color: 'var(--text-heading)' }}>Uji Ketahanan Tim</span>
+            <span style={{ color: 'var(--text-heading)' }}>{t('landing.hero.title1')}</span>
             <br />
-            <span style={{ color: 'var(--text-heading)' }}>Anda Terhadap </span>
+            <span style={{ color: 'var(--text-heading)' }}>{t('landing.hero.title2')}</span>
             <span style={{
               background: 'linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-cyan))',
               backgroundSize: '200% 100%',
@@ -339,8 +340,10 @@ export default function LandingHome() {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
+              display: 'inline-block',
+              whiteSpace: 'nowrap'
             }}>
-              <TypeWriter words={['Phishing', 'Social Engineering', 'Cyber Attack']} speed={90} pause={2500} />
+              <TypeWriter words={t('landing.hero.words', { returnObjects: true })} speed={90} pause={2500} />
             </span>
           </h1>
 
@@ -352,15 +355,15 @@ export default function LandingHome() {
             marginInline: 'auto',
             lineHeight: 1.7,
           }}>
-            Buat simulasi phishing dengan AI, kirim ke seluruh departemen, dan lihat siapa yang klik — semua dalam satu dashboard yang intuitif. <span style={{ color: 'var(--neon-cyan)' }}>Gratis untuk dicoba.</span>
+            {t('landing.hero.desc')}
           </p>
 
           <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/register" className="btn btn-primary btn-lg" style={{ gap: '8px' }}>
-              Mulai Sekarang <HiOutlineArrowRight size={18} />
+              {t('landing.hero.btn_start')} <HiOutlineArrowRight size={18} />
             </Link>
             <a href="#how-it-works" className="btn btn-secondary btn-lg">
-              Lihat Cara Kerja ↓
+              {t('landing.hero.btn_how_it_works')}
             </a>
           </div>
         </div>
@@ -374,11 +377,17 @@ export default function LandingHome() {
       </header>
 
       {/* ── Stats Bar ── */}
-      <section style={{
-        padding: '40px 24px',
-        borderTop: '1px solid var(--border)',
-        borderBottom: '1px solid var(--border)',
-      }}>
+      <motion.section 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6 }}
+        style={{
+          padding: '40px 24px',
+          borderTop: '1px solid var(--border)',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
         <div style={{
           maxWidth: '900px',
           margin: '0 auto',
@@ -386,15 +395,21 @@ export default function LandingHome() {
           gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
           gap: '16px',
         }}>
-          <StatCounter value={99} suffix="%" label="Delivery Rate" icon={HiOutlineRocketLaunch} />
-          <StatCounter value={50} suffix="+" label="Template Siap" icon={HiOutlineSparkles} />
-          <StatCounter value={3} suffix=" detik" label="Setup Kampanye" icon={HiOutlineBoltSlash} />
-          <StatCounter value={24} suffix="/7" label="Monitoring" icon={HiOutlineEye} />
+          <StatCounter value={99} suffix="%" label={t('landing.stats.delivery')} icon={HiOutlineRocketLaunch} />
+          <StatCounter value={50} suffix="+" label={t('landing.stats.templates')} icon={HiOutlineSparkles} />
+          <StatCounter value={3} suffix={t('landing.stats.seconds')} label={t('landing.stats.setup')} icon={HiOutlineBoltSlash} />
+          <StatCounter value={24} suffix="/7" label={t('landing.stats.monitor')} icon={HiOutlineEye} />
         </div>
-      </section>
+      </motion.section>
 
       {/* ── Features ── */}
-      <section style={{ padding: 'clamp(3rem, 6vw, 5rem) 1.5rem', background: 'var(--bg-secondary)', position: 'relative' }}>
+      <motion.section 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{ duration: 0.6 }}
+        style={{ padding: 'clamp(3rem, 6vw, 5rem) 1.5rem', background: 'var(--bg-secondary)', position: 'relative' }}
+      >
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <h2 style={{
@@ -403,51 +418,65 @@ export default function LandingHome() {
               marginBottom: '14px',
               letterSpacing: '0.03em',
             }}>
-              Kenapa Harus <span className="text-gradient">PhiSim</span>? 🤔
+              {t('landing.features.title')}
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-base)', maxWidth: '520px', margin: '0 auto' }}>
-              Tiga fitur utama yang membuat simulasi phishing semudah memesan kopi.
+              {t('landing.features.desc')}
             </p>
           </div>
 
           <div className="grid-3">
-            {features.map((f, i) => (
-              <div
-                key={i}
-                className="card-glow"
-                onMouseEnter={() => setHoveredFeature(i)}
-                onMouseLeave={() => setHoveredFeature(null)}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '14px',
-                  cursor: 'default',
-                  transform: hoveredFeature === i ? 'translateY(-6px) scale(1.02)' : 'translateY(0)',
-                  borderColor: hoveredFeature === i ? `${f.color}33` : undefined,
-                  boxShadow: hoveredFeature === i ? `0 0 30px ${f.color}15` : undefined,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-              >
-                <div style={{ fontSize: '2rem', lineHeight: 1 }}>{f.emoji}</div>
-                <h3 style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'var(--font-size-lg)',
-                  letterSpacing: '0.02em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}>
-                  {f.title}
-                </h3>
-                <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, fontSize: 'var(--font-size-sm)' }}>{f.desc}</p>
-              </div>
-            ))}
+            {t('landing.features.items', { returnObjects: true }).map((f, i) => {
+              const Icon = featuresVisuals[i].icon;
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  key={i}
+                  className="card-glow"
+                  onMouseEnter={() => setHoveredFeature(i)}
+                  onMouseLeave={() => setHoveredFeature(null)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '14px',
+                    cursor: 'default',
+                    transform: hoveredFeature === i ? 'translateY(-6px) scale(1.02)' : 'translateY(0)',
+                    borderColor: hoveredFeature === i ? `${featuresVisuals[i].color}33` : undefined,
+                    boxShadow: hoveredFeature === i ? `0 0 30px ${featuresVisuals[i].color}15` : undefined,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}
+                >
+                  <div style={{ fontSize: '2rem', lineHeight: 1 }}>{featuresVisuals[i].emoji}</div>
+                  <h3 style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--font-size-lg)',
+                    letterSpacing: '0.02em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}>
+                    {f.title}
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, fontSize: 'var(--font-size-sm)' }}>{f.desc}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── How It Works ── */}
-      <section id="how-it-works" style={{ padding: 'clamp(3rem, 6vw, 5rem) 1.5rem', position: 'relative' }}>
+      <motion.section 
+        id="how-it-works"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{ duration: 0.6 }}
+        style={{ padding: 'clamp(3rem, 6vw, 5rem) 1.5rem', position: 'relative' }}
+      >
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <h2 style={{
@@ -455,10 +484,10 @@ export default function LandingHome() {
               fontSize: 'clamp(1.6rem, 4vw, 2.8rem)',
               marginBottom: '14px',
             }}>
-              Cuma <span className="text-gradient">4 Langkah</span> 🎯
+              {t('landing.steps.title')}
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-base)' }}>
-              Dari nol sampai kampanye berjalan — kurang dari 5 menit.
+              {t('landing.steps.desc')}
             </p>
           </div>
 
@@ -475,60 +504,69 @@ export default function LandingHome() {
               borderRadius: '2px',
             }} />
 
-            {steps.map((s, i) => (
-              <div key={i} style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '20px',
-                padding: '20px 24px 20px 0',
-                position: 'relative',
-              }}>
-                {/* Step circle */}
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: `${s.color}10`,
-                  border: `1.5px solid ${s.color}30`,
+            {t('landing.steps.items', { returnObjects: true }).map((s, i) => {
+              const Icon = stepsVisuals[i].icon;
+              return (
+                <div key={i} style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: s.color,
-                  flexShrink: 0,
-                  zIndex: 1,
-                  boxShadow: `0 0 12px ${s.color}15`,
+                  alignItems: 'flex-start',
+                  gap: '20px',
+                  padding: '20px 24px 20px 0',
+                  position: 'relative',
                 }}>
-                  <s.icon size={22} />
-                </div>
-                <div style={{ flex: 1 }}>
+                  {/* Step circle */}
                   <div style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.6rem',
-                    color: s.color,
-                    letterSpacing: '0.15em',
-                    marginBottom: '4px',
-                    textShadow: `0 0 6px ${s.color}44`,
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    background: `${stepsVisuals[i].color}10`,
+                    border: `1.5px solid ${stepsVisuals[i].color}30`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: stepsVisuals[i].color,
+                    flexShrink: 0,
+                    zIndex: 1,
+                    boxShadow: `0 0 12px ${stepsVisuals[i].color}15`,
                   }}>
-                    STEP 0{i + 1}
+                    <Icon size={22} />
                   </div>
-                  <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--font-size-md)', marginBottom: '4px' }}>{s.title}</h4>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', lineHeight: 1.6 }}>{s.desc}</p>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.6rem',
+                      color: stepsVisuals[i].color,
+                      letterSpacing: '0.15em',
+                      marginBottom: '4px',
+                      textShadow: `0 0 6px ${stepsVisuals[i].color}44`,
+                    }}>
+                      {t('landing.steps.step')} 0{i + 1}
+                    </div>
+                    <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--font-size-md)', marginBottom: '4px' }}>{s.title}</h4>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', lineHeight: 1.6 }}>{s.desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── CTA ── */}
-      <section style={{
-        padding: 'clamp(3rem, 6vw, 5rem) 1.5rem',
-        textAlign: 'center',
-        background: 'var(--bg-secondary)',
-        borderTop: '1px solid var(--border)',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
+      <motion.section 
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6 }}
+        style={{
+          padding: 'clamp(3rem, 6vw, 5rem) 1.5rem',
+          textAlign: 'center',
+          background: 'var(--bg-secondary)',
+          borderTop: '1px solid var(--border)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '600px', height: '600px', background: 'var(--neon-cyan)', filter: 'blur(300px)', opacity: 0.04, borderRadius: '50%' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '600px', margin: '0 auto' }}>
           <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🛡️</div>
@@ -537,21 +575,21 @@ export default function LandingHome() {
             fontSize: 'clamp(1.6rem, 4vw, 2.8rem)',
             marginBottom: '16px',
           }}>
-            Siap <span className="text-gradient">Upgrade</span> Keamanan?
+            {t('landing.cta.title')}
           </h2>
           <p style={{ color: 'var(--text-secondary)', margin: '0 auto 32px', fontSize: 'var(--font-size-base)', lineHeight: 1.7 }}>
-            Mulai simulasi phishing pertama Anda hari ini. Gratis, tanpa kartu kredit, tanpa batas waktu trial.
+            {t('landing.cta.desc')}
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/register" className="btn btn-primary btn-lg">
-              🚀 Daftar Gratis
+              {t('landing.cta.btn_signup')}
             </Link>
             <Link to="/login" className="btn btn-secondary btn-lg">
-              <HiOutlineLockClosed size={16} /> Login Admin
+              <HiOutlineLockClosed size={16} /> {t('landing.cta.btn_login')}
             </Link>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── Footer ── */}
       <footer style={{
@@ -563,8 +601,9 @@ export default function LandingHome() {
         fontSize: '0.65rem',
         letterSpacing: '0.1em',
       }}>
-        <p>© 2026 PHISIM // DIBUAT DENGAN ❤️ UNTUK KEAMANAN SIBER YANG LEBIH BAIK</p>
+        <p>{t('landing.footer')}</p>
       </footer>
     </div>
+    </>
   );
 }

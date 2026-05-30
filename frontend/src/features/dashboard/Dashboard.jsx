@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import usePolling from '../../hooks/usePolling';
 import { useAuth } from '../../context/AuthContext';
@@ -38,6 +39,7 @@ const RISK_LABELS = {
 };
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,7 @@ export default function Dashboard() {
     return (
       <div className="loading-center" style={{ minHeight: '50vh' }}>
         <div className="spinner"></div>
+        <p style={{ marginTop: '16px', color: 'var(--text-muted)' }}>{t('admin_dashboard.loading')}</p>
       </div>
     );
   }
@@ -80,27 +83,33 @@ export default function Dashboard() {
   const totalRisk = riskData.reduce((s, d) => s + d.value, 0);
   const clickRate = stats?.click_rate || 0;
 
+  const RISK_LABELS = {
+    LOW: t('admin_dashboard.charts.risk_low'),
+    MEDIUM: t('admin_dashboard.charts.risk_medium'),
+    HIGH: t('admin_dashboard.charts.risk_high'),
+  };
+
   // Determine Organization Health
-  let healthStatus = 'Sehat';
+  let healthStatus = t('admin_dashboard.health.status_healthy');
   let healthColor = 'var(--success)';
   let healthIcon = <HiOutlineShieldCheck size={28} />;
-  let healthMessage = 'Karyawan Anda memiliki kesadaran keamanan yang baik. Pertahankan!';
+  let healthMessage = t('admin_dashboard.health.msg_healthy');
   
   if (clickRate > 30 || (stats?.risk_distribution?.HIGH || 0) > 10) {
-    healthStatus = 'Kritis';
+    healthStatus = t('admin_dashboard.health.status_critical');
     healthColor = 'var(--danger)';
     healthIcon = <HiOutlineShieldExclamation size={28} />;
-    healthMessage = 'Tingkat klik sangat tinggi! Segera jalankan simulasi edukasi.';
+    healthMessage = t('admin_dashboard.health.msg_critical');
   } else if (clickRate > 10 || (stats?.risk_distribution?.HIGH || 0) > 0) {
-    healthStatus = 'Waspada';
+    healthStatus = t('admin_dashboard.health.status_warning');
     healthColor = 'var(--warning)';
     healthIcon = <HiOutlineExclamationTriangle size={28} />;
-    healthMessage = 'Beberapa karyawan rentan terhadap serangan. Perlu perhatian ekstra.';
+    healthMessage = t('admin_dashboard.health.msg_warning');
   }
 
   // Greeting based on time
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Selamat Pagi' : hour < 18 ? 'Selamat Siang' : 'Selamat Malam';
+  const greeting = hour < 12 ? t('admin_dashboard.greeting.morning') : hour < 18 ? t('admin_dashboard.greeting.afternoon') : t('admin_dashboard.greeting.evening');
   const firstName = (user?.full_name || user?.username || 'Admin').split(' ')[0];
 
   return (
@@ -110,13 +119,13 @@ export default function Dashboard() {
         <div>
           <div className="dash-greeting">
             <HiOutlineCalendarDays size={14} style={{ color: 'var(--neon-cyan)' }} />
-            <span>{new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <span>{new Date().toLocaleDateString(t('admin_dashboard.greeting.morning') === 'Good Morning' ? 'en-US' : 'id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
           </div>
           <h1 className="dash-title" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', marginBottom: '8px' }}>
             {greeting}, {firstName}! 👋
           </h1>
           <p className="dash-subtitle" style={{ fontSize: '1rem' }}>
-            Berikut adalah ringkasan keamanan organisasi Anda hari ini.
+            {t('admin_dashboard.greeting.subtitle')}
           </p>
         </div>
 
@@ -137,7 +146,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: healthColor, marginBottom: '4px' }}>
-              Status Organisasi: {healthStatus}
+              {t('admin_dashboard.health.title')} {healthStatus}
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
               {healthMessage}
@@ -148,48 +157,48 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div style={{ marginBottom: 'var(--space-2xl)', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <Link to="/dashboard/campaigns" className="btn btn-primary" style={{ padding: '12px 20px', fontSize: '0.9rem', gap: '8px' }}>
-          <HiOutlinePlus size={18} /> Buat Simulasi Baru
+        <Link to="/dashboard/campaigns" className="btn btn-primary" style={{ flex: '1 1 200px', padding: '12px', justifyContent: 'center' }}>
+          <HiOutlinePlus size={20} /> {t('admin_dashboard.quick_actions.new_campaign')}
         </Link>
-        <Link to="/dashboard/reports" className="btn btn-secondary" style={{ padding: '12px 20px', fontSize: '0.9rem', gap: '8px' }}>
-          <HiOutlineChartBarSquare size={18} /> Lihat Laporan Lengkap
+        <Link to="/dashboard/reports" className="btn btn-secondary" style={{ flex: '1 1 200px', padding: '12px', justifyContent: 'center' }}>
+          <HiOutlineChartBarSquare size={20} /> {t('admin_dashboard.quick_actions.view_report')}
         </Link>
       </div>
 
       <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <HiOutlineInformationCircle size={18} style={{ color: 'var(--neon-cyan)' }} />
-        <h2 style={{ fontSize: '1.1rem', fontFamily: 'var(--font-display)' }}>Statistik Utama</h2>
+        <h2 style={{ fontSize: '1.1rem', fontFamily: 'var(--font-display)' }}>{t('admin_dashboard.stats.total_campaigns')} Overview</h2>
       </div>
 
       {/* Stat Cards - Simplified descriptions */}
       <div className="stats-grid">
         <StatCard
           icon={<HiOutlineUserGroup size={22} />}
-          label="Total Karyawan"
+          label={t('admin_dashboard.nav_cards.employees.title')}
           value={stats?.total_employees || 0}
-          desc="Jumlah orang yang dilindungi"
+          desc={t('admin_dashboard.nav_cards.employees.desc')}
           color="#3b82f6"
         />
         <StatCard
           icon={<HiOutlineEnvelope size={22} />}
-          label="Simulasi Berjalan"
+          label={t('admin_dashboard.stats.total_campaigns')}
           value={stats?.total_campaigns || 0}
-          desc="Total email pancingan terkirim"
+          desc={t('admin_dashboard.stats.targets_reached')}
           color="#8b5cf6"
         />
         <StatCard
           icon={<HiOutlineCursorArrowRays size={22} />}
-          label="Tingkat Tertipu"
+          label={t('admin_dashboard.stats.overall_click_rate')}
           value={`${clickRate}%`}
-          desc={clickRate > 0 ? `${clickRate}% orang mengklik tautan bahaya` : 'Tidak ada yang mengklik tautan'}
+          desc={clickRate > 0 ? `${clickRate}% clicked` : '0%'}
           color={clickRate > 30 ? '#ef4444' : clickRate > 10 ? '#f59e0b' : '#10b981'}
           trend={clickRate > 30 ? 'up' : 'down'}
         />
         <StatCard
           icon={<HiOutlineExclamationTriangle size={22} />}
-          label="Berisiko Tinggi"
+          label={t('admin_dashboard.stats.high_risk')}
           value={stats?.risk_distribution?.HIGH || 0}
-          desc="Orang yang butuh pelatihan segera"
+          desc="Action needed"
           color="#ef4444"
         />
       </div>
@@ -198,29 +207,29 @@ export default function Dashboard() {
       <div className="nav-cards">
         <Link to="/dashboard/campaigns" className="nav-card">
           <div className="nav-card-content">
-            <h4>Kampanye</h4>
-            <p>Buat & kelola simulasi phishing</p>
+            <h4>{t('admin_dashboard.nav_cards.campaigns.title')}</h4>
+            <p>{t('admin_dashboard.nav_cards.campaigns.desc')}</p>
           </div>
           <HiOutlineChevronRight size={18} />
         </Link>
         <Link to="/dashboard/employees" className="nav-card">
           <div className="nav-card-content">
-            <h4>Karyawan</h4>
-            <p>Kelola data karyawan target</p>
+            <h4>{t('admin_dashboard.nav_cards.employees.title')}</h4>
+            <p>{t('admin_dashboard.nav_cards.employees.desc')}</p>
           </div>
           <HiOutlineChevronRight size={18} />
         </Link>
         <Link to="/dashboard/departments" className="nav-card">
           <div className="nav-card-content">
-            <h4>Departemen</h4>
-            <p>Atur struktur departemen</p>
+            <h4>{t('admin_dashboard.nav_cards.departments.title')}</h4>
+            <p>{t('admin_dashboard.nav_cards.departments.desc')}</p>
           </div>
           <HiOutlineChevronRight size={18} />
         </Link>
         <Link to="/dashboard/reports" className="nav-card">
           <div className="nav-card-content">
-            <h4>Laporan</h4>
-            <p>Analisis hasil kampanye</p>
+            <h4>{t('admin_dashboard.nav_cards.reports.title')}</h4>
+            <p>{t('admin_dashboard.nav_cards.reports.desc')}</p>
           </div>
           <HiOutlineChevronRight size={18} />
         </Link>
@@ -231,8 +240,8 @@ export default function Dashboard() {
         {/* Risk Distribution */}
         <div className="card chart-card">
           <div className="chart-header">
-            <h3 className="chart-title">Distribusi Risiko Karyawan</h3>
-            <span className="chart-badge">{totalRisk} karyawan</span>
+            <h3 className="chart-title">{t('admin_dashboard.charts.employee_risk')}</h3>
+            <span className="chart-badge">{totalRisk} {t('admin_dashboard.nav_cards.employees.title')}</span>
           </div>
           {riskData.length > 0 ? (
             <>
@@ -281,7 +290,7 @@ export default function Dashboard() {
             </>
           ) : (
             <div className="empty-state" style={{ minHeight: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Belum ada data risiko</p>
+              <p>{t('admin_dashboard.charts.no_data')}</p>
             </div>
           )}
         </div>
@@ -290,7 +299,7 @@ export default function Dashboard() {
         <div className="card chart-card">
           <div className="chart-header">
             <h3 className="chart-title">Event Tracking</h3>
-            <span className="chart-badge">Semua kampanye</span>
+            <span className="chart-badge">{t('admin_dashboard.buttons.all_campaigns')}</span>
           </div>
           {eventData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -321,7 +330,7 @@ export default function Dashboard() {
             </ResponsiveContainer>
           ) : (
             <div className="empty-state" style={{ minHeight: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Belum ada data event</p>
+              <p>{t('admin_dashboard.charts.no_data')}</p>
             </div>
           )}
         </div>
@@ -333,12 +342,10 @@ export default function Dashboard() {
           <div style={{ background: 'rgba(8, 145, 178, 0.15)', padding: '8px', borderRadius: '8px', color: 'var(--neon-cyan)' }}>
             <HiOutlineLightBulb size={24} />
           </div>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>Tips Keamanan Hari Ini</h3>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>{t('admin_dashboard.tips.title')}</h3>
         </div>
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-          Phishing sering terjadi pada hari libur atau akhir pekan ketika karyawan lengah. 
-          Jadwalkan kampanye simulasi secara acak untuk melatih kewaspadaan mereka di segala situasi. 
-          Gunakan topik yang relevan dengan pekerjaan sehari-hari seperti "Pembaruan Kebijakan Cuti" atau "Reset Password Email Kantor".
+          {t('admin_dashboard.tips.desc')}
         </p>
       </div>
     </div>

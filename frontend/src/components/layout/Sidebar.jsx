@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import {
@@ -20,22 +21,28 @@ import {
 import './Sidebar.css';
 
 const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: HiOutlineHome },
-  { path: '/dashboard/campaigns', label: 'Kampanye', icon: HiOutlineEnvelope },
-  { path: '/dashboard/templates', label: 'Galeri Template', icon: HiOutlineEnvelopeOpen },
-  { path: '/dashboard/osint', label: 'OSINT & SocEng', icon: HiOutlineGlobeAlt },
-  { path: '/dashboard/intel', label: 'Threat Intel', icon: HiOutlineShieldCheck },
-  { path: '/dashboard/employees', label: 'Karyawan', icon: HiOutlineUserGroup },
-  { path: '/dashboard/departments', label: 'Departemen', icon: HiOutlineBuildingOffice2 },
-  { path: '/dashboard/reports', label: 'Laporan', icon: HiOutlineChartBarSquare },
-  { path: '/dashboard/api-keys', label: 'API Keys', icon: HiOutlineKey },
-  { path: '/dashboard/profile', label: 'Profil Saya', icon: HiOutlineUser },
+  { path: '/dashboard', labelKey: 'dashboard', icon: HiOutlineHome },
+  { path: '/dashboard/campaigns', labelKey: 'campaigns', icon: HiOutlineEnvelope },
+  { path: '/dashboard/templates', labelKey: 'templates', icon: HiOutlineEnvelopeOpen },
+  { path: '/dashboard/osint', labelKey: 'osint', icon: HiOutlineGlobeAlt },
+  { path: '/dashboard/intel', labelKey: 'intel', icon: HiOutlineShieldCheck },
+  { path: '/dashboard/employees', labelKey: 'employees', icon: HiOutlineUserGroup },
+  { path: '/dashboard/departments', labelKey: 'departments', icon: HiOutlineBuildingOffice2 },
+  { path: '/dashboard/reports', labelKey: 'reports', icon: HiOutlineChartBarSquare },
+  { path: '/dashboard/api-keys', labelKey: 'api_keys', icon: HiOutlineKey },
+  { path: '/dashboard/profile', labelKey: 'profile', icon: HiOutlineUser },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
+  const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'id' : 'en';
+    i18n.changeLanguage(newLang);
+  };
 
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
@@ -54,7 +61,7 @@ export default function Sidebar({ isOpen, onClose }) {
       </div>
 
       <nav className="sidebar-nav">
-        <div className="nav-section-label">MENU</div>
+        <div className="nav-section-label">{t('dashboard_layout.mobile_menu').toUpperCase()}</div>
         {navItems.map((item) => (
           <NavLink
             key={item.path}
@@ -64,7 +71,7 @@ export default function Sidebar({ isOpen, onClose }) {
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <item.icon size={20} />
-            <span>{item.label}</span>
+            <span>{t(`dashboard_layout.menus.${item.labelKey}`)}</span>
           </NavLink>
         ))}
       </nav>
@@ -79,16 +86,24 @@ export default function Sidebar({ isOpen, onClose }) {
             <span className="user-role">{user?.role}</span>
           </div>
         </div>
-        <button className="btn-ghost logout-btn" onClick={logout} title="Logout">
-          <HiOutlineArrowRightOnRectangle size={20} />
+        <button
+          className="btn-ghost logout-btn"
+          onClick={toggleLanguage}
+          title="Ubah Bahasa / Change Language"
+          style={{ color: 'var(--neon-cyan)', fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.8rem' }}
+        >
+          {i18n.language === 'en' ? 'ID' : 'EN'}
         </button>
         <button
           className="btn-ghost logout-btn"
           onClick={toggleTheme}
-          title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          title={theme === 'dark' ? t('dashboard_layout.light_mode') : t('dashboard_layout.dark_mode')}
           style={{ color: 'var(--neon-cyan)' }}
         >
           {theme === 'dark' ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
+        </button>
+        <button className="btn-ghost logout-btn" onClick={logout} title={t('dashboard_layout.logout')}>
+          <HiOutlineArrowRightOnRectangle size={20} />
         </button>
       </div>
     </aside>

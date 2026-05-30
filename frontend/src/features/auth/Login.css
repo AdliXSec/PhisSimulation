@@ -235,3 +235,48 @@
     padding: var(--space-2xl) var(--space-lg);
   }
 }
+
+/* ============================================
+   LIGHT MODE OVERRIDES
+   ============================================ */
+
+[data-theme="light"] .login-card {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 0 80px rgba(8, 145, 178, 0.05);
+}
+
+[data-theme="light"] .input.input-with-icon {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .input.input-with-icon:focus {
+  background: #ffffff;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.15);
+}
+
+[data-theme="light"] .input-icon {
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .back-link {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .back-link:hover {
+  background: rgba(8, 145, 178, 0.1);
+  color: var(--neon-cyan);
+  border-color: rgba(8, 145, 178, 0.3);
+}
+
+[data-theme="light"] .login-logo {
+  background: rgba(8, 145, 178, 0.06);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(8, 145, 178, 0.15);
+}
+

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   HiOutlineShieldCheck, 
   HiOutlineKey, 
@@ -6,13 +7,15 @@ import {
   HiOutlineCheckCircle,
   HiOutlineXCircle,
   HiOutlineDocumentDuplicate,
-  HiOutlineArrowPath
+  HiOutlineArrowPath,
+  HiOutlineShieldExclamation
 } from 'react-icons/hi2';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 import './PasswordIntel.css';
 
 export default function PasswordIntel() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('audit'); // 'audit' | 'generate'
   
   // Audit State
@@ -39,12 +42,12 @@ export default function PasswordIntel() {
       const res = await api.post('/intel/password/check', { password: auditPassword });
       setAuditResult(res.data);
       if (res.data.risk_level === 'CRITICAL') {
-        toast.error('Sandi sangat rentan!');
+        toast.error(t('admin_dashboard.intel.messages.audit_critical'));
       } else if (res.data.risk_level === 'LOW') {
-        toast.success('Sandi sangat kuat!');
+        toast.success(t('admin_dashboard.intel.messages.audit_low'));
       }
     } catch (err) {
-      toast.error('Gagal melakukan audit sandi');
+      toast.error(t('admin_dashboard.intel.messages.audit_failed'));
     } finally {
       setIsAuditing(false);
     }
@@ -56,9 +59,9 @@ export default function PasswordIntel() {
     try {
       const res = await api.post('/intel/password/generate', genOptions);
       setGeneratedPassword(res.data.password);
-      toast.success('Sandi baru berhasil dibuat!');
+      toast.success(t('admin_dashboard.intel.messages.gen_success'));
     } catch (err) {
-      toast.error('Gagal membuat sandi');
+      toast.error(t('admin_dashboard.intel.messages.gen_failed'));
     } finally {
       setIsGenerating(false);
     }
@@ -67,7 +70,7 @@ export default function PasswordIntel() {
   const copyToClipboard = () => {
     if (!generatedPassword) return;
     navigator.clipboard.writeText(generatedPassword);
-    toast.success('Sandi disalin ke clipboard!');
+    toast.success(t('admin_dashboard.intel.messages.copied'));
   };
 
   const renderAuditResult = () => {
@@ -85,7 +88,7 @@ export default function PasswordIntel() {
       <div className="audit-result slide-up">
         <div className="risk-banner" style={{ borderColor: riskColor, boxShadow: `0 0 20px ${riskColor}33` }}>
           <h2 style={{ color: riskColor }}>
-            RISK LEVEL: {risk_level}
+            {t('admin_dashboard.intel.risk_level')} {risk_level}
           </h2>
           <div className="score-meter">
             <div 
@@ -97,7 +100,7 @@ export default function PasswordIntel() {
               }}
             ></div>
           </div>
-          <p className="entropy-text">Entropy Score: {entropy} bits</p>
+          <p className="entropy-text">{t('admin_dashboard.intel.entropy_score')} {entropy} bits</p>
         </div>
 
         <div className="grid-2" style={{ marginTop: 'var(--space-lg)' }}>
@@ -107,7 +110,7 @@ export default function PasswordIntel() {
             </div>
             <div className="intel-info">
               <h3>Local Dictionary (RockYou)</h3>
-              <p>{is_in_rockyou ? 'Sandi DITEMUKAN dalam daftar sandi pasaran.' : 'Sandi tidak ada di kamus pasaran.'}</p>
+              <p>{is_in_rockyou ? t('admin_dashboard.intel.rockyou_found') : t('admin_dashboard.intel.rockyou_clean')}</p>
             </div>
           </div>
 
@@ -117,14 +120,14 @@ export default function PasswordIntel() {
             </div>
             <div className="intel-info">
               <h3>Global Breach (HaveIBeenPwned)</h3>
-              <p>{pwned_count > 0 ? `Bocor sebanyak ${pwned_count.toLocaleString()} kali di internet!` : 'Tidak ditemukan riwayat kebocoran.'}</p>
+              <p>{pwned_count > 0 ? t('admin_dashboard.intel.pwned_found').replace('{{count}}', pwned_count.toLocaleString()) : t('admin_dashboard.intel.pwned_clean')}</p>
             </div>
           </div>
         </div>
 
         {feedback.length > 0 && (
           <div className="feedback-box">
-            <h4>Saran Perbaikan:</h4>
+            <h4>{t('admin_dashboard.intel.feedback_title')}</h4>
             <ul>
               {feedback.map((msg, i) => <li key={i}>{msg}</li>)}
             </ul>
@@ -138,8 +141,10 @@ export default function PasswordIntel() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Threat Intel</h1>
-          <p>Intelijen Keamanan & Audit Kata Sandi</p>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <HiOutlineShieldExclamation /> {t('admin_dashboard.intel.title')}
+          </h1>
+          <p>{t('admin_dashboard.intel.desc')}</p>
         </div>
       </div>
 
@@ -150,30 +155,28 @@ export default function PasswordIntel() {
             onClick={() => setActiveTab('audit')}
           >
             <HiOutlineShieldCheck size={20} />
-            PASSWORD AUDITOR
+            {t('admin_dashboard.intel.tab_audit')}
           </button>
           <button 
             className={`tab-btn ${activeTab === 'generate' ? 'active' : ''}`}
             onClick={() => setActiveTab('generate')}
           >
             <HiOutlineKey size={20} />
-            SECURE GENERATOR
+            {t('admin_dashboard.intel.tab_gen')}
           </button>
         </div>
 
         <div className="tab-content" style={{ padding: 'var(--space-xl)' }}>
           {activeTab === 'audit' && (
             <div className="audit-panel">
-              <p style={{ marginBottom: 'var(--space-lg)', color: 'var(--text-secondary)' }}>
-                Masukkan kata sandi untuk dianalisis kekuatannya. Sistem akan mengeceknya secara lokal terhadap <i>RockYou dictionary</i> dan secara global melalui API k-Anonymity (sangat aman, sandi Anda tidak akan terkirim secara utuh).
-              </p>
+              <p style={{ marginBottom: 'var(--space-lg)', color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: t('admin_dashboard.intel.audit_desc') }} />
               
               <form onSubmit={handleAudit} className="audit-form">
                 <div className="input-group">
                   <input
                     type="text"
                     className="input"
-                    placeholder="Masukkan sandi yang ingin diaudit..."
+                    placeholder={t('admin_dashboard.intel.audit_placeholder')}
                     value={auditPassword}
                     onChange={(e) => setAuditPassword(e.target.value)}
                     style={{ fontSize: '1.2rem', padding: '15px' }}
@@ -185,7 +188,7 @@ export default function PasswordIntel() {
                   disabled={!auditPassword || isAuditing}
                   style={{ width: '100%', marginTop: 'var(--space-md)' }}
                 >
-                  {isAuditing ? <span className="spinner"></span> : '>> JALANKAN AUDIT'}
+                  {isAuditing ? <span className="spinner"></span> : t('admin_dashboard.intel.btn_run_audit')}
                 </button>
               </form>
 
@@ -201,7 +204,7 @@ export default function PasswordIntel() {
                   className="input generated-input" 
                   value={generatedPassword} 
                   readOnly 
-                  placeholder="Klik tombol Generate untuk membuat sandi..."
+                  placeholder={t('admin_dashboard.intel.gen_placeholder')}
                 />
                 <button className="btn btn-secondary icon-btn" onClick={copyToClipboard} title="Copy">
                   <HiOutlineDocumentDuplicate size={24} />
@@ -210,7 +213,7 @@ export default function PasswordIntel() {
 
               <div className="gen-options grid-2">
                 <div className="input-group">
-                  <label>Panjang Sandi ({genOptions.length})</label>
+                  <label>{t('admin_dashboard.intel.len_label')} ({genOptions.length})</label>
                   <input 
                     type="range" 
                     min="8" 
@@ -228,7 +231,7 @@ export default function PasswordIntel() {
                       onChange={(e) => setGenOptions({...genOptions, use_uppercase: e.target.checked})}
                     />
                     <span className="checkmark"></span>
-                    Gunakan Huruf Besar (A-Z)
+                    {t('admin_dashboard.intel.opt_upper')}
                   </label>
                   <label className="cyber-checkbox">
                     <input 
@@ -237,7 +240,7 @@ export default function PasswordIntel() {
                       onChange={(e) => setGenOptions({...genOptions, use_numbers: e.target.checked})}
                     />
                     <span className="checkmark"></span>
-                    Gunakan Angka (0-9)
+                    {t('admin_dashboard.intel.opt_numbers')}
                   </label>
                   <label className="cyber-checkbox">
                     <input 
@@ -246,7 +249,7 @@ export default function PasswordIntel() {
                       onChange={(e) => setGenOptions({...genOptions, use_symbols: e.target.checked})}
                     />
                     <span className="checkmark"></span>
-                    Gunakan Simbol (!@#$)
+                    {t('admin_dashboard.intel.opt_symbols')}
                   </label>
                 </div>
               </div>
@@ -257,7 +260,7 @@ export default function PasswordIntel() {
                 disabled={isGenerating}
                 style={{ width: '100%', marginTop: 'var(--space-xl)' }}
               >
-                {isGenerating ? <span className="spinner"></span> : <><HiOutlineArrowPath size={20} /> GENERATE PASSWORD</>}
+                {isGenerating ? <span className="spinner"></span> : <><HiOutlineArrowPath size={20} /> {t('admin_dashboard.intel.btn_generate')}</>}
               </button>
             </div>
           )}

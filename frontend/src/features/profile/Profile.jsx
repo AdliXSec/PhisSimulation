@@ -3,8 +3,10 @@ import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { HiOutlineUser, HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineShieldCheck, HiOutlineCpuChip } from 'react-icons/hi2';
+import { useTranslation } from 'react-i18next';
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user, fetchUser } = useAuth();
   const [form, setForm] = useState({
     full_name: '',
@@ -27,7 +29,7 @@ export default function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.password && form.password !== form.password_confirm) {
-      toast.error('Password baru dan konfirmasi tidak cocok');
+      toast.error(t('admin_dashboard.profile.messages.password_mismatch'));
       return;
     }
 
@@ -42,7 +44,7 @@ export default function Profile() {
       }
 
       await api.put('/auth/me', payload);
-      toast.success('Profil berhasil diperbarui');
+      toast.success(t('admin_dashboard.profile.messages.update_success'));
       
       // Clear password fields
       setForm(f => ({ ...f, password: '', password_confirm: '' }));
@@ -50,7 +52,7 @@ export default function Profile() {
       // Refresh user context
       await fetchUser();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Gagal memperbarui profil');
+      toast.error(err.response?.data?.detail || t('admin_dashboard.profile.messages.update_failed'));
     } finally {
       setLoading(false);
     }
@@ -62,8 +64,8 @@ export default function Profile() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Manajemen Profil</h1>
-          <p>Konfigurasi identitas dan kredensial akses sistem Anda</p>
+          <h1>{t('admin_dashboard.profile.title')}</h1>
+          <p>{t('admin_dashboard.profile.desc')}</p>
         </div>
       </div>
 
@@ -109,18 +111,18 @@ export default function Profile() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
             
             <h3 style={{ borderBottom: '1px solid var(--divider)', paddingBottom: 'var(--space-sm)', color: 'var(--neon-cyan)' }}>
-              Informasi Pribadi
+              {t('admin_dashboard.profile.personal_info')}
             </h3>
 
             <div className="input-group">
-              <label>Nama Lengkap</label>
+              <label>{t('admin_dashboard.profile.full_name')}</label>
               <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-muted)' }}>
                   <HiOutlineUser size={20} />
                 </div>
                 <input 
                   className="input" 
-                  placeholder="Masukkan nama lengkap" 
+                  placeholder={t('admin_dashboard.profile.name_placeholder')} 
                   value={form.full_name} 
                   onChange={e => setForm({ ...form, full_name: e.target.value })} 
                   required 
@@ -130,7 +132,7 @@ export default function Profile() {
             </div>
             
             <div className="input-group">
-              <label>Alamat Email</label>
+              <label>{t('admin_dashboard.profile.email_addr')}</label>
               <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-muted)' }}>
                   <HiOutlineEnvelope size={20} />
@@ -138,7 +140,7 @@ export default function Profile() {
                 <input 
                   type="email"
                   className="input" 
-                  placeholder="Masukkan alamat email" 
+                  placeholder={t('admin_dashboard.profile.email_placeholder')} 
                   value={form.email} 
                   onChange={e => setForm({ ...form, email: e.target.value })} 
                   required 
@@ -148,11 +150,11 @@ export default function Profile() {
             </div>
 
             <h3 style={{ borderBottom: '1px solid var(--divider)', paddingBottom: 'var(--space-sm)', marginTop: 'var(--space-md)', color: 'var(--neon-cyan)' }}>
-              Kredensial Keamanan
+              {t('admin_dashboard.profile.security_credentials')}
             </h3>
             
             <div className="input-group">
-              <label>Password Baru</label>
+              <label>{t('admin_dashboard.profile.new_password')}</label>
               <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-muted)' }}>
                   <HiOutlineLockClosed size={20} />
@@ -160,7 +162,7 @@ export default function Profile() {
                 <input 
                   type="password"
                   className="input" 
-                  placeholder="Kosongkan jika tidak ingin mengubah" 
+                  placeholder={t('admin_dashboard.profile.new_password_placeholder')} 
                   value={form.password} 
                   onChange={e => setForm({ ...form, password: e.target.value })} 
                   style={{ paddingLeft: '40px' }}
@@ -169,7 +171,7 @@ export default function Profile() {
             </div>
             
             <div className="input-group">
-              <label>Konfirmasi Password</label>
+              <label>{t('admin_dashboard.profile.confirm_password')}</label>
               <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-muted)' }}>
                   <HiOutlineLockClosed size={20} />
@@ -177,7 +179,7 @@ export default function Profile() {
                 <input 
                   type="password"
                   className="input" 
-                  placeholder="Ulangi password baru" 
+                  placeholder={t('admin_dashboard.profile.confirm_password_placeholder')} 
                   value={form.password_confirm} 
                   onChange={e => setForm({ ...form, password_confirm: e.target.value })} 
                   disabled={!form.password}
@@ -188,7 +190,7 @@ export default function Profile() {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--divider)', marginTop: 'var(--space-sm)' }}>
               <button type="submit" className="btn btn-primary" disabled={loading} style={{ padding: '10px 24px', letterSpacing: '1px' }}>
-                {loading ? 'MENYIMPAN...' : 'SIMPAN PERUBAHAN'}
+                {loading ? t('admin_dashboard.profile.btn_saving') : t('admin_dashboard.profile.btn_save')}
               </button>
             </div>
           </form>

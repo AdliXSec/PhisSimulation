@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 import usePolling from '../../hooks/usePolling';
@@ -9,6 +10,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 export default function Reports() {
+  const { t } = useTranslation();
   const { campaignId } = useParams();
   const [report, setReport] = useState(null);
   const [aiAnalysis, setAiAnalysis] = useState('');
@@ -21,7 +23,7 @@ export default function Reports() {
       const res = await api.get(`/reports/campaigns/${campaignId}`);
       setReport(res.data);
     } catch (err) {
-      if (loading) toast.error('Gagal memuat laporan');
+      if (loading) toast.error(t('admin_dashboard.reports.messages.load_failed'));
     } finally {
       setLoading(false);
     }
@@ -47,9 +49,9 @@ export default function Reports() {
     try {
       const res = await api.post(`/reports/campaigns/${campaignId}/ai-analysis`);
       setAiAnalysis(res.data.analysis);
-      toast.success('Analisis AI berhasil digenerate!');
+      toast.success(t('admin_dashboard.reports.messages.ai_success'));
     } catch (err) {
-      toast.error('Gagal generate analisis');
+      toast.error(t('admin_dashboard.reports.messages.ai_failed'));
     } finally {
       setAnalyzing(false);
     }
@@ -62,13 +64,13 @@ export default function Reports() {
       <div className="fade-in">
         <div className="page-header">
           <div>
-            <h1>Hasil Laporan</h1>
-            <p>Pilih kampanye yang ingin Anda lihat laporannya melalui menu Kampanye.</p>
+            <h1>{t('admin_dashboard.reports.title')}</h1>
+            <p>{t('admin_dashboard.reports.desc')}</p>
           </div>
         </div>
         <div className="empty-state">
-          <h3>Belum ada kampanye yang dipilih</h3>
-          <p>Silakan buka halaman <strong>Kampanye</strong> lalu klik tombol <strong>Detail</strong> pada kampanye yang ingin Anda lihat hasilnya.</p>
+          <h3>{t('admin_dashboard.reports.empty_title')}</h3>
+          <p dangerouslySetInnerHTML={{ __html: t('admin_dashboard.reports.empty_desc') }} />
         </div>
       </div>
     );
@@ -76,44 +78,44 @@ export default function Reports() {
 
   const summary = report?.summary;
   const chartData = summary ? [
-    { name: 'Terkirim', value: summary.sent, fill: '#3b82f6' },
-    { name: 'Dibuka', value: summary.opened, fill: '#22d3ee' },
-    { name: 'Diklik', value: summary.clicked, fill: '#f59e0b' },
-    { name: 'Submit', value: summary.submitted, fill: '#ef4444' },
+    { name: t('admin_dashboard.reports.stat_sent'), value: summary.sent, fill: '#3b82f6' },
+    { name: t('admin_dashboard.reports.stat_opened'), value: summary.opened, fill: '#22d3ee' },
+    { name: t('admin_dashboard.reports.stat_clicked'), value: summary.clicked, fill: '#f59e0b' },
+    { name: t('admin_dashboard.reports.stat_submit'), value: summary.submitted, fill: '#ef4444' },
   ] : [];
 
   return (
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Laporan: {report?.campaign?.name}</h1>
+          <h1>{t('admin_dashboard.reports.report_for')} {report?.campaign?.name}</h1>
           <p style={{ marginTop: '8px' }}>
-            Lihat performa kampanye dan analisis tingkat kerentanan target.
+            {t('admin_dashboard.reports.report_desc')}
             <br />
-            Status: <span className="badge badge-info">{report?.campaign?.status}</span>
-            {' '} | Tema: {report?.campaign?.theme}
+            {t('admin_dashboard.reports.status_label')} <span className="badge badge-info">{report?.campaign?.status}</span>
+            {' '} | {t('admin_dashboard.reports.theme_label')} {report?.campaign?.theme}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button 
             className="btn btn-secondary" 
             onClick={async () => {
-              if(!report?.templates?.[0]) return toast.error('Template tidak ditemukan');
-              const name = prompt('Masukkan nama untuk menyimpan template ini:');
+              if(!report?.templates?.[0]) return toast.error(t('admin_dashboard.reports.messages.tpl_not_found'));
+              const name = prompt(t('admin_dashboard.reports.messages.tpl_prompt'));
               if(!name) return;
               try {
                 await api.post(`/saved-templates/from-campaign/${report.templates[0].id}?name=${encodeURIComponent(name)}`);
-                toast.success('Template berhasil disimpan ke Galeri');
+                toast.success(t('admin_dashboard.reports.messages.tpl_saved'));
               } catch(e) {
-                toast.error('Gagal menyimpan template');
+                toast.error(t('admin_dashboard.reports.messages.tpl_failed'));
               }
             }}
           >
-            💾 Simpan Template
+            {t('admin_dashboard.reports.btn_save_tpl')}
           </button>
           <button className="btn btn-primary" onClick={generateAnalysis} disabled={analyzing}>
             <HiOutlineSparkles size={18} />
-            {analyzing ? 'Menganalisis...' : 'Generate Analisis AI'}
+            {analyzing ? t('admin_dashboard.reports.btn_analyzing') : t('admin_dashboard.reports.btn_gen_ai')}
           </button>
         </div>
       </div>
@@ -122,25 +124,25 @@ export default function Reports() {
       <div className="stats-grid">
         <div className="card-glow">
           <div style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, color: 'var(--info)' }}>{summary?.total_targets || 0}</div>
-          <div style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Total Target</div>
+          <div style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>{t('admin_dashboard.reports.card_total')}</div>
         </div>
         <div className="card-glow">
           <div style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, color: 'var(--accent-secondary)' }}>{summary?.open_rate || 0}%</div>
-          <div style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Open Rate</div>
+          <div style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>{t('admin_dashboard.reports.card_open')}</div>
         </div>
         <div className="card-glow">
           <div style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, color: 'var(--warning)' }}>{summary?.click_rate || 0}%</div>
-          <div style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Click Rate</div>
+          <div style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>{t('admin_dashboard.reports.card_click')}</div>
         </div>
         <div className="card-glow">
           <div style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, color: 'var(--danger)' }}>{summary?.submit_rate || 0}%</div>
-          <div style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Submit Rate</div>
+          <div style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>{t('admin_dashboard.reports.card_submit')}</div>
         </div>
       </div>
 
       {/* Funnel Chart */}
       <div className="card" style={{ marginBottom: 'var(--space-2xl)' }}>
-        <h3 style={{ marginBottom: 'var(--space-lg)' }}>Funnel Interaksi</h3>
+        <h3 style={{ marginBottom: 'var(--space-lg)' }}>{t('admin_dashboard.reports.funnel_title')}</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData} layout="vertical">
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -160,7 +162,7 @@ export default function Reports() {
       {aiAnalysis && (
         <div className="card" style={{ marginBottom: 'var(--space-2xl)' }}>
           <h3 style={{ marginBottom: 'var(--space-lg)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <HiOutlineSparkles size={20} style={{ color: 'var(--accent-primary)' }} /> Analisis AI
+            <HiOutlineSparkles size={20} style={{ color: 'var(--accent-primary)' }} /> {t('admin_dashboard.reports.ai_title')}
           </h3>
           <div className="markdown-content" style={{ color: 'var(--text-secondary)', lineHeight: 1.8 }}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiAnalysis}</ReactMarkdown>
@@ -170,16 +172,16 @@ export default function Reports() {
 
       {/* Target Table (Internal) */}
       <div className="card" style={{ marginBottom: 'var(--space-2xl)' }}>
-        <h3 style={{ marginBottom: 'var(--space-lg)' }}>Detail Target & Data (Internal)</h3>
+        <h3 style={{ marginBottom: 'var(--space-lg)' }}>{t('admin_dashboard.reports.internal_title')}</h3>
         <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Departemen</th>
-                <th>Status</th>
-                <th>Data Disubmit</th>
+                <th>{t('admin_dashboard.reports.col_name')}</th>
+                <th>{t('admin_dashboard.reports.col_email')}</th>
+                <th>{t('admin_dashboard.reports.col_dept')}</th>
+                <th>{t('admin_dashboard.reports.col_status')}</th>
+                <th>{t('admin_dashboard.reports.col_data')}</th>
               </tr>
             </thead>
             <tbody>
@@ -243,22 +245,22 @@ export default function Reports() {
       {/* External Submissions Table */}
       {report?.external_submissions && report.external_submissions.length > 0 && (
         <div className="card">
-          <h3 style={{ marginBottom: 'var(--space-lg)' }}>Submisi Web Eksternal</h3>
+          <h3 style={{ marginBottom: 'var(--space-lg)' }}>{t('admin_dashboard.reports.external_title')}</h3>
           <div className="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>Waktu</th>
-                  <th>API Key</th>
-                  <th>Target Email (Jika Ada)</th>
-                  <th>IP Address</th>
-                  <th>Data Disubmit</th>
+                  <th>{t('admin_dashboard.reports.col_time')}</th>
+                  <th>{t('admin_dashboard.reports.col_apikey')}</th>
+                  <th>{t('admin_dashboard.reports.col_target_email')}</th>
+                  <th>{t('admin_dashboard.reports.col_ip')}</th>
+                  <th>{t('admin_dashboard.reports.col_data')}</th>
                 </tr>
               </thead>
               <tbody>
                 {report.external_submissions.map((sub, idx) => (
                   <tr key={idx}>
-                    <td style={{ fontSize: '0.85rem' }}>{new Date(sub.created_at).toLocaleString('id-ID')}</td>
+                    <td style={{ fontSize: '0.85rem' }}>{new Date(sub.created_at).toLocaleString()}</td>
                     <td>
                       <span className="badge badge-info">{sub.api_key_name}</span>
                     </td>
@@ -268,7 +270,7 @@ export default function Reports() {
                           <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{sub.matched_email}</span>
                         </>
                       ) : (
-                        <span style={{ color: 'var(--text-muted)' }}>Tidak Dikenali</span>
+                        <span style={{ color: 'var(--text-muted)' }}>{t('admin_dashboard.reports.unknown_target')}</span>
                       )}
                     </td>
                     <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{sub.ip}</td>

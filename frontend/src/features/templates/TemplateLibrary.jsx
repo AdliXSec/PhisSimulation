@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { HiOutlineEnvelopeOpen, HiOutlineTrash, HiOutlineEye, HiXMark } from 'react-icons/hi2';
 
 export default function TemplateLibrary() {
+  const { t } = useTranslation();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [previewTemplate, setPreviewTemplate] = useState(null);
@@ -18,20 +20,20 @@ export default function TemplateLibrary() {
       const res = await api.get('/saved-templates');
       setTemplates(res.data);
     } catch (err) {
-      toast.error('Gagal memuat galeri template');
+      toast.error(t('admin_dashboard.templates.load_failed'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id, name) => {
-    if (!confirm(`Hapus template "${name}" secara permanen?`)) return;
+    if (!confirm(t('admin_dashboard.templates.delete_confirm').replace('{{name}}', name))) return;
     try {
       await api.delete(`/saved-templates/${id}`);
-      toast.success('Template berhasil dihapus');
+      toast.success(t('admin_dashboard.templates.delete_success'));
       loadTemplates();
     } catch (err) {
-      toast.error('Gagal menghapus template');
+      toast.error(t('admin_dashboard.templates.delete_failed'));
     }
   };
 
@@ -68,7 +70,7 @@ export default function TemplateLibrary() {
           flexShrink: 0
         }}>
           <h3 style={{ margin: 0, color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.1rem', fontFamily: 'var(--font-display)' }}>
-            <HiOutlineEye size={20} /> Preview Template
+            <HiOutlineEye size={20} /> {t('admin_dashboard.templates.modal_preview')}
           </h3>
           <button 
             onClick={() => setPreviewTemplate(null)} 
@@ -81,11 +83,11 @@ export default function TemplateLibrary() {
         {/* Meta Info */}
         <div style={{ padding: '14px 24px', borderBottom: '1px solid var(--border)', background: 'var(--bg-primary)', display: 'flex', gap: '32px', flexWrap: 'wrap', flexShrink: 0 }}>
           <div style={{ fontSize: '13px' }}>
-            <strong style={{ color: 'var(--text-muted)', marginRight: '8px' }}>Subjek:</strong> 
+            <strong style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{t('admin_dashboard.templates.modal_subject')}</strong> 
             <span style={{ color: 'var(--text-primary)' }}>{previewTemplate.email_subject}</span>
           </div>
           <div style={{ fontSize: '13px' }}>
-            <strong style={{ color: 'var(--text-muted)', marginRight: '8px' }}>Pengirim:</strong> 
+            <strong style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{t('admin_dashboard.templates.modal_sender')}</strong> 
             <span style={{ color: 'var(--text-primary)' }}>{previewTemplate.email_sender_name}</span>
           </div>
         </div>
@@ -110,8 +112,8 @@ export default function TemplateLibrary() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Galeri Template</h1>
-          <p>Koleksi template phishing siap pakai. Anda dapat menggunakannya kembali saat membuat kampanye baru.</p>
+          <h1>{t('admin_dashboard.templates.title')}</h1>
+          <p>{t('admin_dashboard.templates.desc')}</p>
         </div>
       </div>
 
@@ -121,42 +123,42 @@ export default function TemplateLibrary() {
         ) : templates.length === 0 ? (
           <div className="empty-state">
             <HiOutlineEnvelopeOpen size={48} style={{ color: 'var(--border)' }} />
-            <h3>Belum Ada Template Tersimpan</h3>
-            <p>Untuk menyimpan template, buka laporan kampanye yang sudah selesai dan klik "Simpan ke Galeri".</p>
+            <h3>{t('admin_dashboard.templates.empty_title')}</h3>
+            <p>{t('admin_dashboard.templates.empty_desc')}</p>
           </div>
         ) : (
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Nama Template</th>
-                  <th>Subjek Email</th>
-                  <th>Pengirim</th>
-                  <th>Tanggal Disimpan</th>
-                  <th>Aksi</th>
+                  <th>{t('admin_dashboard.templates.table_name')}</th>
+                  <th>{t('admin_dashboard.templates.table_subject')}</th>
+                  <th>{t('admin_dashboard.templates.table_sender')}</th>
+                  <th>{t('admin_dashboard.templates.table_date')}</th>
+                  <th>{t('admin_dashboard.templates.table_actions')}</th>
                 </tr>
               </thead>
               <tbody>
-                {templates.map(t => (
-                  <tr key={t.id}>
-                    <td style={{ fontWeight: 500, color: 'var(--neon-cyan)' }}>{t.name}</td>
+                {templates.map(tmpl => (
+                  <tr key={tmpl.id}>
+                    <td style={{ fontWeight: 500, color: 'var(--neon-cyan)' }}>{tmpl.name}</td>
                     <td>
-                      <span className="truncate-mobile" title={t.email_subject}>
-                        {t.email_subject}
+                      <span className="truncate-mobile" title={tmpl.email_subject}>
+                        {tmpl.email_subject}
                       </span>
                     </td>
                     <td>
-                      <span className="truncate-mobile" title={t.email_sender_name}>
-                        {t.email_sender_name}
+                      <span className="truncate-mobile" title={tmpl.email_sender_name}>
+                        {tmpl.email_sender_name}
                       </span>
                     </td>
-                    <td>{new Date(t.created_at).toLocaleDateString('id-ID')}</td>
+                    <td>{new Date(tmpl.created_at).toLocaleDateString(t('admin_dashboard.templates.table_date') === 'Date Saved' ? 'en-US' : 'id-ID')}</td>
                     <td>
                       <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
                         <button 
                           className="btn-icon" 
-                          onClick={() => setPreviewTemplate(t)} 
-                          title="Preview Template"
+                          onClick={() => setPreviewTemplate(tmpl)} 
+                          title={t('admin_dashboard.templates.action_preview')}
                           style={{ 
                             background: 'rgba(0, 240, 255, 0.1)', 
                             border: '1px solid rgba(0, 240, 255, 0.2)', 
@@ -171,8 +173,8 @@ export default function TemplateLibrary() {
                         </button>
                         <button 
                           className="btn-icon" 
-                          onClick={() => handleDelete(t.id, t.name)} 
-                          title="Hapus Template"
+                          onClick={() => handleDelete(tmpl.id, tmpl.name)} 
+                          title={t('admin_dashboard.templates.action_delete')}
                           style={{ 
                             background: 'transparent', 
                             border: '1px solid transparent', 

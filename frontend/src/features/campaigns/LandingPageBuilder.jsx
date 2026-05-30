@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { HiOutlineSparkles, HiOutlineCheckCircle, HiOutlinePlus, HiOutlineTrash } from 'react-icons/hi2';
 import './LandingPageBuilder.css';
 
@@ -13,6 +14,7 @@ const THEME_STYLES = [
 ];
 
 export default function LandingPageBuilder({ value, onChange, templates = [] }) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(value?.theme_style === 'raw_html' ? 'raw' : (value?.theme_style === 'ai' ? 'ai' : 'custom')); // 'ai', 'custom', 'template', 'raw'
   const [selectedTemplate, setSelectedTemplate] = useState('');
 
@@ -67,7 +69,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
             onChange({ ...value, theme_style: 'ai' });
           }}
         >
-          <HiOutlineSparkles /> AI Generate
+          <HiOutlineSparkles /> {t('admin_dashboard.campaigns.form.lpb.tab_ai')}
         </button>
         <button 
           type="button"
@@ -77,14 +79,14 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
             onChange({ ...value, theme_style: value.theme_style === 'raw_html' || value.theme_style === 'ai' ? 'generic' : value.theme_style || 'generic' });
           }}
         >
-          ✏️ Custom Builder
+          {t('admin_dashboard.campaigns.form.lpb.tab_custom')}
         </button>
         <button 
           type="button"
           className={`lpb-tab ${activeTab === 'template' ? 'active' : ''}`}
           onClick={() => setActiveTab('template')}
         >
-          📋 From Template
+          {t('admin_dashboard.campaigns.form.lpb.tab_template')}
         </button>
         <button 
           type="button"
@@ -94,7 +96,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
             onChange({ ...value, theme_style: 'raw_html' });
           }}
         >
-          💻 Raw HTML
+          {t('admin_dashboard.campaigns.form.lpb.tab_raw')}
         </button>
       </div>
 
@@ -103,14 +105,12 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
           <div className="lpb-ai-mode">
             <div className="lpb-ai-info">
               <HiOutlineSparkles size={32} style={{ color: 'var(--accent-primary)' }} />
-              <h4>AI Landing Page Generation</h4>
+              <h4>{t('admin_dashboard.campaigns.form.lpb.ai_title')}</h4>
               <p>
-                Konfigurasi landing page akan di-generate secara otomatis oleh AI berdasarkan 
-                <strong> Tema</strong> dan <strong>Tingkat Kesulitan</strong> kampanye Anda saat tombol 
-                "Generate Template" ditekan di halaman utama.
+                {t('admin_dashboard.campaigns.form.lpb.ai_desc')}
               </p>
               <div className="lpb-badge-success">
-                <HiOutlineCheckCircle /> Mode AI aktif
+                <HiOutlineCheckCircle /> {t('admin_dashboard.campaigns.form.lpb.ai_active')}
               </div>
             </div>
           </div>
@@ -118,10 +118,10 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
 
         {activeTab === 'template' && (
           <div className="lpb-template-mode">
-            <h4>Pilih Template</h4>
+            <h4>{t('admin_dashboard.campaigns.form.lpb.tmpl_title')}</h4>
             <div className="lpb-template-list">
               {templates.length === 0 ? (
-                <p className="text-muted">Belum ada template tersedia.</p>
+                <p className="text-muted">{t('admin_dashboard.campaigns.form.lpb.tmpl_empty')}</p>
               ) : (
                 templates.map(t => (
                   <div 
@@ -144,28 +144,27 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
         {activeTab === 'raw' && (
           <div className="lpb-raw-mode">
             <div className="lpb-editor-section">
-              <h5>Upload HTML File</h5>
+              <h5>{t('admin_dashboard.campaigns.form.lpb.raw_title')}</h5>
               <p className="text-muted" style={{ marginBottom: '16px' }}>
-                Unggah file HTML mentah (misal: halaman login game) yang akan ditampilkan kepada target.
-                Sistem secara ajaib akan mencegat form submit agar data masuk ke tracker tanpa mengubah desain aslinya!
+                {t('admin_dashboard.campaigns.form.lpb.raw_desc')}
               </p>
               <input type="file" accept=".html,.htm" className="input" onChange={handleFileUpload} />
               
               <div className="input-group" style={{ marginTop: '16px' }}>
-                <label>HTML Source Code</label>
+                <label>{t('admin_dashboard.campaigns.form.lpb.raw_code')}</label>
                 <textarea 
                   className="input" 
                   rows="12" 
                   style={{ fontFamily: 'monospace', whiteSpace: 'pre' }}
                   value={value.raw_html || ''}
                   onChange={e => onChange({ ...value, raw_html: e.target.value, theme_style: 'raw_html' })}
-                  placeholder="Paste HTML Anda di sini..."
+                  placeholder={t('admin_dashboard.campaigns.form.lpb.raw_placeholder')}
                 />
               </div>
             </div>
             
             <div className="lpb-preview" style={{ marginTop: '24px' }}>
-              <h5>Live Preview</h5>
+              <h5>{t('admin_dashboard.campaigns.form.lpb.preview_title')}</h5>
               <div className="lpb-preview-wrapper" style={{ height: '500px', backgroundColor: '#fff', overflow: 'hidden', padding: 0 }}>
                 {value.raw_html ? (
                   <iframe 
@@ -174,7 +173,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
                     style={{ width: '100%', height: '100%', border: 'none' }} 
                   />
                 ) : (
-                  <div style={{ padding: '20px', color: '#999' }}>Belum ada HTML yang diupload</div>
+                  <div style={{ padding: '20px', color: '#999' }}>{t('admin_dashboard.campaigns.form.lpb.preview_empty')}</div>
                 )}
               </div>
             </div>
@@ -186,7 +185,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
             {/* Editor Panel */}
             <div className="lpb-editor">
               <div className="lpb-editor-section">
-                <h5>Identity & Copy</h5>
+                <h5>{t('admin_dashboard.campaigns.form.lpb.edit_id')}</h5>
                 <div className="input-group">
                   <label>Brand Name</label>
                   <input className="input" value={value.brand_name || ''} onChange={e => handleFieldChange('brand_name', e.target.value)} />
@@ -210,7 +209,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
               </div>
 
               <div className="lpb-editor-section">
-                <h5>Colors & Theme</h5>
+                <h5>{t('admin_dashboard.campaigns.form.lpb.edit_colors')}</h5>
                 <div className="lpb-color-grid">
                   <div className="input-group">
                     <label>Primary</label>
@@ -247,9 +246,9 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
 
               <div className="lpb-editor-section">
                 <div className="lpb-section-header">
-                  <h5>Form Fields</h5>
+                  <h5>{t('admin_dashboard.campaigns.form.lpb.edit_fields')}</h5>
                   <button type="button" className="btn btn-sm btn-ghost" onClick={addFormField}>
-                    <HiOutlinePlus /> Add Field
+                    <HiOutlinePlus /> {t('admin_dashboard.campaigns.form.lpb.add_field')}
                   </button>
                 </div>
                 <div className="lpb-fields-list">
@@ -281,7 +280,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
               </div>
 
               <div className="lpb-editor-section">
-                <h5>Footer</h5>
+                <h5>{t('admin_dashboard.campaigns.form.lpb.edit_footer')}</h5>
                 <div className="input-group">
                   <label>Footer Text</label>
                   <input className="input" value={value.footer_text || ''} onChange={e => handleFieldChange('footer_text', e.target.value)} />
@@ -291,7 +290,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
 
             {/* Preview Panel */}
             <div className="lpb-preview">
-              <h5>Live Preview</h5>
+              <h5>{t('admin_dashboard.campaigns.form.lpb.preview_title')}</h5>
               <div 
                 className="lpb-preview-wrapper" 
                 style={{ 

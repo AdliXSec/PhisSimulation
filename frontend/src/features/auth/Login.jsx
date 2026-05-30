@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { HiOutlineShieldCheck, HiOutlineLockClosed, HiOutlineUser, HiOutlineArrowLeft } from 'react-icons/hi2';
 import { useGoogleLogin } from '@react-oauth/google';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import './Login.css';
 
@@ -11,6 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, googleLogin } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const loginWithGoogle = useGoogleLogin({
@@ -18,32 +20,32 @@ export default function Login() {
       setLoading(true);
       try {
         await googleLogin({ access_token: tokenResponse.access_token });
-        toast.success('Login Google berhasil!');
+        toast.success(t('admin_dashboard.auth.google_success'));
         navigate('/dashboard');
       } catch (err) {
-        toast.error(err.response?.data?.detail || 'Login Google gagal');
+        toast.error(err.response?.data?.detail || t('admin_dashboard.auth.google_failed'));
       } finally {
         setLoading(false);
       }
     },
     onError: () => {
-      toast.error('Gagal terhubung ke Google');
+      toast.error(t('admin_dashboard.auth.google_error'));
     }
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username || !password) {
-      toast.error('Username dan password wajib diisi');
+      toast.error(t('admin_dashboard.auth.missing_fields'));
       return;
     }
     setLoading(true);
     try {
       await login(username, password);
-      toast.success('Login berhasil!');
+      toast.success(t('admin_dashboard.auth.login_success'));
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Login gagal');
+      toast.error(err.response?.data?.detail || t('admin_dashboard.auth.login_failed'));
     } finally {
       setLoading(false);
     }
@@ -58,27 +60,27 @@ export default function Login() {
       </div>
 
       <div className="login-card fade-in">
-        <Link to="/" className="back-link" title="Kembali ke Beranda">
+        <Link to="/" className="back-link" title={t('admin_dashboard.auth.back_home')}>
           <HiOutlineArrowLeft size={18} />
         </Link>
         <div className="login-header">
           <div className="login-logo">
             <HiOutlineShieldCheck size={36} />
           </div>
-          <h1>PhiSim</h1>
-          <p>Security Awareness Platform</p>
+          <h1>{t('admin_dashboard.auth.app_name')}</h1>
+          <p>{t('admin_dashboard.auth.app_desc')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="input-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">{t('admin_dashboard.auth.username_label')}</label>
             <div className="input-icon-wrapper">
               <HiOutlineUser className="input-icon" size={18} />
               <input
                 id="username"
                 type="text"
                 className="input input-with-icon"
-                placeholder="Masukkan username"
+                placeholder={t('admin_dashboard.auth.username_placeholder')}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
@@ -87,14 +89,14 @@ export default function Login() {
           </div>
 
           <div className="input-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t('admin_dashboard.auth.password_label')}</label>
             <div className="input-icon-wrapper">
               <HiOutlineLockClosed className="input-icon" size={18} />
               <input
                 id="password"
                 type="password"
                 className="input input-with-icon"
-                placeholder="Masukkan password"
+                placeholder={t('admin_dashboard.auth.password_placeholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
@@ -103,13 +105,13 @@ export default function Login() {
           </div>
 
           <button type="submit" className="btn btn-primary btn-lg login-btn" disabled={loading}>
-            {loading ? <span className="spinner"></span> : '>> AKSES SISTEM'}
+            {loading ? <span className="spinner"></span> : t('admin_dashboard.auth.btn_login')}
           </button>
         </form>
 
         <div style={{ margin: 'var(--space-xl) 0', textAlign: 'center', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
-          <span style={{ position: 'relative', background: 'var(--bg-primary)', padding: '0 10px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>ATAU</span>
+          <span style={{ position: 'relative', background: 'var(--bg-primary)', padding: '0 10px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>{t('admin_dashboard.auth.or')}</span>
         </div>
 
         <div style={{ width: '100%' }}>
@@ -127,12 +129,12 @@ export default function Login() {
               <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
               <path fill="none" d="M0 0h48v48H0z"></path>
             </svg>
-            LANJUTKAN DENGAN GOOGLE
+            {t('admin_dashboard.auth.btn_google')}
           </button>
         </div>
 
         <div className="login-footer">
-          <p>Belum punya akun? <Link to="/register" style={{ color: 'var(--neon-cyan)', fontWeight: 'bold' }}>Daftar sekarang</Link></p>
+          <p>{t('admin_dashboard.auth.no_account')}<Link to="/register" style={{ color: 'var(--neon-cyan)', fontWeight: 'bold' }}>{t('admin_dashboard.auth.register_now')}</Link></p>
         </div>
       </div>
     </div>

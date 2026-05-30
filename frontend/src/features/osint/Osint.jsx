@@ -6,19 +6,21 @@ import {
   HiOutlineArrowRight,
   HiOutlineArrowLeft
 } from 'react-icons/hi2';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 import usePolling from '../../hooks/usePolling';
 import StepWizard from '../../components/wizard/StepWizard';
 import './Osint.css';
 
-const WIZARD_STEPS = [
-  { label: 'Data Target' },
-  { label: 'Data OSINT' },
-];
-
 export default function Osint() {
+  const { t } = useTranslation();
   const [profiles, setProfiles] = useState([]);
+
+  const WIZARD_STEPS = [
+    { label: t('admin_dashboard.osint.step1_title', 'Data Target') },
+    { label: t('admin_dashboard.osint.step2_title', 'Data OSINT') },
+  ];
   const [loading, setLoading] = useState(true);
   
   // State for form
@@ -37,7 +39,7 @@ export default function Osint() {
       const res = await api.get('/osint');
       setProfiles(res.data);
     } catch (err) {
-      if (loading) toast.error('Gagal memuat profil OSINT');
+      if (loading) toast.error(t('admin_dashboard.osint.messages.load_failed'));
     } finally {
       setLoading(false);
     }
@@ -49,9 +51,9 @@ export default function Osint() {
   usePolling(loadProfiles, 5000);
 
   const handleOsintScrape = async () => {
-    if (!osintUrl) return toast.error("Masukkan URL terlebih dahulu");
+    if (!osintUrl) return toast.error(t('admin_dashboard.osint.messages.url_required'));
     setIsScraping(true);
-    toast.loading("Scraping URL...", { id: 'scrape' });
+    toast.loading(t('admin_dashboard.osint.messages.scraping'), { id: 'scrape' });
     try {
       const res = await api.post('/osint/scrape', { url: osintUrl });
       setOsintForm(prev => ({ 
@@ -59,9 +61,9 @@ export default function Osint() {
         public_data: prev.public_data ? `${prev.public_data}\n\n[Scraped from ${osintUrl}]:\n${res.data.text}` : `[Scraped from ${osintUrl}]:\n${res.data.text}`
       }));
       setOsintUrl('');
-      toast.success("Berhasil mengekstrak teks dari URL", { id: 'scrape' });
+      toast.success(t('admin_dashboard.osint.messages.scrape_success'), { id: 'scrape' });
     } catch (err) {
-      toast.error(err.response?.data?.detail || "Gagal melakukan scraping", { id: 'scrape' });
+      toast.error(err.response?.data?.detail || t('admin_dashboard.osint.messages.scrape_failed'), { id: 'scrape' });
     } finally {
       setIsScraping(false);
     }
@@ -69,20 +71,20 @@ export default function Osint() {
 
   const handleOsintAnalyze = async (e) => {
     e.preventDefault();
-    if (!osintForm.target_name || !osintForm.public_data) return toast.error("Nama dan data OSINT wajib diisi!");
+    if (!osintForm.target_name || !osintForm.public_data) return toast.error(t('admin_dashboard.osint.messages.form_required'));
     
     setIsOsintLoading(true);
-    toast.loading("AI sedang menganalisis jejak digital...", { id: 'osint' });
+    toast.loading(t('admin_dashboard.osint.messages.analyzing'), { id: 'osint' });
     try {
       const res = await api.post('/osint/analyze', osintForm);
-      toast.success("Analisis OSINT Selesai & Disimpan!", { id: 'osint' });
+      toast.success(t('admin_dashboard.osint.messages.analyze_success'), { id: 'osint' });
       setOsintForm({ target_name: '', target_role: '', public_data: '' });
       setSelectedProfile(res.data);
       setShowForm(false);
       setStep(0);
       loadProfiles(); // Refresh list
     } catch (err) {
-      toast.error(err.response?.data?.detail || "Gagal melakukan analisis", { id: 'osint' });
+      toast.error(err.response?.data?.detail || t('admin_dashboard.osint.messages.analyze_failed'), { id: 'osint' });
     } finally {
       setIsOsintLoading(false);
     }
@@ -90,14 +92,14 @@ export default function Osint() {
 
   const handleDelete = async (e, id) => {
     e.stopPropagation();
-    if (!window.confirm("Yakin ingin menghapus profil OSINT ini?")) return;
+    if (!window.confirm(t('admin_dashboard.osint.messages.delete_confirm'))) return;
     try {
       await api.delete(`/osint/${id}`);
-      toast.success("Profil dihapus");
+      toast.success(t('admin_dashboard.osint.messages.delete_success'));
       if (selectedProfile?.id === id) setSelectedProfile(null);
       loadProfiles();
     } catch (err) {
-      toast.error("Gagal menghapus profil");
+      toast.error(t('admin_dashboard.osint.messages.delete_failed'));
     }
   };
 
@@ -107,9 +109,9 @@ export default function Osint() {
       <div className="osint-detail card card-glow slide-up">
         <div className="detail-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
           <h2 style={{ color: 'var(--neon-cyan)' }}>{selectedProfile.target_name}</h2>
-          <button className="btn btn-secondary" onClick={() => setSelectedProfile(null)}>Tutup</button>
+          <button className="btn btn-secondary" onClick={() => setSelectedProfile(null)}>{t('admin_dashboard.osint.btn_close')}</button>
         </div>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>Jabatan: {selectedProfile.target_role || '-'}</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>{t('admin_dashboard.osint.role_label')} {selectedProfile.target_role || '-'}</p>
 
         <div className="risk-banner" style={{ 
           borderColor: selectedProfile.risk_level === 'CRITICAL' ? 'var(--danger)' : selectedProfile.risk_level === 'HIGH' ? 'var(--warning)' : 'var(--neon-purple)',
@@ -117,7 +119,7 @@ export default function Osint() {
           marginBottom: 'var(--space-md)'
         }}>
           <h3 style={{ color: selectedProfile.risk_level === 'CRITICAL' ? 'var(--danger)' : 'var(--warning)', marginBottom: '8px' }}>
-            RISIKO: {selectedProfile.risk_level}
+            {t('admin_dashboard.osint.risk_label')} {selectedProfile.risk_level}
           </h3>
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)' }}>
             {selectedProfile.vulnerability_summary}
@@ -125,7 +127,7 @@ export default function Osint() {
         </div>
 
         <div className="intel-card" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
-          <h4 style={{ color: 'var(--neon-cyan)', marginBottom: '10px' }}>Vektor Serangan (Attack Vectors)</h4>
+          <h4 style={{ color: 'var(--neon-cyan)', marginBottom: '10px' }}>{t('admin_dashboard.osint.attack_vectors')}</h4>
           <ul style={{ paddingLeft: '20px', color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
             {selectedProfile.attack_vectors?.map((vec, i) => (
               <li key={i} style={{ marginBottom: '8px' }}>{vec}</li>
@@ -134,7 +136,7 @@ export default function Osint() {
         </div>
 
         <div className="intel-card" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: 'var(--space-md)', background: 'rgba(0,0,0,0.4)', border: '1px solid var(--border)', marginBottom: 'var(--space-md)' }}>
-          <h4 style={{ color: 'var(--accent-primary)', marginBottom: '10px' }}>Draf Spear Phishing (AI Generated)</h4>
+          <h4 style={{ color: 'var(--accent-primary)', marginBottom: '10px' }}>{t('admin_dashboard.osint.phishing_draft')}</h4>
           <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)', width: '100%' }}>
             <p><strong>From:</strong> {selectedProfile.example_phishing_email?.sender}</p>
             <p><strong>Subject:</strong> {selectedProfile.example_phishing_email?.subject}</p>
@@ -146,7 +148,7 @@ export default function Osint() {
         </div>
 
         <div className="intel-card" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: 'var(--space-md)' }}>
-          <h4 style={{ color: 'var(--text-secondary)', marginBottom: '10px' }}>Data Mentah (OSINT Input)</h4>
+          <h4 style={{ color: 'var(--text-secondary)', marginBottom: '10px' }}>{t('admin_dashboard.osint.raw_data')}</h4>
           <pre style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)', whiteSpace: 'pre-wrap', maxHeight: '200px', overflowY: 'auto' }}>
             {selectedProfile.public_data}
           </pre>
@@ -161,12 +163,12 @@ export default function Osint() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1><HiOutlineGlobeAlt size={28} style={{ verticalAlign: 'bottom', marginRight: '10px', color: 'var(--neon-cyan)' }}/> OSINT & Spear Phishing</h1>
-          <p>Kumpulkan jejak digital target dan simulasikan serangan *Social Engineering*</p>
+          <h1><HiOutlineGlobeAlt size={28} style={{ verticalAlign: 'bottom', marginRight: '10px', color: 'var(--neon-cyan)' }}/> {t('admin_dashboard.osint.page_title')}</h1>
+          <p>{t('admin_dashboard.osint.page_desc')}</p>
         </div>
         {!showForm && (
           <button className="btn btn-primary" onClick={() => { setShowForm(true); setSelectedProfile(null); setStep(0); setOsintForm({ target_name: '', target_role: '', public_data: '' }); }}>
-            <HiOutlinePlus size={18} /> Profil Baru
+            <HiOutlinePlus size={18} /> {t('admin_dashboard.osint.btn_new_profile')}
           </button>
         )}
       </div>
@@ -174,12 +176,10 @@ export default function Osint() {
       {showForm ? (
         <div className="card card-glow slide-down">
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-lg)' }}>
-            <h2>Buat Profil OSINT Baru</h2>
+            <h2>{t('admin_dashboard.osint.form_title')}</h2>
           </div>
           
-          <p style={{ marginBottom: 'var(--space-lg)', color: 'var(--text-secondary)' }}>
-            Simulasikan bagaimana peretas mengumpulkan jejak digital (OSINT) untuk menyusun serangan <i>Spear Phishing</i> yang sangat terpersonalisasi.
-          </p>
+          <p style={{ marginBottom: 'var(--space-lg)', color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: t('admin_dashboard.osint.form_desc') }} />
 
           <StepWizard steps={WIZARD_STEPS} currentStep={step} onStepClick={(i) => { if (i <= step) setStep(i); }} />
 
@@ -188,27 +188,27 @@ export default function Osint() {
             {step === 0 && (
               <div className="wizard-content" key="step-0">
                 <div className="wizard-step-header">
-                  <h3>🎯 Data Target</h3>
-                  <p>Masukkan informasi dasar mengenai target Anda</p>
+                  <h3>{t('admin_dashboard.osint.step1_title')}</h3>
+                  <p>{t('admin_dashboard.osint.step1_desc')}</p>
                 </div>
                 <div className="grid-2">
                   <div className="input-group">
-                    <label>Nama Target</label>
-                    <input type="text" className="input" placeholder="Misal: Budi Santoso" value={osintForm.target_name} onChange={e => setOsintForm({...osintForm, target_name: e.target.value})} required />
+                    <label>{t('admin_dashboard.osint.target_name')}</label>
+                    <input type="text" className="input" placeholder="e.g. Budi Santoso" value={osintForm.target_name} onChange={e => setOsintForm({...osintForm, target_name: e.target.value})} required />
                   </div>
                   <div className="input-group">
-                    <label>Jabatan Target</label>
-                    <input type="text" className="input" placeholder="Misal: Manager HRD" value={osintForm.target_role} onChange={e => setOsintForm({...osintForm, target_role: e.target.value})} />
+                    <label>{t('admin_dashboard.osint.target_role')}</label>
+                    <input type="text" className="input" placeholder="e.g. HR Manager" value={osintForm.target_role} onChange={e => setOsintForm({...osintForm, target_role: e.target.value})} />
                   </div>
                 </div>
 
                 <div className="wizard-nav">
                   <div className="wizard-nav-left">
-                    <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>{t('admin_dashboard.campaigns.form.btn_cancel', 'Batal')}</button>
                   </div>
                   <div className="wizard-nav-right">
                     <button type="button" className="btn btn-primary" disabled={!osintForm.target_name.trim()} onClick={() => setStep(1)}>
-                      Selanjutnya <HiOutlineArrowRight size={16} />
+                      {t('admin_dashboard.campaigns.form.btn_next', 'Selanjutnya')} <HiOutlineArrowRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -219,27 +219,26 @@ export default function Osint() {
             {step === 1 && (
               <div className="wizard-content" key="step-1">
                 <div className="wizard-step-header">
-                  <h3>🕵️‍♂️ Data OSINT</h3>
-                  <p>Kumpulkan dan masukkan jejak digital target</p>
+                  <h3>{t('admin_dashboard.osint.step2_title')}</h3>
+                  <p>{t('admin_dashboard.osint.step2_desc')}</p>
                 </div>
 
                 <div className="input-group">
-                  <label>URL Scraping (Opsional)</label>
+                  <label>{t('admin_dashboard.osint.scrape_url')}</label>
                   <div style={{ display: 'flex', gap: '10px' }}>
-                    <input type="url" className="input" placeholder="Masukkan URL publik untuk di-scrape..." value={osintUrl} onChange={e => setOsintUrl(e.target.value)} />
+                    <input type="url" className="input" placeholder="https://..." value={osintUrl} onChange={e => setOsintUrl(e.target.value)} />
                     <button type="button" className="btn btn-secondary" onClick={handleOsintScrape} disabled={isScraping || !osintUrl}>
                       {isScraping ? '...' : 'Scrape'}
                     </button>
                   </div>
-                  <small style={{ color: 'var(--text-muted)', marginTop: '5px' }}>Gunakan untuk mengambil teks dari artikel berita, blog, atau profil publik.</small>
+                  <small style={{ color: 'var(--text-muted)', marginTop: '5px' }}>{t('admin_dashboard.osint.scrape_hint')}</small>
                 </div>
 
                 <div className="input-group">
-                  <label>Data Jejak Digital (Manual / Hasil Scrape)</label>
+                  <label>{t('admin_dashboard.osint.digital_footprint')}</label>
                   <textarea 
                     className="input" 
                     rows="6" 
-                    placeholder="Masukkan postingan terakhir di medsos, hobi, masalah yang sedang dihadapi, atau hasil scraping..." 
                     value={osintForm.public_data} 
                     onChange={e => setOsintForm({...osintForm, public_data: e.target.value})}
                     required
@@ -249,12 +248,12 @@ export default function Osint() {
                 <div className="wizard-nav">
                   <div className="wizard-nav-left">
                     <button type="button" className="btn btn-secondary" onClick={() => setStep(0)}>
-                      <HiOutlineArrowLeft size={16} /> Sebelumnya
+                      <HiOutlineArrowLeft size={16} /> {t('admin_dashboard.campaigns.form.btn_back', 'Sebelumnya')}
                     </button>
                   </div>
                   <div className="wizard-nav-right">
                     <button type="submit" className="btn btn-primary" disabled={isOsintLoading || !osintForm.public_data.trim()}>
-                      {isOsintLoading ? <span className="spinner"></span> : '>> JALANKAN AI PROFILER'}
+                      {isOsintLoading ? <span className="spinner"></span> : t('admin_dashboard.osint.btn_run_ai')}
                     </button>
                   </div>
                 </div>
@@ -265,9 +264,9 @@ export default function Osint() {
       ) : (
         <div className="osint-layout">
           <div className="osint-list card card-glow">
-            <h3 style={{ marginBottom: 'var(--space-md)', color: 'var(--neon-cyan)' }}>Riwayat Profiling</h3>
+            <h3 style={{ marginBottom: 'var(--space-md)', color: 'var(--neon-cyan)' }}>{t('admin_dashboard.osint.history_title')}</h3>
             {profiles.length === 0 ? (
-              <div className="empty-state">Belum ada riwayat profil OSINT.</div>
+              <div className="empty-state">{t('admin_dashboard.osint.history_empty')}</div>
             ) : (
               <div className="profile-list">
                 {profiles.map(p => (
@@ -298,7 +297,7 @@ export default function Osint() {
               renderDetail()
             ) : (
               <div className="empty-state card card-glow" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                Pilih profil di sebelah kiri untuk melihat detail analisis.
+                {t('admin_dashboard.osint.detail_empty')}
               </div>
             )}
           </div>
