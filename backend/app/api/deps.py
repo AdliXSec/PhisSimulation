@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -40,3 +40,11 @@ async def get_current_user(
         )
 
     return user
+
+def get_language(request: Request) -> str:
+    """Extract language preference from Accept-Language header."""
+    lang_header = request.headers.get("Accept-Language", "id")
+    # Simplify to just 'en' or 'id'
+    if lang_header.lower().startswith("en"):
+        return "en"
+    return "id"

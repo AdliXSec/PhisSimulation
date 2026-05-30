@@ -53,10 +53,11 @@ async def generate_phishing_template(
     target_departments: list[int],
     external_url: str | None = None,
     ai_instructions: str | None = None,
+    lang: str = "id",
 ) -> dict:
     """Use AI to generate a spear-phishing email template."""
     # Try cache first
-    cache_key = f"ai:email:{hashlib.md5(f'{theme}:{difficulty}:{target_departments}:{external_url}:{ai_instructions}'.encode()).hexdigest()}"
+    cache_key = f"ai:email:{hashlib.md5(f'{theme}:{difficulty}:{target_departments}:{external_url}:{ai_instructions}:{lang}'.encode()).hexdigest()}"
     cached = await _get_cache(cache_key)
     if cached:
         return cached
@@ -84,7 +85,8 @@ async def generate_phishing_template(
         if ai_instructions else ""
     )
 
-    user_prompt = f"""Buat satu template email spear-phishing dalam bahasa Indonesia untuk simulasi keamanan internal perusahaan.
+    lang_instruction = "bahasa Inggris" if lang.startswith("en") else "bahasa Indonesia"
+    user_prompt = f"""Buat satu template email spear-phishing dalam {lang_instruction} untuk simulasi keamanan internal perusahaan.
 
 Parameter:
 - Tema: {theme}
@@ -96,6 +98,7 @@ Instruksi:
 - Gunakan manipulasi psikologis yang sesuai tingkat kesulitan (urgensi, otoritas, kelangkaan)
 - Sertakan call-to-action yang mengarahkan target untuk klik link{external_instruction}
 - Gunakan placeholder {{{{tracking_link}}}} untuk atribut href pada link (jangan taruh link asli di href).
+- JANGAN gunakan placeholder lain seperti {{{{Nama Perusahaan}}}} atau {{{{nama_karyawan}}}}. Langsung karang nama perusahaan fiktif yang realistis, atau gunakan nama perusahaan jika ada di instruksi.
 - Jangan gunakan kata-kata kasar atau mengancam secara berlebihan{admin_instruction}
 
 Output format JSON:
@@ -108,6 +111,9 @@ Output format JSON:
     "red_flags": ["List red flag yang bisa dikenali karyawan waspada"],
     "manipulation_technique": "Teknik manipulasi yang digunakan"
 }}"""
+
+    if lang.startswith("en"):
+        user_prompt += "\n\n[CRITICAL INSTRUCTION: You MUST generate all the content (email body, subject, sender name, etc) entirely in ENGLISH.]"
 
     raw_response = await _call_openrouter(system_prompt, user_prompt)
 
@@ -151,7 +157,7 @@ Output format JSON:
     return result_data
 
 
-async def generate_campaign_analysis(stats_summary: str) -> str:
+async def generate_campaign_analysis(stats_summary: str, lang: str = "id") -> str:
     """Use AI to generate a narrative analysis of campaign results."""
     system_prompt = (
         "Anda adalah SecOps Expert AI. Berikan jawaban yang teknis, mendalam, dan terstruktur. "
@@ -171,6 +177,9 @@ Data Statistik:
 
 Berikan analisis dalam bahasa Indonesia yang profesional dan mudah dipahami oleh manajemen non-teknis."""
 
+    if lang.startswith("en"):
+        user_prompt += "\n\n[CRITICAL INSTRUCTION: You MUST write the entire analysis report in ENGLISH.]"
+
     return await _call_openrouter(system_prompt, user_prompt)
 
 
@@ -178,10 +187,11 @@ async def generate_landing_page_config(
     theme: str,
     difficulty: str,
     brand_context: str | None = None,
+    lang: str = "id",
 ) -> dict:
     """Use AI to generate a dynamic landing page configuration."""
     # Try cache first
-    cache_key = f"ai:landing:{hashlib.md5(f'{theme}:{difficulty}:{brand_context}'.encode()).hexdigest()}"
+    cache_key = f"ai:landing:{hashlib.md5(f'{theme}:{difficulty}:{brand_context}:{lang}'.encode()).hexdigest()}"
     cached = await _get_cache(cache_key)
     if cached:
         return cached
@@ -232,6 +242,9 @@ Output format JSON:
     "footer_text": "Teks footer yang meyakinkan",
     "theme_style": "microsoft365|google|corporate|corporate_dark|banking|generic"
 }}"""
+
+    if lang.startswith("en"):
+        user_prompt += "\n\n[CRITICAL INSTRUCTION: You MUST generate all the text content (title, subtitle, button text, labels, etc) entirely in ENGLISH.]"
 
     raw_response = await _call_openrouter(system_prompt, user_prompt)
 
@@ -338,10 +351,10 @@ def _get_default_landing_config(theme: str) -> dict:
             "theme_style": "corporate",
         }
 
-async def analyze_osint_profile(target_name: str, target_role: str, public_data: str) -> dict:
+async def analyze_osint_profile(target_name: str, target_role: str, public_data: str, lang: str = "id") -> dict:
     """Use AI to analyze OSINT data and generate a spear phishing vector."""
     # Try cache first
-    cache_key = f"ai:osint:{hashlib.md5(f'{target_name}:{target_role}:{public_data}'.encode()).hexdigest()}"
+    cache_key = f"ai:osint:{hashlib.md5(f'{target_name}:{target_role}:{public_data}:{lang}'.encode()).hexdigest()}"
     cached = await _get_cache(cache_key)
     if cached:
         return cached
@@ -380,6 +393,9 @@ Output format JSON:
         "body": "Isi draf email yang sangat persuasif dan personal..."
     }}
 }}"""
+
+    if lang.startswith("en"):
+        user_prompt += "\n\n[CRITICAL INSTRUCTION: You MUST generate all the content (vulnerability summary, attack vectors, example email) entirely in ENGLISH.]"
 
     raw_response = await _call_openrouter(system_prompt, user_prompt)
 

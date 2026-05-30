@@ -105,13 +105,31 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
           <div className="lpb-ai-mode">
             <div className="lpb-ai-info">
               <HiOutlineSparkles size={32} style={{ color: 'var(--accent-primary)' }} />
-              <h4>{t('admin_dashboard.campaigns.form.lpb.ai_title')}</h4>
+              <h4>{t('admin_dashboard.campaigns.form.lpb.ai_title', 'AI Landing Page Generation')}</h4>
               <p>
-                {t('admin_dashboard.campaigns.form.lpb.ai_desc')}
+                {t('admin_dashboard.campaigns.form.lpb.ai_desc', "The landing page configuration will be generated automatically by AI based on your campaign's Theme and Difficulty Level when you click 'Generate Template' on the main page.")}
               </p>
-              <div className="lpb-badge-success">
-                <HiOutlineCheckCircle /> {t('admin_dashboard.campaigns.form.lpb.ai_active')}
+              <div className="lpb-badge-success" style={{ marginBottom: '1rem' }}>
+                <HiOutlineCheckCircle /> {t('admin_dashboard.campaigns.form.lpb.ai_active', 'AI Mode Active')}
               </div>
+            </div>
+            
+            <div className="input-group" style={{ background: 'rgba(0, 240, 255, 0.03)', padding: 'var(--space-lg)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0, 240, 255, 0.1)', textAlign: 'left', width: '100%', marginTop: '1rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <HiOutlineSparkles size={16} style={{ color: 'var(--neon-cyan)' }} />
+                {t('admin_dashboard.campaigns.form.ai_instructions', 'Additional AI Instructions')}
+              </label>
+              <textarea 
+                className="input" 
+                rows="4" 
+                placeholder={t('admin_dashboard.campaigns.form.ai_instructions_placeholder', 'Provide specific details for the AI to generate a more accurate landing page...')}
+                value={value?.brand_context || ''}
+                onChange={(e) => handleFieldChange('brand_context', e.target.value)}
+                style={{ lineHeight: '1.6' }}
+              ></textarea>
+              <small className="text-muted" style={{ marginTop: '4px', display: 'block' }}>
+                {t('admin_dashboard.campaigns.form.ai_instructions_desc', 'Optional — AI will use these details to generate a more realistic and personalized page.')}
+              </small>
             </div>
           </div>
         )}

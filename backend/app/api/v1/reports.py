@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.core.database import get_db
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_language
 from app.models.user import User
 from app.models.campaign import Campaign
 from app.models.campaign_target import CampaignTarget
@@ -210,6 +210,7 @@ async def get_ai_analysis(
     campaign_id: str,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    lang: str = Depends(get_language),
 ):
     """Generate AI-powered analysis and recommendations for a campaign."""
     result = await db.execute(select(Campaign).where(Campaign.id == campaign_id, Campaign.created_by == current_user.id))
@@ -238,7 +239,7 @@ async def get_ai_analysis(
     )
 
     try:
-        analysis = await generate_campaign_analysis(stats_summary)
+        analysis = await generate_campaign_analysis(stats_summary, lang)
         # Save to database for persistence
         campaign.ai_analysis = analysis
         await db.flush()

@@ -594,14 +594,14 @@ export default function Campaigns() {
                           <button className="btn btn-ghost" onClick={() => handleEdit(c)} title={t('admin_dashboard.campaigns.actions.edit', 'Edit')}>
                             <HiOutlinePencil size={18} />
                           </button>
-                          <button className="btn btn-ghost text-danger" onClick={() => handleDelete(c.id, c.name)} title={t('admin_dashboard.campaigns.actions.delete', 'Hapus')}>
-                            <HiOutlineTrash size={18} />
-                          </button>
                           <button className="btn btn-ghost" onClick={() => handleGenerate(c.id)} title={t('admin_dashboard.campaigns.actions.generate', 'Generate Template')}>
                             <HiOutlineSparkles size={18} />
                           </button>
                         </>
                       )}
+                      <button className="btn btn-ghost text-danger" onClick={() => handleDelete(c.id, c.name)} title={t('admin_dashboard.campaigns.actions.delete', 'Hapus')}>
+                        <HiOutlineTrash size={18} />
+                      </button>
                     </div>
                   </div>
                 </td>

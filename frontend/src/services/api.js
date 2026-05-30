@@ -15,6 +15,11 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  // Attach language preference for backend AI and validation
+  const lang = localStorage.getItem('i18nextLng') || 'id';
+  config.headers['Accept-Language'] = lang;
+  
   return config;
 });
 

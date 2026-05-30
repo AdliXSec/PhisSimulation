@@ -15,7 +15,7 @@ const resources = {
           title1: "Test Your Team's Resilience",
           title2: "Against ",
           words: ["Phishing", "Social Engineering", "Cyber Attack"],
-          desc: "Create AI phishing simulations, send them to all departments, and see who clicks — all in one intuitive dashboard. Free to try.",
+          desc: "Create AI phishing simulations, send them to all departments, and see who clicks all in one intuitive dashboard. Free to try.",
           btn_start: "Get Started",
           btn_how_it_works: "See How It Works ↓"
         },
@@ -32,7 +32,7 @@ const resources = {
           items: [
             {
               title: "AI Email Generator",
-              desc: "Just specify a theme — AI will generate realistic phishing emails complete with decoy landing pages. Zero effort."
+              desc: "Just specify a theme AI will generate realistic phishing emails complete with decoy landing pages. Zero effort."
             },
             {
               title: "Custom HTML Engine",
@@ -58,7 +58,7 @@ const resources = {
         },
         steps: {
           title: "Just 4 Steps 🎯",
-          desc: "From zero to a running campaign — in less than 5 minutes.",
+          desc: "From zero to a running campaign in less than 5 minutes.",
           step: "STEP",
           items: [
             {
@@ -71,7 +71,7 @@ const resources = {
             },
             {
               title: "Launch!",
-              desc: "One click — phishing emails are sent to all targets automatically."
+              desc: "One click phishing emails are sent to all targets automatically."
             },
             {
               title: "Monitor & Analyze",
@@ -600,7 +600,7 @@ const resources = {
           title1: "Uji Ketahanan Tim",
           title2: "Anda Terhadap ",
           words: ["Phishing", "Social Engineering", "Cyber Attack"],
-          desc: "Buat simulasi phishing dengan AI, kirim ke seluruh departemen, dan lihat siapa yang klik — semua dalam satu dashboard yang intuitif. Gratis untuk dicoba.",
+          desc: "Buat simulasi phishing dengan AI, kirim ke seluruh departemen, dan lihat siapa yang klik semua dalam satu dashboard yang intuitif. Gratis untuk dicoba.",
           btn_start: "Mulai Sekarang",
           btn_how_it_works: "Lihat Cara Kerja ↓"
         },
@@ -617,7 +617,7 @@ const resources = {
           items: [
             {
               title: "AI Email Generator",
-              desc: "Cukup tentukan tema — AI akan membuatkan email phishing realistis lengkap dengan landing page tiruannya. Zero effort."
+              desc: "Cukup tentukan tema AI akan membuatkan email phishing realistis lengkap dengan landing page tiruannya. Zero effort."
             },
             {
               title: "Custom HTML Engine",
@@ -643,7 +643,7 @@ const resources = {
         },
         steps: {
           title: "Cuma 4 Langkah 🎯",
-          desc: "Dari nol sampai kampanye berjalan — kurang dari 5 menit.",
+          desc: "Dari nol sampai kampanye berjalan kurang dari 5 menit.",
           step: "STEP",
           items: [
             {
@@ -656,7 +656,7 @@ const resources = {
             },
             {
               title: "Luncurkan!",
-              desc: "Satu klik — email phishing terkirim ke seluruh target secara otomatis."
+              desc: "Satu klik email phishing terkirim ke seluruh target secara otomatis."
             },
             {
               title: "Pantau & Analisis",

@@ -6,7 +6,7 @@ import httpx
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import get_current_user, get_db, get_language
 from app.models.user import User
 from app.models.osint import OsintProfile
 from app.services.ai_service import analyze_osint_profile
@@ -26,13 +26,15 @@ class OsintScrapeRequest(BaseModel):
 async def analyze_osint(
     request: OsintAnalyzeRequest, 
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(get_language)
 ):
     try:
         result = await analyze_osint_profile(
             target_name=request.target_name,
             target_role=request.target_role,
-            public_data=request.public_data
+            public_data=request.public_data,
+            lang=lang
         )
         
         # Save to DB
