@@ -2,6 +2,7 @@ import React, { Suspense, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Float, Environment, ContactShadows, Center } from '@react-three/drei';
 import * as THREE from 'three';
+import ErrorBoundary from '../ui/ErrorBoundary';
 
 function RocketModel(props) {
   const { scene } = useGLTF('/rocket.glb');
@@ -99,41 +100,43 @@ useGLTF.preload('/rocket.glb');
 export default function Rocket3D() {
   return (
     <div style={{ width: '100%', height: '100%', minHeight: '500px', position: 'relative', zIndex: 10 }}>
-      {/* 
-        eventSource={document.body} allows the Canvas to track mouse movements 
-        across the ENTIRE web page, even though the Canvas container has pointerEvents: 'none'
-      */}
-      <Canvas
-        camera={{ position: [0, 0, 10], fov: 45 }}
-        dpr={[1, 2]}
-        eventSource={typeof document !== 'undefined' ? document.body : undefined}
-        eventPrefix="client"
-      >
-        <ambientLight intensity={1.5} />
-        <directionalLight position={[10, 20, 10]} intensity={3} color="#00f0ff" />
-        <directionalLight position={[-10, -10, -10]} intensity={2} color="#ff00ff" />
-        <Environment preset="city" />
-
-        <Suspense fallback={null}>
-          <Float
-            speed={2}
-            rotationIntensity={0.2}
-            floatIntensity={1.5}
-            floatingRange={[-0.5, 0.5]}
+        {/* 
+          eventSource={document.body} allows the Canvas to track mouse movements 
+          across the ENTIRE web page, even though the Canvas container has pointerEvents: 'none'
+        */}
+        <ErrorBoundary fallback={null}>
+          <Canvas
+            camera={{ position: [0, 0, 10], fov: 45 }}
+            dpr={[1, 2]}
+            eventSource={typeof document !== 'undefined' ? document.body : undefined}
+            eventPrefix="client"
           >
-            <RocketModel />
-          </Float>
+            <ambientLight intensity={1.5} />
+            <directionalLight position={[10, 20, 10]} intensity={3} color="#00f0ff" />
+            <directionalLight position={[-10, -10, -10]} intensity={2} color="#ff00ff" />
+            <Environment preset="city" />
 
-          <ContactShadows
-            position={[0, -4, 0]}
-            opacity={0.5}
-            scale={30}
-            blur={3}
-            far={10}
-            color="#00f0ff"
-          />
-        </Suspense>
-      </Canvas>
-    </div>
-  );
+            <Suspense fallback={null}>
+              <Float
+                speed={2}
+                rotationIntensity={0.2}
+                floatIntensity={1.5}
+                floatingRange={[-0.5, 0.5]}
+              >
+                <RocketModel />
+              </Float>
+
+              <ContactShadows
+                position={[0, -4, 0]}
+                opacity={0.5}
+                scale={30}
+                blur={3}
+                far={10}
+                color="#00f0ff"
+              />
+            </Suspense>
+          </Canvas>
+        </ErrorBoundary>
+      </div>
+    );
 }

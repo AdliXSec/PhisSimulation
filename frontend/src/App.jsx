@@ -20,6 +20,7 @@ import LandingPage from './features/tracking/LandingPage';
 import EducationPage from './features/tracking/EducationPage';
 import LandingHome from './features/public/LandingHome';
 import TemplateLibrary from './features/templates/TemplateLibrary';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import './index.css';
 
 function ProtectedRoute({ children }) {
@@ -97,9 +98,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <AuthProvider>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ThemeProvider>
+          <AuthProvider>
           <CustomCursor />
           <AppRoutes />
           <Toaster
@@ -116,8 +118,9 @@ export default function App() {
               },
             }}
           />
-        </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
