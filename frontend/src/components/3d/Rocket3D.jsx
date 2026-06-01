@@ -41,7 +41,7 @@ function RocketModel(props) {
     if (groupRef.current) {
       // Check for mouse movement
       if (
-        Math.abs(state.pointer.x - lastPointer.current.x) > 0.001 || 
+        Math.abs(state.pointer.x - lastPointer.current.x) > 0.001 ||
         Math.abs(state.pointer.y - lastPointer.current.y) > 0.001
       ) {
         idleTime.current = 0;
@@ -54,13 +54,14 @@ function RocketModel(props) {
       let pointerX = state.pointer.x;
       let pointerY = state.pointer.y;
 
-      // Automatically animate if idle for more than 2 seconds
+      // Automatically animate if idle for more than 2 seconds — smooth figure-8 drift
       if (idleTime.current > 2) {
         const time = state.clock.elapsedTime;
-        // Kombinasi beberapa gelombang sinus (harmonisasi) untuk pergerakan pseudo-random (tidak berulang persis)
-        const autoX = (Math.sin(time * 0.35) + Math.sin(time * 0.55 + 2) + Math.sin(time * 0.85 + 4.5)) / 2.5; 
-        const autoY = (Math.sin(time * 0.45) + Math.sin(time * 0.65 + 1) + Math.sin(time * 0.95 + 3.5)) / 2.5;
-        
+        // Lemniscate (figure-8) path: satu gelombang sinus tunggal per sumbu
+        // dengan rasio frekuensi 2:1 untuk membentuk jalur angka-8 yang mulus
+        const autoX = Math.sin(time * 0.12) * 0.6;
+        const autoY = Math.sin(time * 0.24) * 0.35;
+
         // Smoothly blend to auto movement over 2 seconds
         const blend = Math.min((idleTime.current - 2) * 0.5, 1);
         pointerX = THREE.MathUtils.lerp(pointerX, autoX, blend);
@@ -89,54 +90,104 @@ function RocketModel(props) {
   return (
     <group ref={groupRef} {...props}>
       <Center>
-        <primitive object={scene} scale={0.045} />
+        <primitive object={scene} scale={0.02} />
       </Center>
     </group>
   );
 }
 
+// ── Satellite: Orbiting autonomously ──
+function SatelliteModel() {
+  const { scene } = useGLTF('/satelit.glb');
+  const orbitRef = useRef();
+  const meshRef = useRef();
+
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (child.isMesh && child.material) {
+        child.material.metalness = 0.9;
+        child.material.roughness = 0.15;
+      }
+    });
+  }, [scene]);
+
+  useFrame((state) => {
+    const time = state.clock.elapsedTime;
+
+    // Elliptical orbit path
+    const orbitRadiusX = 5.5;
+    const orbitRadiusZ = 3.5;
+    const orbitSpeed = 0.25; // Slow, majestic orbit
+
+    if (orbitRef.current) {
+      orbitRef.current.position.x = Math.cos(time * orbitSpeed) * orbitRadiusX;
+      orbitRef.current.position.z = Math.sin(time * orbitSpeed) * orbitRadiusZ;
+      // Gentle vertical bob
+      orbitRef.current.position.y = Math.sin(time * 0.4) * 0.8;
+    }
+
+    // Self-rotation on its own axis
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.008;
+    }
+  });
+
+  return (
+    <group ref={orbitRef}>
+      <group ref={meshRef}>
+        <Center>
+          <primitive object={scene} scale={0.003} />
+        </Center>
+      </group>
+    </group>
+  );
+}
+
 useGLTF.preload('/rocket.glb');
+useGLTF.preload('/satelit.glb');
 
 export default function Rocket3D() {
   return (
     <div style={{ width: '100%', height: '100%', minHeight: '500px', position: 'relative', zIndex: 10 }}>
-        {/* 
+      {/* 
           eventSource={document.body} allows the Canvas to track mouse movements 
           across the ENTIRE web page, even though the Canvas container has pointerEvents: 'none'
         */}
-        <ErrorBoundary fallback={null}>
-          <Canvas
-            camera={{ position: [0, 0, 10], fov: 45 }}
-            dpr={[1, 2]}
-            eventSource={typeof document !== 'undefined' ? document.body : undefined}
-            eventPrefix="client"
-          >
-            <ambientLight intensity={1.5} />
-            <directionalLight position={[10, 20, 10]} intensity={3} color="#00f0ff" />
-            <directionalLight position={[-10, -10, -10]} intensity={2} color="#ff00ff" />
-            <Environment preset="city" />
+      <ErrorBoundary fallback={null}>
+        <Canvas
+          camera={{ position: [0, 0, 10], fov: 45 }}
+          dpr={[1, 2]}
+          eventSource={typeof document !== 'undefined' ? document.body : undefined}
+          eventPrefix="client"
+        >
+          <ambientLight intensity={1.5} />
+          <directionalLight position={[10, 20, 10]} intensity={3} color="#00f0ff" />
+          <directionalLight position={[-10, -10, -10]} intensity={2} color="#ff00ff" />
+          <Environment preset="city" />
 
-            <Suspense fallback={null}>
-              <Float
-                speed={2}
-                rotationIntensity={0.2}
-                floatIntensity={1.5}
-                floatingRange={[-0.5, 0.5]}
-              >
-                <RocketModel />
-              </Float>
+          <Suspense fallback={null}>
+            <Float
+              speed={2}
+              rotationIntensity={0.2}
+              floatIntensity={1.5}
+              floatingRange={[-0.5, 0.5]}
+            >
+              <RocketModel />
+            </Float>
 
-              <ContactShadows
-                position={[0, -4, 0]}
-                opacity={0.5}
-                scale={30}
-                blur={3}
-                far={10}
-                color="#00f0ff"
-              />
-            </Suspense>
-          </Canvas>
-        </ErrorBoundary>
-      </div>
-    );
+            <SatelliteModel />
+
+            <ContactShadows
+              position={[0, -4, 0]}
+              opacity={0.5}
+              scale={30}
+              blur={3}
+              far={10}
+              color="#00f0ff"
+            />
+          </Suspense>
+        </Canvas>
+      </ErrorBoundary>
+    </div>
+  );
 }

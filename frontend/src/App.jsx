@@ -31,7 +31,7 @@ function ProtectedRoute({ children }) {
 }
 
 const getPageTitle = (pathname) => {
-  if (pathname === '/') return 'Phising Simulation Home Page';
+  if (pathname === '/') return 'AI Phising Simulation';
   if (pathname === '/login') return 'Login - PhiSim';
   if (pathname === '/register') return 'Register - PhiSim';
   if (pathname === '/dashboard') return 'Dashboard - PhiSim';
@@ -102,22 +102,22 @@ export default function App() {
       <BrowserRouter>
         <ThemeProvider>
           <AuthProvider>
-          <CustomCursor />
-          <AppRoutes />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-                borderRadius: '8px',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '0.875rem',
-                boxShadow: 'var(--shadow-md)',
-              },
-            }}
-          />
+            <CustomCursor />
+            <AppRoutes />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                style: {
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px',
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '0.875rem',
+                  boxShadow: 'var(--shadow-md)',
+                },
+              }}
+            />
           </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>

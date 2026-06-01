@@ -27,7 +27,7 @@ const resources = {
           seconds: " sec"
         },
         features: {
-          title: "Why Choose PhiSim? 🤔",
+          title: "Why Choose PhiSim?",
           desc: "Three key features that make phishing simulation as easy as ordering coffee.",
           items: [
             {
@@ -57,7 +57,7 @@ const resources = {
           ]
         },
         steps: {
-          title: "Just 4 Steps 🎯",
+          title: "Just 4 Steps",
           desc: "From zero to a running campaign in less than 5 minutes.",
           step: "STEP",
           items: [
@@ -85,7 +85,54 @@ const resources = {
           btn_signup: "🚀 Sign Up Free",
           btn_login: "Admin Login"
         },
-        footer: "© 2026 PHISIM // CRAFTED WITH ❤️ FOR BETTER CYBERSECURITY"
+        about: {
+          title: "Building a Human Firewall",
+          desc: "PhiSim was born from a simple idea: technology alone cannot stop phishing. We believe that training the human mind is the ultimate defense against social engineering.",
+          quote: "\"A firewall can block malware, but only awareness can stop deception.\"",
+          mission: "Our mission is to democratize enterprise-grade security awareness training, making it accessible, engaging, and highly effective for teams of all sizes."
+        },
+        faq: {
+          title: "Frequently Asked Questions",
+          desc: "Everything you need to know about PhiSim.",
+          items: [
+            {
+              q: "Is it really free?",
+              a: "Yes! PhiSim is an open-source project designed to provide free access to essential phishing simulation tools."
+            },
+            {
+              q: "How does the AI generator work?",
+              a: "We integrate with powerful LLMs. By providing a theme, the AI generates context-aware, highly realistic phishing emails complete with psychological triggers."
+            },
+            {
+              q: "Can I use my own HTML templates?",
+              a: "Absolutely. You can upload custom raw HTML files for the landing page, and our engine will automatically parse and intercept form submissions."
+            },
+            {
+              q: "Are the simulated emails actually sent?",
+              a: "Yes, the emails are sent via SMTP to the target employees. Ensure you have authorized the simulation within your organization before launching."
+            }
+          ]
+        },
+        footer_links: {
+          product: {
+            title: "Product",
+            features: "Features",
+            pricing: "Pricing",
+            changelog: "Changelog"
+          },
+          resources: {
+            title: "Resources",
+            documentation: "Documentation",
+            blog: "Security Blog",
+            templates: "Template Gallery"
+          },
+          legal: {
+            title: "Legal",
+            privacy: "Privacy Policy",
+            terms: "Terms of Service"
+          }
+        },
+        footer_copyright: "© 2026 PHISIM // CRAFTED WITH ❤️ FOR BETTER CYBERSECURITY"
       },
       dashboard_layout: {
         mobile_menu: "Menu",
@@ -612,7 +659,7 @@ const resources = {
           seconds: " detik"
         },
         features: {
-          title: "Kenapa Harus PhiSim? 🤔",
+          title: "Kenapa Harus PhiSim?",
           desc: "Tiga fitur utama yang membuat simulasi phishing semudah memesan kopi.",
           items: [
             {
@@ -642,7 +689,7 @@ const resources = {
           ]
         },
         steps: {
-          title: "Cuma 4 Langkah 🎯",
+          title: "Cuma 4 Langkah",
           desc: "Dari nol sampai kampanye berjalan kurang dari 5 menit.",
           step: "STEP",
           items: [
@@ -670,7 +717,54 @@ const resources = {
           btn_signup: "🚀 Daftar Gratis",
           btn_login: "Login Admin"
         },
-        footer: "© 2026 PHISIM // DIBUAT DENGAN ❤️ UNTUK KEAMANAN SIBER YANG LEBIH BAIK"
+        about: {
+          title: "Membangun Firewall Manusia",
+          desc: "PhiSim lahir dari satu ide sederhana: teknologi saja tidak cukup untuk menghentikan phishing. Kami percaya bahwa melatih pikiran manusia adalah pertahanan pamungkas melawan rekayasa sosial.",
+          quote: "\"Firewall dapat memblokir malware, tetapi hanya kesadaran yang dapat menghentikan tipu daya.\"",
+          mission: "Misi kami adalah mendemokratisasi pelatihan kesadaran keamanan kelas perusahaan, menjadikannya mudah diakses, menarik, dan sangat efektif untuk tim dari berbagai ukuran."
+        },
+        faq: {
+          title: "Pertanyaan yang Sering Diajukan",
+          desc: "Semua yang perlu Anda ketahui tentang PhiSim.",
+          items: [
+            {
+              q: "Apakah ini benar-benar gratis?",
+              a: "Ya! PhiSim adalah proyek open-source yang dirancang untuk memberikan akses gratis ke alat simulasi phishing esensial."
+            },
+            {
+              q: "Bagaimana cara kerja AI generator?",
+              a: "Kami berintegrasi dengan LLM yang kuat. Dengan memberikan sebuah tema, AI akan menghasilkan email phishing yang sangat realistis dan sadar konteks, lengkap dengan pemicu psikologis."
+            },
+            {
+              q: "Bisakah saya menggunakan template HTML saya sendiri?",
+              a: "Tentu saja. Anda dapat mengunggah file HTML mentah untuk landing page, dan mesin kami akan secara otomatis mem-parsing dan mencegat pengiriman formulir."
+            },
+            {
+              q: "Apakah email simulasi benar-benar dikirim?",
+              a: "Ya, email dikirim via SMTP ke karyawan target. Pastikan Anda memiliki izin resmi di organisasi Anda sebelum meluncurkan simulasi."
+            }
+          ]
+        },
+        footer_links: {
+          product: {
+            title: "Produk",
+            features: "Fitur",
+            pricing: "Harga",
+            changelog: "Pembaruan"
+          },
+          resources: {
+            title: "Sumber Daya",
+            documentation: "Dokumentasi",
+            blog: "Blog Keamanan",
+            templates: "Galeri Template"
+          },
+          legal: {
+            title: "Hukum",
+            privacy: "Kebijakan Privasi",
+            terms: "Syarat & Ketentuan"
+          }
+        },
+        footer_copyright: "© 2026 PHISIM // DIBUAT DENGAN ❤️ UNTUK KEAMANAN SIBER YANG LEBIH BAIK"
       },
       dashboard_layout: {
         mobile_menu: "Menu",

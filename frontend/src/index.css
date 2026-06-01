@@ -309,6 +309,26 @@ pre, code {
   }
 }
 
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.bento-item-wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 900px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .bento-item-wide {
+    grid-column: span 1;
+  }
+}
+
+
 .card-glow::before {
   content: '';
   position: absolute;

@@ -42,3 +42,8 @@ yarn-error.log*
 # Docker volumes
 postgres_data/
 redis_data/
+
+CLAUDE.md
+implementation_plan.md
+UPDATE.md
+UPDATE*.md
