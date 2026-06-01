@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import CustomCursor from './components/ui/CustomCursor';
+import SpaceLoader from './components/ui/SpaceLoader';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Login from './features/auth/Login';
 import Register from './features/auth/Register';
@@ -96,28 +97,56 @@ function AppRoutes() {
   );
 }
 
+function MainApp() {
+  const location = useLocation();
+  const isDecoyRoute = location.pathname.startsWith('/landing') || location.pathname.startsWith('/education');
+  
+  const [appReady, setAppReady] = useState(isDecoyRoute);
+
+  useEffect(() => {
+    if (isDecoyRoute) {
+      setAppReady(true);
+    }
+  }, [isDecoyRoute]);
+
+  const shouldShowLoader = !appReady && !isDecoyRoute;
+  const isContentVisible = appReady || isDecoyRoute;
+
+  return (
+    <>
+      {/* Space Loader — shown until app is fully ready */}
+      {shouldShowLoader && <SpaceLoader onComplete={() => setAppReady(true)} />}
+
+      {/* App content renders behind the loader (pre-renders while user watches animation) */}
+      <div style={{ visibility: isContentVisible ? 'visible' : 'hidden' }}>
+        {!isDecoyRoute && <CustomCursor />}
+        <AppRoutes />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: 'var(--bg-card)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              fontFamily: "'Inter', sans-serif",
+              fontSize: '0.875rem',
+              boxShadow: 'var(--shadow-md)',
+            },
+          }}
+        />
+      </div>
+    </>
+  );
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
         <ThemeProvider>
           <AuthProvider>
-            <CustomCursor />
-            <AppRoutes />
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                style: {
-                  background: 'var(--bg-card)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '8px',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '0.875rem',
-                  boxShadow: 'var(--shadow-md)',
-                },
-              }}
-            />
+            <MainApp />
           </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>

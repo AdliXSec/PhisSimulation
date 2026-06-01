@@ -168,7 +168,9 @@
    Reset & Base
    ============================================ */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -207,7 +209,12 @@ a:hover {
   text-shadow: 0 0 8px var(--neon-cyan-glow);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--text-heading);
   font-family: var(--font-display);
   font-weight: 700;
@@ -215,7 +222,8 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.02em;
 }
 
-pre, code {
+pre,
+code {
   white-space: pre-wrap;
   word-wrap: break-word;
   word-break: break-word;
@@ -251,15 +259,16 @@ pre, code {
 .scanline-overlay::after {
   content: '';
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 240, 255, 0.012) 2px,
-    rgba(0, 240, 255, 0.012) 4px
-  );
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 240, 255, 0.012) 2px,
+      rgba(0, 240, 255, 0.012) 4px);
   z-index: 9999;
 }
 
@@ -323,6 +332,7 @@ pre, code {
   .bento-grid {
     grid-template-columns: 1fr;
   }
+
   .bento-item-wide {
     grid-column: span 1;
   }
@@ -332,7 +342,9 @@ pre, code {
 .card-glow::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--neon-cyan-glow), transparent);
 }
@@ -340,7 +352,8 @@ pre, code {
 .card-glow::after {
   content: '';
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 1px;
   height: 100%;
   background: linear-gradient(180deg, var(--neon-cyan-glow), transparent);
@@ -663,22 +676,31 @@ table tbody tr:hover {
 }
 
 @media (max-width: 1200px) {
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 1024px) {
-  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-  .grid-2, .grid-3, .grid-4 { 
-    grid-template-columns: 1fr; 
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
     gap: var(--space-md);
   }
+
   .page-header {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-md);
@@ -706,7 +728,9 @@ table tbody tr:hover {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-center {
@@ -721,37 +745,91 @@ table tbody tr:hover {
    ============================================ */
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 8px var(--neon-cyan-glow); }
-  50% { box-shadow: 0 0 20px var(--neon-cyan-glow), 0 0 40px rgba(0, 240, 255, 0.1); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px var(--neon-cyan-glow);
+  }
+
+  50% {
+    box-shadow: 0 0 20px var(--neon-cyan-glow), 0 0 40px rgba(0, 240, 255, 0.1);
+  }
 }
 
 @keyframes borderGlow {
-  0%, 100% { border-color: rgba(0, 240, 255, 0.1); }
-  50% { border-color: rgba(0, 240, 255, 0.25); }
+
+  0%,
+  100% {
+    border-color: rgba(0, 240, 255, 0.1);
+  }
+
+  50% {
+    border-color: rgba(0, 240, 255, 0.25);
+  }
 }
 
 @keyframes textFlicker {
-  0%, 100% { opacity: 1; }
-  92% { opacity: 1; }
-  93% { opacity: 0.8; }
-  94% { opacity: 1; }
-  96% { opacity: 0.9; }
-  97% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  92% {
+    opacity: 1;
+  }
+
+  93% {
+    opacity: 0.8;
+  }
+
+  94% {
+    opacity: 1;
+  }
+
+  96% {
+    opacity: 0.9;
+  }
+
+  97% {
+    opacity: 1;
+  }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 .fade-in {
@@ -968,4 +1046,3 @@ table tbody tr:hover {
   background: rgba(0, 0, 0, 0.03);
   border-color: rgba(0, 0, 0, 0.08);
 }
-
