@@ -69,6 +69,7 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 -- TRIGGER: Fire after each log insert
 -- ============================================
+DROP TRIGGER IF EXISTS trg_update_risk_score ON campaign_logs;
 CREATE TRIGGER trg_update_risk_score
 AFTER INSERT ON campaign_logs
 FOR EACH ROW
@@ -120,6 +121,7 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 -- TRIGGER: Update target status on log insert
 -- ============================================
+DROP TRIGGER IF EXISTS trg_update_target_status ON campaign_logs;
 CREATE TRIGGER trg_update_target_status
 AFTER INSERT ON campaign_logs
 FOR EACH ROW
@@ -137,14 +139,22 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply auto-update timestamp to relevant tables
+DROP TRIGGER IF EXISTS trg_users_updated_at ON users;
 CREATE TRIGGER trg_users_updated_at
 BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION fn_update_timestamp();
 
+DROP TRIGGER IF EXISTS trg_departments_updated_at ON departments;
 CREATE TRIGGER trg_departments_updated_at
 BEFORE UPDATE ON departments FOR EACH ROW EXECUTE FUNCTION fn_update_timestamp();
 
+DROP TRIGGER IF EXISTS trg_employees_updated_at ON employees;
 CREATE TRIGGER trg_employees_updated_at
 BEFORE UPDATE ON employees FOR EACH ROW EXECUTE FUNCTION fn_update_timestamp();
 
+DROP TRIGGER IF EXISTS trg_campaigns_updated_at ON campaigns;
 CREATE TRIGGER trg_campaigns_updated_at
 BEFORE UPDATE ON campaigns FOR EACH ROW EXECUTE FUNCTION fn_update_timestamp();
+
+DROP TRIGGER IF EXISTS trg_lp_templates_updated_at ON landing_page_templates;
+CREATE TRIGGER trg_lp_templates_updated_at
+BEFORE UPDATE ON landing_page_templates FOR EACH ROW EXECUTE FUNCTION fn_update_timestamp();

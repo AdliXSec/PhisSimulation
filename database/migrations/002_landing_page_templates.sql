@@ -4,29 +4,7 @@
 -- Run: psql -U phisim_admin -d phisimulation -f migrations/002_landing_page_templates.sql
 -- ============================================
 
--- Create reusable landing page templates table
-CREATE TABLE IF NOT EXISTS landing_page_templates (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(300) NOT NULL,
-    description TEXT,
-    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    config JSONB NOT NULL DEFAULT '{}',
-    is_default BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_lp_templates_created_by ON landing_page_templates(created_by);
-
-COMMENT ON TABLE landing_page_templates IS
-'Reusable landing page template configurations for phishing campaigns.';
-
-COMMENT ON COLUMN landing_page_templates.config IS
-'JSON config: title, subtitle, logo_emoji, brand_name, primary_color, bg_color, text_color, button_text, button_color, form_fields[], footer_text, theme_style';
-
--- Apply auto-update timestamp trigger
-CREATE TRIGGER trg_lp_templates_updated_at
-BEFORE UPDATE ON landing_page_templates FOR EACH ROW EXECUTE FUNCTION fn_update_timestamp();
+-- Insert default templates
 
 -- Insert default templates
 INSERT INTO landing_page_templates (name, description, config, is_default) VALUES

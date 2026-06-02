@@ -20,8 +20,7 @@ INSERT INTO departments (name, description) VALUES
     ('Finance', 'Departemen Keuangan dan Akuntansi'),
     ('Information Technology', 'Departemen TI dan Infrastruktur'),
     ('Marketing', 'Departemen Pemasaran dan Komunikasi'),
-    ('Operations', 'Departemen Operasional dan Logistik')
-ON CONFLICT (name) DO NOTHING;
+    ('Operations', 'Departemen Operasional dan Logistik');
 
 -- Sample employees
 INSERT INTO employees (name, email, department_id, position) VALUES
@@ -36,8 +35,7 @@ INSERT INTO employees (name, email, department_id, position) VALUES
     ('Maya Sari', 'maya.sari@company.com', 4, 'Marketing Manager'),
     ('Dimas Aditya', 'dimas.aditya@company.com', 4, 'Content Creator'),
     ('Rina Wulandari', 'rina.wulandari@company.com', 5, 'Operations Manager'),
-    ('Hendra Gunawan', 'hendra.gunawan@company.com', 5, 'Logistics Staff')
-ON CONFLICT (email) DO NOTHING;
+    ('Hendra Gunawan', 'hendra.gunawan@company.com', 5, 'Logistics Staff');
 
 -- Initialize risk profiles for all employees
 INSERT INTO employee_risk_profiles (employee_id)
