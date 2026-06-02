@@ -6,5 +6,17 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: true
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          framer: ['framer-motion'],
+          three: ['three', '@react-three/fiber', '@react-three/drei']
+        }
+      }
+    }
   }
 })
