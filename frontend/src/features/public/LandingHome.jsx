@@ -631,7 +631,7 @@ export default function LandingHome() {
             position: 'sticky',
             top: 0,
             height: '100dvh',
-            minHeight: '-webkit-fill-available',
+            // minHeight: '-webkit-fill-available',
             padding: 'clamp(4rem, 10vw, 7rem) 1.5rem clamp(3rem, 8vw, 5rem)',
             textAlign: 'center',
             overflow: 'hidden',
