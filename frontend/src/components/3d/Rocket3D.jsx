@@ -1,6 +1,6 @@
 import React, { Suspense, useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, Float, Environment, ContactShadows, Center } from '@react-three/drei';
+import { useGLTF, Float, Environment, Center } from '@react-three/drei'; // ContactShadows
 import * as THREE from 'three';
 import ErrorBoundary from '../ui/ErrorBoundary';
 
@@ -77,7 +77,7 @@ function WarpLines({ scrollProgress }) {
 
     // Warp lines only active during zoom phase (0.15 - 0.9)
     const warpIntensity = THREE.MathUtils.clamp((p - 0.15) / 0.5, 0, 1) *
-                          THREE.MathUtils.clamp((0.9 - p) / 0.1, 0, 1);
+      THREE.MathUtils.clamp((0.9 - p) / 0.1, 0, 1);
 
     if (!meshRef.current) return;
 
@@ -314,14 +314,15 @@ export default function Rocket3D({ scrollProgress = 0 }) {
 
             <WarpLines scrollProgress={scrollProgress} />
 
-            <ContactShadows
+            {/* <ContactShadows
               position={[0, -4, 0]}
               opacity={0.5}
               scale={30}
               blur={3}
               far={10}
               color="#00f0ff"
-            />
+            /> */}
+
           </Suspense>
         </Canvas>
       </ErrorBoundary>
