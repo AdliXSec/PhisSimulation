@@ -165,7 +165,7 @@ BEFORE UPDATE ON landing_page_templates FOR EACH ROW EXECUTE FUNCTION fn_update_
 
 TEMPLATES_SQL = """
 -- Insert default templates
-INSERT INTO landing_page_templates (name, description, config, is_default) VALUES
+INSERT INTO landing_page_templates (name, description, config, is_default, created_at, updated_at) VALUES
 (
     'Microsoft 365 Login',
     'Template tiruan halaman login Microsoft 365',
@@ -186,7 +186,8 @@ INSERT INTO landing_page_templates (name, description, config, is_default) VALUE
         "footer_text": "Terms of use | Privacy & cookies",
         "theme_style": "microsoft365"
     }'::jsonb,
-    TRUE
+    TRUE,
+    NOW(), NOW()
 ),
 (
     'Google Workspace Login',
@@ -208,7 +209,8 @@ INSERT INTO landing_page_templates (name, description, config, is_default) VALUE
         "footer_text": "One account. All of Google working for you.",
         "theme_style": "google"
     }'::jsonb,
-    TRUE
+    TRUE,
+    NOW(), NOW()
 ),
 (
     'Portal Internal Perusahaan',
@@ -230,7 +232,8 @@ INSERT INTO landing_page_templates (name, description, config, is_default) VALUE
         "footer_text": "Dengan masuk, Anda menyetujui kebijakan keamanan perusahaan.",
         "theme_style": "corporate_dark"
     }'::jsonb,
-    TRUE
+    TRUE,
+    NOW(), NOW()
 ),
 (
     'Banking Portal',
@@ -252,7 +255,8 @@ INSERT INTO landing_page_templates (name, description, config, is_default) VALUE
         "footer_text": "Bank ini dijamin oleh LPS. Jangan berikan PIN Anda kepada siapa pun.",
         "theme_style": "banking"
     }'::jsonb,
-    TRUE
+    TRUE,
+    NOW(), NOW()
 );
 """
 
@@ -264,40 +268,43 @@ SEED_SQL = """
 
 -- Default admin user (password: admin123)
 -- bcrypt hash of 'admin123'
-INSERT INTO users (username, email, password_hash, full_name, role)
+INSERT INTO users (username, email, password_hash, full_name, role, is_active, created_at, updated_at)
 VALUES (
     'admin',
     'admin@phisimulation.local',
     '$2b$12$ZhAZhnIKgQtUFi3NXZEwRe/ahUG4khZkyknh0UNOxoKNmRQUCTLRK',
     'System Administrator',
-    'ADMIN'
+    'ADMIN',
+    TRUE,
+    NOW(),
+    NOW()
 ) ON CONFLICT (username) DO NOTHING;
 
 -- Sample departments
-INSERT INTO departments (name, description) VALUES
-    ('Human Resources', 'Departemen SDM dan Personalia'),
-    ('Finance', 'Departemen Keuangan dan Akuntansi'),
-    ('Information Technology', 'Departemen TI dan Infrastruktur'),
-    ('Marketing', 'Departemen Pemasaran dan Komunikasi'),
-    ('Operations', 'Departemen Operasional dan Logistik');
+INSERT INTO departments (name, description, created_at, updated_at) VALUES
+    ('Human Resources', 'Departemen SDM dan Personalia', NOW(), NOW()),
+    ('Finance', 'Departemen Keuangan dan Akuntansi', NOW(), NOW()),
+    ('Information Technology', 'Departemen TI dan Infrastruktur', NOW(), NOW()),
+    ('Marketing', 'Departemen Pemasaran dan Komunikasi', NOW(), NOW()),
+    ('Operations', 'Departemen Operasional dan Logistik', NOW(), NOW());
 
 -- Sample employees
-INSERT INTO employees (name, email, department_id, position) VALUES
-    ('Budi Santoso', 'budi.santoso@company.com', 1, 'HR Manager'),
-    ('Siti Rahayu', 'siti.rahayu@company.com', 1, 'HR Staff'),
-    ('Ahmad Wijaya', 'ahmad.wijaya@company.com', 2, 'Finance Manager'),
-    ('Dewi Lestari', 'dewi.lestari@company.com', 2, 'Accountant'),
-    ('Riko Pratama', 'riko.pratama@company.com', 2, 'Finance Staff'),
-    ('Andi Kurniawan', 'andi.kurniawan@company.com', 3, 'IT Manager'),
-    ('Putri Handayani', 'putri.handayani@company.com', 3, 'System Admin'),
-    ('Fajar Nugroho', 'fajar.nugroho@company.com', 3, 'Developer'),
-    ('Maya Sari', 'maya.sari@company.com', 4, 'Marketing Manager'),
-    ('Dimas Aditya', 'dimas.aditya@company.com', 4, 'Content Creator'),
-    ('Rina Wulandari', 'rina.wulandari@company.com', 5, 'Operations Manager'),
-    ('Hendra Gunawan', 'hendra.gunawan@company.com', 5, 'Logistics Staff');
+INSERT INTO employees (name, email, department_id, position, created_at, updated_at) VALUES
+    ('Budi Santoso', 'budi.santoso@company.com', 1, 'HR Manager', NOW(), NOW()),
+    ('Siti Rahayu', 'siti.rahayu@company.com', 1, 'HR Staff', NOW(), NOW()),
+    ('Ahmad Wijaya', 'ahmad.wijaya@company.com', 2, 'Finance Manager', NOW(), NOW()),
+    ('Dewi Lestari', 'dewi.lestari@company.com', 2, 'Accountant', NOW(), NOW()),
+    ('Riko Pratama', 'riko.pratama@company.com', 2, 'Finance Staff', NOW(), NOW()),
+    ('Andi Kurniawan', 'andi.kurniawan@company.com', 3, 'IT Manager', NOW(), NOW()),
+    ('Putri Handayani', 'putri.handayani@company.com', 3, 'System Admin', NOW(), NOW()),
+    ('Fajar Nugroho', 'fajar.nugroho@company.com', 3, 'Developer', NOW(), NOW()),
+    ('Maya Sari', 'maya.sari@company.com', 4, 'Marketing Manager', NOW(), NOW()),
+    ('Dimas Aditya', 'dimas.aditya@company.com', 4, 'Content Creator', NOW(), NOW()),
+    ('Rina Wulandari', 'rina.wulandari@company.com', 5, 'Operations Manager', NOW(), NOW()),
+    ('Hendra Gunawan', 'hendra.gunawan@company.com', 5, 'Logistics Staff', NOW(), NOW());
 
 -- Initialize risk profiles for all employees
-INSERT INTO employee_risk_profiles (employee_id)
-SELECT id FROM employees
+INSERT INTO employee_risk_profiles (employee_id, total_score, risk_level, campaigns_participated, times_opened, times_clicked, times_submitted, last_assessed_at, created_at, updated_at)
+SELECT id, 0, 'LOW', 0, 0, 0, 0, NOW(), NOW(), NOW() FROM employees
 ON CONFLICT (employee_id) DO NOTHING;
 """
