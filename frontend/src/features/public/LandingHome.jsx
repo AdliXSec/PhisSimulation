@@ -522,8 +522,8 @@ function Rocket3DWrapper({ scrollRef }) {
 }
 
 /* ── Custom Cinematic Smooth Scroll ── */
-function easeInOutQuint(t) {
-  return t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
+function easeLinear(t) {
+  return t;
 }
 
 const handleCinematicScroll = (e, targetId) => {
@@ -544,8 +544,8 @@ const handleCinematicScroll = (e, targetId) => {
     const timeElapsed = currentTime - startTime;
     const progress = Math.min(timeElapsed / duration, 1);
     
-    // easeInOutQuint memberikan efek tahan lama di awal, melesat di tengah, dan berhenti perlahan
-    const easeProgress = easeInOutQuint(progress);
+    // Kecepatan linier (konsisten) dari awal hingga akhir
+    const easeProgress = easeLinear(progress);
     
     window.scrollTo(0, startY + (distance * easeProgress));
 
