@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Integer, DateTime, ForeignKey
+from sqlalchemy import text, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
@@ -8,7 +8,7 @@ from app.core.database import Base
 class EmployeeRiskProfile(Base):
     __tablename__ = "employee_risk_profiles"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4, server_default=text('gen_random_uuid()'))
     employee_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("employees.id", ondelete="CASCADE"), unique=True, nullable=False
     )

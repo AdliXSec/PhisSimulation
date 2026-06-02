@@ -45,6 +45,12 @@ async def init_database():
         # 1. Triggers (now idempotent with DROP TRIGGER IF EXISTS)
         await run_sql_string(conn, TRIGGERS_SQL, "triggers.sql")
         
+        # Ensure UUID primary keys have DB-side default (since create_all might have missed it previously)
+        await conn.execute(text("ALTER TABLE landing_page_templates ALTER COLUMN id SET DEFAULT gen_random_uuid();"))
+        await conn.execute(text("ALTER TABLE users ALTER COLUMN id SET DEFAULT gen_random_uuid();"))
+        await conn.execute(text("ALTER TABLE employee_risk_profiles ALTER COLUMN id SET DEFAULT gen_random_uuid();"))
+        await conn.execute(text("ALTER TABLE employees ALTER COLUMN id SET DEFAULT gen_random_uuid();"))
+
         # 2. Default landing page templates (only if empty)
         res_lp = await conn.execute(text("SELECT COUNT(*) FROM landing_page_templates"))
         if res_lp.scalar() == 0:
