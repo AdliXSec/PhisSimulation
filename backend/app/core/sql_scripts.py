@@ -36,7 +36,9 @@ BEGIN
     -- Upsert employee risk profile
     INSERT INTO employee_risk_profiles (
         id, employee_id, total_score, risk_level,
-        times_opened, times_clicked, times_submitted
+        campaigns_participated,
+        times_opened, times_clicked, times_submitted,
+        last_assessed_at, created_at, updated_at
     )
     VALUES (
         gen_random_uuid(), v_employee_id, v_score_delta,
@@ -45,9 +47,11 @@ BEGIN
             WHEN v_score_delta > 40 THEN 'MEDIUM'
             ELSE 'LOW'
         END,
+        0, -- campaigns_participated default
         CASE WHEN NEW.event_type = 'EMAIL_OPENED' THEN 1 ELSE 0 END,
         CASE WHEN NEW.event_type = 'LINK_CLICKED' THEN 1 ELSE 0 END,
-        CASE WHEN NEW.event_type = 'DATA_SUBMITTED' THEN 1 ELSE 0 END
+        CASE WHEN NEW.event_type = 'DATA_SUBMITTED' THEN 1 ELSE 0 END,
+        NOW(), NOW(), NOW()
     )
     ON CONFLICT (employee_id) DO UPDATE SET
         total_score = employee_risk_profiles.total_score + v_score_delta,
