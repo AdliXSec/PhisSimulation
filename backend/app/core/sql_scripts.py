@@ -289,19 +289,19 @@ INSERT INTO departments (name, description, created_at, updated_at) VALUES
     ('Operations', 'Departemen Operasional dan Logistik', NOW(), NOW());
 
 -- Sample employees
-INSERT INTO employees (name, email, department_id, position, created_at, updated_at) VALUES
-    ('Budi Santoso', 'budi.santoso@company.com', 1, 'HR Manager', NOW(), NOW()),
-    ('Siti Rahayu', 'siti.rahayu@company.com', 1, 'HR Staff', NOW(), NOW()),
-    ('Ahmad Wijaya', 'ahmad.wijaya@company.com', 2, 'Finance Manager', NOW(), NOW()),
-    ('Dewi Lestari', 'dewi.lestari@company.com', 2, 'Accountant', NOW(), NOW()),
-    ('Riko Pratama', 'riko.pratama@company.com', 2, 'Finance Staff', NOW(), NOW()),
-    ('Andi Kurniawan', 'andi.kurniawan@company.com', 3, 'IT Manager', NOW(), NOW()),
-    ('Putri Handayani', 'putri.handayani@company.com', 3, 'System Admin', NOW(), NOW()),
-    ('Fajar Nugroho', 'fajar.nugroho@company.com', 3, 'Developer', NOW(), NOW()),
-    ('Maya Sari', 'maya.sari@company.com', 4, 'Marketing Manager', NOW(), NOW()),
-    ('Dimas Aditya', 'dimas.aditya@company.com', 4, 'Content Creator', NOW(), NOW()),
-    ('Rina Wulandari', 'rina.wulandari@company.com', 5, 'Operations Manager', NOW(), NOW()),
-    ('Hendra Gunawan', 'hendra.gunawan@company.com', 5, 'Logistics Staff', NOW(), NOW());
+INSERT INTO employees (name, email, department_id, position, is_active, metadata, created_at, updated_at) VALUES
+    ('Budi Santoso', 'budi.santoso@company.com', 1, 'HR Manager', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Siti Rahayu', 'siti.rahayu@company.com', 1, 'HR Staff', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Ahmad Wijaya', 'ahmad.wijaya@company.com', 2, 'Finance Manager', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Dewi Lestari', 'dewi.lestari@company.com', 2, 'Accountant', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Riko Pratama', 'riko.pratama@company.com', 2, 'Finance Staff', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Andi Kurniawan', 'andi.kurniawan@company.com', 3, 'IT Manager', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Putri Handayani', 'putri.handayani@company.com', 3, 'System Admin', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Fajar Nugroho', 'fajar.nugroho@company.com', 3, 'Developer', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Maya Sari', 'maya.sari@company.com', 4, 'Marketing Manager', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Dimas Aditya', 'dimas.aditya@company.com', 4, 'Content Creator', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Rina Wulandari', 'rina.wulandari@company.com', 5, 'Operations Manager', TRUE, '{}'::jsonb, NOW(), NOW()),
+    ('Hendra Gunawan', 'hendra.gunawan@company.com', 5, 'Logistics Staff', TRUE, '{}'::jsonb, NOW(), NOW());
 
 -- Initialize risk profiles for all employees
 INSERT INTO employee_risk_profiles (employee_id, total_score, risk_level, campaigns_participated, times_opened, times_clicked, times_submitted, last_assessed_at, created_at, updated_at)
