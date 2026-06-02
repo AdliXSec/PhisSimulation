@@ -196,18 +196,18 @@ function FeatureShowcases() {
   // Everything else (scroll zones, height, dots) adapts automatically.
   const showcases = [
     {
-      title: 'Real-Time Dashboard',
-      desc: 'Monitor campaigns as they happen. Track open rates, click-throughs, and compromised credentials through an interactive and beautiful analytics dashboard.',
+      title: t('landing.features.items.2.title'),
+      desc: t('landing.features.items.2.desc'),
       img: '/dashboard.png',
     },
     {
-      title: 'AI Email Generator',
-      desc: 'Craft hyper-realistic phishing emails in seconds. Our AI engine automatically generates content and creates matching decoy login pages based on your specified themes.',
+      title: t('landing.features.items.0.title'),
+      desc: t('landing.features.items.0.desc'),
       img: '/email.png',
     },
     {
-      title: 'OSINT & Profiling',
-      desc: 'Deeply research your targets. Leverage integrated open-source intelligence tools to gather public data and craft highly targeted, spear-phishing campaigns.',
+      title: t('landing.features.items.3.title'),
+      desc: t('landing.features.items.3.desc'),
       img: '/osint.png',
     },
   ];
@@ -378,7 +378,7 @@ function FeatureShowcases() {
                   transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
                   className="sticky-text-align"
                 >
-                  <div className="sticky-badge">Feature 0{activeIndex + 1}</div>
+                  <div className="sticky-badge">{t('landing.footer_links.product.features')} 0{activeIndex + 1}</div>
                   <h3 style={{
                     fontFamily: 'var(--font-display)',
                     fontSize: 'clamp(1.6rem, 4vw, 3rem)',
@@ -758,7 +758,7 @@ export default function LandingHome() {
         </div>
 
         {/* ── Content Wrapper: Pulls everything up over the sticky hero to prevent empty gap ── */}
-        <div style={{ marginTop: '-18vh', position: 'relative', zIndex: 20, background: 'var(--bg-primary)' }}>
+        <div style={{ marginTop: '-26vh', position: 'relative', zIndex: 20, background: 'var(--bg-primary)' }}>
           {/* ── Stats Bar ── */}
           <motion.section
             initial={{ opacity: 0, y: 30 }}
@@ -870,9 +870,6 @@ export default function LandingHome() {
                       onMouseLeave={() => setHoveredFeature(null)}
                       style={{
                         display: 'flex',
-                        flexDirection: isWide ? 'row' : 'column',
-                        alignItems: isWide ? 'center' : 'flex-start',
-                        gap: isWide ? '24px' : '0',
                         padding: '24px',
                         borderRadius: '20px',
                         background: 'var(--bg-primary)',
@@ -903,32 +900,30 @@ export default function LandingHome() {
                         }} />
                       )}
 
-                      <div style={{
-                        width: isWide ? '64px' : '48px',
-                        height: isWide ? '64px' : '48px',
+                      <div className="feature-icon-container" style={{
+                        width: '48px',
+                        height: '48px',
                         flexShrink: 0,
                         borderRadius: '14px',
                         background: `${featuresVisuals[i].color}15`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        marginBottom: isWide ? '0' : '20px',
                         color: featuresVisuals[i].color,
                         boxShadow: `inset 0 0 16px ${featuresVisuals[i].color}10`,
                         position: 'relative',
                         zIndex: 1
                       }}>
-                        <Icon size={isWide ? 28 : 24} />
+                        <Icon className="feature-icon-svg" />
                       </div>
                       <div style={{ position: 'relative', zIndex: 1 }}>
                         <h3 style={{
                           fontFamily: 'var(--font-display)',
-                          fontSize: isWide ? '1.4rem' : '1.2rem',
                           fontWeight: 700,
                           marginBottom: '8px',
                           color: 'var(--text-heading)'
                         }}>
                           {f.title}
                         </h3>
-                        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: isWide ? '0.95rem' : '0.85rem' }}>{f.desc}</p>
+                        <p className="feature-desc" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>{f.desc}</p>
                       </div>
                     </motion.div>
                   );
