@@ -1274,7 +1274,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en', // Set English as default!
+    lng: localStorage.getItem('i18nextLng') || 'en', // Strict default to English for international competition
+    fallbackLng: 'en',
     debug: false,
     interpolation: {
       escapeValue: false, // React already escapes values

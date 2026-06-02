@@ -521,6 +521,41 @@ function Rocket3DWrapper({ scrollRef }) {
   return <Rocket3D scrollProgress={progress} />;
 }
 
+/* ── Custom Cinematic Smooth Scroll ── */
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+const handleCinematicScroll = (e, targetId) => {
+  e.preventDefault();
+  const targetElement = document.getElementById(targetId);
+  if (!targetElement) return;
+
+  const startY = window.scrollY;
+  const targetY = targetElement.getBoundingClientRect().top + window.scrollY;
+  const distance = targetY - startY;
+  
+  // Custom duration for a cinematic feel
+  const duration = 2500; 
+  let startTime = null;
+
+  function animation(currentTime) {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1);
+    
+    // easeInOutCubic ensures it moves slow at the start, fast in middle, soft land
+    const easeProgress = easeInOutCubic(progress);
+    
+    window.scrollTo(0, startY + (distance * easeProgress));
+
+    if (timeElapsed < duration) {
+      requestAnimationFrame(animation);
+    }
+  }
+  requestAnimationFrame(animation);
+};
+
 export default function LandingHome() {
   const { t, i18n } = useTranslation();
   const [hoveredFeature, setHoveredFeature] = useState(null);
@@ -733,7 +768,11 @@ export default function LandingHome() {
                 <Link to="/register" className="btn btn-primary btn-lg" style={{ gap: '8px' }}>
                   {t('landing.hero.btn_start')} <HiOutlineArrowRight size={18} />
                 </Link>
-                <a href="#how-it-works" className="btn btn-secondary btn-lg">
+                <a 
+                  href="#how-it-works" 
+                  onClick={(e) => handleCinematicScroll(e, 'how-it-works')}
+                  className="btn btn-secondary btn-lg"
+                >
                   {t('landing.hero.btn_how_it_works')}
                 </a>
               </div>
