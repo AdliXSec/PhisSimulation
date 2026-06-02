@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from typing import Optional
 
 
@@ -14,6 +15,16 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://phisim_admin:phisim_secret_2026@localhost:5433/phisimulation"
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def replace_postgres_scheme(cls, v: str) -> str:
+        if isinstance(v, str):
+            if v.startswith("postgres://"):
+                return v.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif v.startswith("postgresql://"):
+                return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
 
     # JWT
     JWT_SECRET_KEY: str = "change-me-in-production"
