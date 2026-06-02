@@ -188,10 +188,21 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
+  min-height: 100dvh;
   background-image:
     radial-gradient(ellipse at 20% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(255, 0, 170, 0.02) 0%, transparent 50%);
   transition: background-color 0.3s ease, color 0.3s ease;
+  /* Prevent iOS rubber-band overscroll from revealing background */
+  overscroll-behavior-y: none;
+}
+
+/* iOS Safari: prevent WebGL canvas from bleeding past sticky boundary */
+@supports (-webkit-touch-callout: none) {
+  #rocket-canvas-container canvas {
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+  }
 }
 
 [data-theme="light"] body {

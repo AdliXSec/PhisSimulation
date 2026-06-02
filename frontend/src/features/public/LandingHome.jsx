@@ -623,14 +623,15 @@ export default function LandingHome() {
         </div>
       </nav>
 
-      <div className="fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', position: 'relative' }}>
+      <div className="fade-in" style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', position: 'relative' }}>
 
         {/* ── Cinematic Hero (Scroll-linked 3D Zoom) ── */}
         <div ref={heroContainerRef} style={{ height: '300vh', position: 'relative' }}>
           <header style={{
             position: 'sticky',
             top: 0,
-            height: '100vh',
+            height: '100dvh',
+            minHeight: '-webkit-fill-available',
             padding: 'clamp(4rem, 10vw, 7rem) 1.5rem clamp(3rem, 8vw, 5rem)',
             textAlign: 'center',
             overflow: 'hidden',
@@ -758,7 +759,7 @@ export default function LandingHome() {
         </div>
 
         {/* ── Content Wrapper: Pulls everything up over the sticky hero to prevent empty gap ── */}
-        <div style={{ marginTop: '-26vh', position: 'relative', zIndex: 20, background: 'var(--bg-primary)' }}>
+        <div style={{ marginTop: '-200px', position: 'relative', zIndex: 20, background: 'var(--bg-primary)' }}>
           {/* ── Stats Bar ── */}
           <motion.section
             initial={{ opacity: 0, y: 30 }}
