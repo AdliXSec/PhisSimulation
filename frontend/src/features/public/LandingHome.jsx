@@ -522,8 +522,8 @@ function Rocket3DWrapper({ scrollRef }) {
 }
 
 /* ── Custom Cinematic Smooth Scroll ── */
-function easeInOutCubic(t) {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function easeInOutQuint(t) {
+  return t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
 }
 
 const handleCinematicScroll = (e, targetId) => {
@@ -535,8 +535,8 @@ const handleCinematicScroll = (e, targetId) => {
   const targetY = targetElement.getBoundingClientRect().top + window.scrollY;
   const distance = targetY - startY;
   
-  // Custom duration for a cinematic feel
-  const duration = 2500; 
+  // Sangat lambat di awal (hero section), total durasi 8 detik
+  const duration = 8000; 
   let startTime = null;
 
   function animation(currentTime) {
@@ -544,8 +544,8 @@ const handleCinematicScroll = (e, targetId) => {
     const timeElapsed = currentTime - startTime;
     const progress = Math.min(timeElapsed / duration, 1);
     
-    // easeInOutCubic ensures it moves slow at the start, fast in middle, soft land
-    const easeProgress = easeInOutCubic(progress);
+    // easeInOutQuint memberikan efek tahan lama di awal, melesat di tengah, dan berhenti perlahan
+    const easeProgress = easeInOutQuint(progress);
     
     window.scrollTo(0, startY + (distance * easeProgress));
 
