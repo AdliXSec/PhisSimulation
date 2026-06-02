@@ -21,6 +21,7 @@ httpx==0.28.1
 
 # Email
 fastapi-mail==1.4.2
+resend==2.2.0
 
 # Redis
 redis==5.2.1

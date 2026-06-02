@@ -32,6 +32,14 @@ except Exception as e:
     logger.warning(f"Email config error (will use mock mode): {e}")
     fast_mail = None
 
+try:
+    import resend
+    if settings.RESEND:
+        resend.api_key = settings.RESEND_API_KEY
+except ImportError:
+    resend = None
+    if settings.RESEND:
+        logger.error("Resend is enabled but 'resend' package is not installed.")
 
 import qrcode
 import io
@@ -130,14 +138,37 @@ async def send_campaign_emails(campaign_id: str):
                             use_qr_code=getattr(campaign, 'use_qr_code', False)
                         )
 
-                        if fast_mail:
+                        if settings.RESEND and resend:
+                            params = {
+                                "from": f"{template.sender_name} <{settings.MAIL_FROM}>",
+                                "to": [employee.email],
+                                "subject": template.subject,
+                                "html": personalized_html,
+                            }
+                            # The Resend Python SDK is synchronous for this call
+                            resend.Emails.send(params)
+                        elif fast_mail:
+                            # Re-initialize FastMail config to inject dynamic sender name
+                            custom_config = ConnectionConfig(
+                                MAIL_USERNAME=settings.MAIL_USERNAME,
+                                MAIL_PASSWORD=settings.MAIL_PASSWORD,
+                                MAIL_FROM=settings.MAIL_FROM,
+                                MAIL_FROM_NAME=template.sender_name,
+                                MAIL_PORT=settings.MAIL_PORT,
+                                MAIL_SERVER=settings.MAIL_SERVER,
+                                MAIL_STARTTLS=settings.MAIL_STARTTLS,
+                                MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
+                                USE_CREDENTIALS=True,
+                            )
+                            custom_fast_mail = FastMail(custom_config)
+                            
                             message = MessageSchema(
                                 subject=template.subject,
                                 recipients=[employee.email],
                                 body=personalized_html,
                                 subtype=MessageType.html,
                             )
-                            await fast_mail.send_message(message)
+                            await custom_fast_mail.send_message(message)
                         else:
                             # Mock mode
                             logger.info(f"[MOCK EMAIL] To: {employee.email} | Subject: {template.subject}")
@@ -164,13 +195,15 @@ async def send_campaign_emails(campaign_id: str):
                 campaign.processed_count = sent_count
                 campaign.error_count = error_count
                 
-                # Log the event
-                log = CampaignLog(
-                    target_id=target.id,
-                    event_type="EMAIL_SENT" if success else "EMAIL_FAILED",
-                    metadata_={"recipient": employee.email, "retries": retry_count},
-                )
-                db.add(log)
+                # Log the event only on success (DB constraint does not allow EMAIL_FAILED)
+                if success:
+                    log = CampaignLog(
+                        target_id=target.id,
+                        event_type="EMAIL_SENT",
+                        metadata_={"recipient": employee.email, "retries": retry_count},
+                    )
+                    db.add(log)
+                
                 await db.commit()
                 
                 # Prevent SMTP rate limiting

@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     MAIL_SERVER: str = "sandbox.smtp.mailtrap.io"
     MAIL_STARTTLS: bool = True
     MAIL_SSL_TLS: bool = False
+    # Email - Resend (Primary if RESEND=True)
+    RESEND: bool = False
+    RESEND_API_KEY: str = ""
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
