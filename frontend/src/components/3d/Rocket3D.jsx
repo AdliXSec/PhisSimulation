@@ -167,8 +167,11 @@ function RocketModel({ scrollProgress = 0 }) {
 
       // During zoom phase, gradually pull rocket toward center
       const zoomPhase = THREE.MathUtils.clamp((sp - 0.2) / 0.6, 0, 1);
-      const mouseInfluence = 1 - zoomPhase * 0.7;
       const centerPull = zoomPhase;
+
+      // Influence factors: as zoomPhase approaches 1, translation and up/down rotation ignore the mouse
+      const translationInfluence = 1 - centerPull;
+      const rotationUpDnInfluence = 1 - centerPull;
 
       // Check for mouse movement
       if (
@@ -195,23 +198,23 @@ function RocketModel({ scrollProgress = 0 }) {
         pointerY = THREE.MathUtils.lerp(pointerY, autoY, blend);
       }
 
-      pointerX *= mouseInfluence;
-      pointerY *= mouseInfluence;
-
       // 1. Rotation — frame-rate independent
-      const targetRotationX = (pointerX * Math.PI) / 3;
-      const targetRotationY = (pointerY * Math.PI) / 3;
+      // Left/right rotation always follows mouse
+      const targetRotationY = (pointerX * Math.PI) / 3; 
+      // Up/down rotation ignores mouse when zoomed in
+      const targetRotationX = -(pointerY * Math.PI) / 3 * rotationUpDnInfluence; 
 
-      groupRef.current.rotation.y = damp(groupRef.current.rotation.y, targetRotationX, 0.18, delta);
-      groupRef.current.rotation.x = damp(groupRef.current.rotation.x, -targetRotationY, 0.18, delta);
+      groupRef.current.rotation.y = damp(groupRef.current.rotation.y, targetRotationY, 0.18, delta);
+      groupRef.current.rotation.x = damp(groupRef.current.rotation.x, targetRotationX, 0.18, delta);
 
-      // 2. Translation — pull toward center during zoom
+      // 2. Translation — pull toward center and ignore mouse during zoom
       const moveRadiusX = THREE.MathUtils.lerp(11, 3, centerPull);
       const moveRadiusY = THREE.MathUtils.lerp(5, 1.5, centerPull);
 
       const targetBaseX = THREE.MathUtils.lerp(basePositionX, 0, centerPull);
-      const targetPosX = targetBaseX + (pointerX * moveRadiusX);
-      const targetPosY = (pointerY * moveRadiusY);
+      
+      const targetPosX = targetBaseX + (pointerX * moveRadiusX * translationInfluence);
+      const targetPosY = (pointerY * moveRadiusY * translationInfluence);
 
       groupRef.current.position.x = damp(groupRef.current.position.x, targetPosX, 0.25, delta);
       groupRef.current.position.y = damp(groupRef.current.position.y, targetPosY, 0.25, delta);

@@ -534,19 +534,19 @@ const handleCinematicScroll = (e, targetId) => {
   const startY = window.scrollY;
   const targetY = targetElement.getBoundingClientRect().top + window.scrollY;
   const distance = targetY - startY;
-  
+
   // Sangat lambat di awal (hero section), total durasi 8 detik
-  const duration = 8000; 
+  const duration = 8000;
   let startTime = null;
 
   function animation(currentTime) {
     if (startTime === null) startTime = currentTime;
     const timeElapsed = currentTime - startTime;
     const progress = Math.min(timeElapsed / duration, 1);
-    
+
     // Kecepatan linier (konsisten) dari awal hingga akhir
     const easeProgress = easeLinear(progress);
-    
+
     window.scrollTo(0, startY + (distance * easeProgress));
 
     if (timeElapsed < duration) {
@@ -768,8 +768,8 @@ export default function LandingHome() {
                 <Link to="/register" className="btn btn-primary btn-lg" style={{ gap: '8px' }}>
                   {t('landing.hero.btn_start')} <HiOutlineArrowRight size={18} />
                 </Link>
-                <a 
-                  href="#how-it-works" 
+                <a
+                  href="#how-it-works"
                   onClick={(e) => handleCinematicScroll(e, 'how-it-works')}
                   className="btn btn-secondary btn-lg"
                 >

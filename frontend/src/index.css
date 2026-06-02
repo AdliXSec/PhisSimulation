@@ -349,7 +349,7 @@ code {
   font-size: 0.85rem;
 }
 
-.bento-grid .card-glow > div:nth-child(2) {
+.bento-grid .card-glow>div:nth-child(2) {
   margin-bottom: 20px;
 }
 
@@ -365,7 +365,7 @@ code {
   gap: 24px !important;
 }
 
-.bento-item-wide > div:nth-child(2) {
+.bento-item-wide>div:nth-child(2) {
   width: 64px !important;
   height: 64px !important;
   margin-bottom: 0 !important;
@@ -396,7 +396,7 @@ code {
     gap: 0 !important;
   }
 
-  .bento-item-wide > div:nth-child(2) {
+  .bento-item-wide>div:nth-child(2) {
     width: 48px !important;
     height: 48px !important;
     margin-bottom: 20px !important;
