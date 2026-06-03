@@ -159,7 +159,8 @@ async def track_click(
             return RedirectResponse(url=external_url)
 
     # Redirect to the fake landing page on the frontend
-    landing_url = f"{settings.FRONTEND_URL}/landing/{token}"
+    frontend_base = settings.FRONTEND_URL.rstrip("/")
+    landing_url = f"{frontend_base}/landing/{token}"
     return RedirectResponse(url=landing_url)
 
 
@@ -245,7 +246,8 @@ async def track_submit(
         db.add(log)
 
     # Redirect to education page
-    education_url = f"{settings.FRONTEND_URL}/education/{token}"
+    frontend_base = settings.FRONTEND_URL.rstrip("/")
+    education_url = f"{frontend_base}/education/{token}"
     return RedirectResponse(url=education_url, status_code=303)
 
 
