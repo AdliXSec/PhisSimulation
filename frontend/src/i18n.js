@@ -632,6 +632,24 @@ const resources = {
             launch_failed: "Failed to launch"
           }
         }
+      },
+      education_page: {
+        title: "🎯 This is a Phishing Simulation",
+        subtitle_1: "The email you just clicked was part of the company's internal ",
+        subtitle_strong: "security awareness training program",
+        subtitle_2: ". None of your data has been stored or misused.",
+        card1_title: "What Happened?",
+        card1_desc: "You received a simulated phishing email and clicked a link inside it. In the real world, this action could compromise your personal and company data.",
+        card2_title: "Tips to Identify Phishing",
+        tips: [
+          "✅ Check the sender's email address — is the domain official?",
+          "✅ Beware of language that creates urgency or pressure",
+          "✅ Don't click suspicious links — hover to see the real URL",
+          "✅ Never enter your password on a page you don't recognize",
+          "✅ Report suspicious emails to the IT/Security team"
+        ],
+        footer: "If you have any questions, contact the company's Information Security team.",
+        tracking_id: "Tracking ID: "
       }
     }
   },
@@ -1264,6 +1282,24 @@ const resources = {
             launch_failed: "Gagal meluncurkan"
           }
         }
+      },
+      education_page: {
+        title: "🎯 Ini Adalah Simulasi Phishing",
+        subtitle_1: "Email yang baru saja Anda klik adalah bagian dari ",
+        subtitle_strong: "program pelatihan kesadaran keamanan",
+        subtitle_2: " internal perusahaan. Tidak ada data Anda yang disimpan atau disalahgunakan.",
+        card1_title: "Apa yang Terjadi?",
+        card1_desc: "Anda menerima email simulasi phishing dan mengeklik tautan di dalamnya. Di dunia nyata, tindakan ini bisa membahayakan data pribadi dan perusahaan Anda.",
+        card2_title: "Tips Mengenali Phishing",
+        tips: [
+          "✅ Periksa alamat pengirim email — apakah domain-nya resmi?",
+          "✅ Waspadai bahasa yang menimbulkan urgensi atau tekanan",
+          "✅ Jangan klik tautan mencurigakan — arahkan kursor untuk melihat URL asli",
+          "✅ Jangan pernah memasukkan password di halaman yang tidak Anda kenal",
+          "✅ Laporkan email mencurigakan ke tim IT/Security"
+        ],
+        footer: "Jika Anda memiliki pertanyaan, hubungi tim Keamanan Informasi perusahaan.",
+        tracking_id: "Tracking ID: "
       }
     }
   }

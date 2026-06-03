@@ -1,9 +1,11 @@
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { HiOutlineShieldCheck, HiOutlineExclamationTriangle, HiOutlineLightBulb } from 'react-icons/hi2';
 import './Education.css';
 
 export default function EducationPage() {
   const { token } = useParams();
+  const { t } = useTranslation();
 
   return (
     <div className="education-page">
@@ -12,35 +14,32 @@ export default function EducationPage() {
           <HiOutlineShieldCheck size={56} />
         </div>
 
-        <h1>🎯 Ini Adalah Simulasi Phishing</h1>
+        <h1>{t('education_page.title')}</h1>
         <p className="education-subtitle">
-          Email yang baru saja Anda klik adalah bagian dari <strong>program pelatihan kesadaran keamanan</strong> internal perusahaan.
-          Tidak ada data Anda yang disimpan atau disalahgunakan.
+          {t('education_page.subtitle_1')}<strong>{t('education_page.subtitle_strong')}</strong>{t('education_page.subtitle_2')}
         </p>
 
         <div className="education-cards">
           <div className="edu-card warning">
             <HiOutlineExclamationTriangle size={28} />
-            <h3>Apa yang Terjadi?</h3>
-            <p>Anda menerima email simulasi phishing dan mengeklik tautan di dalamnya. Di dunia nyata, tindakan ini bisa membahayakan data pribadi dan perusahaan Anda.</p>
+            <h3>{t('education_page.card1_title')}</h3>
+            <p>{t('education_page.card1_desc')}</p>
           </div>
 
           <div className="edu-card tips">
             <HiOutlineLightBulb size={28} />
-            <h3>Tips Mengenali Phishing</h3>
+            <h3>{t('education_page.card2_title')}</h3>
             <ul>
-              <li>✅ Periksa alamat pengirim email — apakah domain-nya resmi?</li>
-              <li>✅ Waspadai bahasa yang menimbulkan urgensi atau tekanan</li>
-              <li>✅ Jangan klik tautan mencurigakan — arahkan kursor untuk melihat URL asli</li>
-              <li>✅ Jangan pernah memasukkan password di halaman yang tidak Anda kenal</li>
-              <li>✅ Laporkan email mencurigakan ke tim IT/Security</li>
+              {t('education_page.tips', { returnObjects: true }).map((tip, index) => (
+                <li key={index}>{tip}</li>
+              ))}
             </ul>
           </div>
         </div>
 
         <div className="education-footer">
-          <p>Jika Anda memiliki pertanyaan, hubungi tim Keamanan Informasi perusahaan.</p>
-          <p className="education-token">Tracking ID: {token}</p>
+          <p>{t('education_page.footer')}</p>
+          <p className="education-token">{t('education_page.tracking_id')}{token}</p>
         </div>
       </div>
     </div>

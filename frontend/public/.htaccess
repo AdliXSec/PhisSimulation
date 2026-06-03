@@ -1,0 +1,18 @@
+RewriteEngine On
+RewriteBase /
+
+# 1. Paksa penggunaan HTTPS (Redirect HTTP ke HTTPS)
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 2. Lindungi file rocket.glb dari unduhan langsung (Anti-Hotlinking/Direct Access)
+# Hanya izinkan jika request datang dari dalam website phissimulation.my.id
+RewriteCond %{HTTP_REFERER} !^https://(www\.)?phissimulation\.my\.id [NC]
+RewriteRule ^rocket\.glb$ - [F,NC]
+
+# 3. Aturan Routing SPA (Single Page Application) React
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule . /index.html [L]
