@@ -50,13 +50,16 @@ def _inject_tracking(body_html: str, token: str, use_qr_code: bool = False) -> s
     backend_url = settings.BACKEND_URL
     api_prefix = settings.API_V1_PREFIX
 
+    # Ensure we have a proper schema for all links
+    base_url = backend_url if backend_url.startswith("http") else f"https://{backend_url}"
+
     # Tracking link
-    tracking_link = f"{backend_url}{api_prefix}/track/click/{token}"
+    tracking_link = f"{base_url}{api_prefix}/track/click/{token}"
     body_html = body_html.replace("{{tracking_link}}", tracking_link)
 
     # Optional QR Code Generation (Quishing)
     if use_qr_code:
-        qr_url = f"{backend_url}{api_prefix}/track/qr/{token}"
+        qr_url = f"{base_url}{api_prefix}/track/qr/{token}"
         qr_img_tag = f'<div style="text-align: center; margin: 20px 0;"><img src="{qr_url}" alt="Scan QR Code" style="max-width: 200px; border-radius: 8px; border: 1px solid #ccc; padding: 10px; background: #fff;" /><p style="font-size: 12px; color: #666; margin-top: 8px;">Scan QR Code ini dengan HP Anda</p></div>'
         
         # Inject QR code before the button or at the end of content
@@ -69,7 +72,7 @@ def _inject_tracking(body_html: str, token: str, use_qr_code: bool = False) -> s
              body_html += qr_img_tag
 
     # Inject tracking pixel before </body> or at the end
-    pixel_tag = f'<img src="{backend_url}{api_prefix}/track/pixel/{token}" width="1" height="1" style="display:none" />'
+    pixel_tag = f'<img src="{base_url}{api_prefix}/track/pixel/{token}" width="1" height="1" style="display:none" />'
     if "</body>" in body_html:
         body_html = body_html.replace("</body>", f"{pixel_tag}</body>")
     else:
