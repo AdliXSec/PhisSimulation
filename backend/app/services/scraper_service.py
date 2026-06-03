@@ -57,7 +57,10 @@ def _sync_scrape(url: str) -> str:
     with sync_playwright() as p:
         try:
             import os
-            os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
+            # Hanya gunakan path lokal jika dijalankan di server Railway
+            if "RAILWAY_ENVIRONMENT_NAME" in os.environ or "RAILWAY_PROJECT_ID" in os.environ:
+                os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
+
             browser = p.chromium.launch(
                 headless=True,
                 args=[
