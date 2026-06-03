@@ -56,6 +56,8 @@ def _sync_scrape(url: str) -> str:
 
     with sync_playwright() as p:
         try:
+            import os
+            os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
             browser = p.chromium.launch(
                 headless=True,
                 args=[
