@@ -72,7 +72,7 @@ export default function Campaigns() {
       const [campRes, deptRes, tmplRes, savedTmplRes] = await Promise.all([
         api.get('/campaigns'),
         api.get('/departments'),
-        api.get('/landing-pages').catch(() => ({ data: [] })),
+        api.get('landing-pages').catch(() => ({ data: [] })),
         api.get('/saved-templates').catch(() => ({ data: [] }))
       ]);
       setCampaigns(campRes.data);
@@ -511,6 +511,7 @@ export default function Campaigns() {
                 <div className="input-group">
                   <LandingPageBuilder
                     value={form.landing_page_config}
+                    templates={templates}
                     onChange={cfg => setForm(f => ({ ...f, landing_page_config: cfg, landing_page_mode: cfg.theme_style === 'raw_html' ? 'raw' : 'custom' }))}
                   />
                 </div>

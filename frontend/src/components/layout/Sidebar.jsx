@@ -17,6 +17,7 @@ import {
   HiOutlineGlobeAlt,
   HiOutlineSun,
   HiOutlineMoon,
+  HiOutlineDocumentText,
 } from 'react-icons/hi2';
 import './Sidebar.css';
 
@@ -24,6 +25,7 @@ const navItems = [
   { path: '/dashboard', labelKey: 'dashboard', icon: HiOutlineHome },
   { path: '/dashboard/campaigns', labelKey: 'campaigns', icon: HiOutlineEnvelope },
   { path: '/dashboard/templates', labelKey: 'templates', icon: HiOutlineEnvelopeOpen },
+  { path: '/dashboard/landing-pages', labelKey: 'landing_pages', icon: HiOutlineDocumentText },
   { path: '/dashboard/osint', labelKey: 'osint', icon: HiOutlineGlobeAlt },
   { path: '/dashboard/intel', labelKey: 'intel', icon: HiOutlineShieldCheck },
   { path: '/dashboard/employees', labelKey: 'employees', icon: HiOutlineUserGroup },

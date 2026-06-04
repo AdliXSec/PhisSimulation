@@ -43,7 +43,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
     if (tmpl) {
       onChange(tmpl.config);
       setSelectedTemplate(id);
-      if (tmpl.config.theme_style === 'raw_html') setActiveTab('raw');
+      // We no longer switch to 'raw' tab so the user stays on the template gallery view
     }
   };
 
@@ -202,8 +202,21 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
           <div className="lpb-custom-grid">
             {/* Editor Panel */}
             <div className="lpb-editor">
-              <div className="lpb-editor-section">
-                <h5>{t('admin_dashboard.campaigns.form.lpb.edit_id')}</h5>
+              {activeTab === 'template' && !selectedTemplate ? (
+                <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <h5>Pilih Template</h5>
+                  <p>Silakan pilih template dari daftar di atas untuk melihat pratinjau.</p>
+                </div>
+              ) : value.theme_style === 'raw_html' ? (
+                <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <h5>Raw HTML Template</h5>
+                  <p>Template ini menggunakan kode HTML kustom.</p>
+                  <p>Beralih ke tab <strong>Raw HTML</strong> jika Anda ingin mengedit kode sumbernya.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="lpb-editor-section">
+                    <h5>{t('admin_dashboard.campaigns.form.lpb.edit_id')}</h5>
                 <div className="input-group">
                   <label>Brand Name</label>
                   <input className="input" value={value.brand_name || ''} onChange={e => handleFieldChange('brand_name', e.target.value)} />
@@ -304,56 +317,76 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
                   <input className="input" value={value.footer_text || ''} onChange={e => handleFieldChange('footer_text', e.target.value)} />
                 </div>
               </div>
+              </>
+              )}
             </div>
 
             {/* Preview Panel */}
             <div className="lpb-preview">
               <h5>{t('admin_dashboard.campaigns.form.lpb.preview_title')}</h5>
-              <div 
-                className="lpb-preview-wrapper" 
-                style={{ 
-                  backgroundColor: value.bg_color || '#f5f5f5',
-                  backgroundImage: value.bg_image ? `url(${value.bg_image})` : 'none',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div 
-                  className={`lpb-preview-card theme-${value.theme_style || 'generic'}`}
-                  style={{
-                    '--p-primary': value.primary_color || '#0066cc',
-                    '--p-bg': value.bg_color || '#f5f5f5',
-                    '--p-text': value.text_color || '#1a1a1a',
-                    '--p-btn': value.button_color || '#0066cc',
-                  }}
-                >
-                  <div className="lpb-p-logo">
-                    {value.logo_image ? (
-                      <img src={value.logo_image} alt="Logo" style={{ maxHeight: '48px', maxWidth: '100%' }} />
-                    ) : (
-                      value.logo_emoji || '🔒'
-                    )}
-                  </div>
-                  <h1 className="lpb-p-title">{value.title || 'Title'}</h1>
-                  <p className="lpb-p-subtitle">{value.subtitle || 'Subtitle'}</p>
-                  
-                  <div className="lpb-p-form">
-                    {(value.form_fields || []).map((f, i) => (
-                      <div key={i} className="lpb-p-group">
-                        <label>{f.label || 'Label'}</label>
-                        <input type={f.type || 'text'} placeholder={f.placeholder || ''} disabled />
-                      </div>
-                    ))}
-                    <button className="lpb-p-btn" type="button" disabled>
-                      {value.button_text || 'Submit'}
-                    </button>
-                  </div>
-                  
-                  {value.footer_text && (
-                    <div className="lpb-p-footer">{value.footer_text}</div>
+              {activeTab === 'template' && !selectedTemplate ? (
+                <div className="lpb-preview-wrapper" style={{ height: '500px', backgroundColor: '#fff', overflow: 'hidden', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ padding: '20px', color: '#999' }}>Pratinjau akan muncul di sini</div>
+                </div>
+              ) : value.theme_style === 'raw_html' ? (
+                <div className="lpb-preview-wrapper" style={{ height: '500px', backgroundColor: '#fff', overflow: 'hidden', padding: 0 }}>
+                  {value.raw_html ? (
+                    <iframe 
+                      title="Preview HTML"
+                      srcDoc={value.raw_html} 
+                      style={{ width: '100%', height: '100%', border: 'none' }} 
+                    />
+                  ) : (
+                    <div style={{ padding: '20px', color: '#999' }}>{t('admin_dashboard.campaigns.form.lpb.preview_empty')}</div>
                   )}
                 </div>
-              </div>
+              ) : (
+                <div 
+                  className="lpb-preview-wrapper" 
+                  style={{ 
+                    backgroundColor: value.bg_color || '#f5f5f5',
+                    backgroundImage: value.bg_image ? `url(${value.bg_image})` : 'none',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  <div 
+                    className={`lpb-preview-card theme-${value.theme_style || 'generic'}`}
+                    style={{
+                      '--p-primary': value.primary_color || '#0066cc',
+                      '--p-bg': value.bg_color || '#f5f5f5',
+                      '--p-text': value.text_color || '#1a1a1a',
+                      '--p-btn': value.button_color || '#0066cc',
+                    }}
+                  >
+                    <div className="lpb-p-logo">
+                      {value.logo_image ? (
+                        <img src={value.logo_image} alt="Logo" style={{ maxHeight: '48px', maxWidth: '100%' }} />
+                      ) : (
+                        value.logo_emoji || '🔒'
+                      )}
+                    </div>
+                    <h1 className="lpb-p-title">{value.title || 'Title'}</h1>
+                    <p className="lpb-p-subtitle">{value.subtitle || 'Subtitle'}</p>
+                    
+                    <div className="lpb-p-form">
+                      {(value.form_fields || []).map((f, i) => (
+                        <div key={i} className="lpb-p-group">
+                          <label>{f.label || 'Label'}</label>
+                          <input type={f.type || 'text'} placeholder={f.placeholder || ''} disabled />
+                        </div>
+                      ))}
+                      <button className="lpb-p-btn" type="button" disabled>
+                        {value.button_text || 'Submit'}
+                      </button>
+                    </div>
+                    
+                    {value.footer_text && (
+                      <div className="lpb-p-footer">{value.footer_text}</div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

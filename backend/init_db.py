@@ -12,8 +12,8 @@ from app.core.database import Base
 # Import all models to ensure they are registered with SQLAlchemy Base.metadata
 from app.models import *
 
-# Import raw SQL scripts to bypass file path deployment issues on Railway
-from app.core.sql_scripts import TRIGGERS_SQL, TEMPLATES_SQL, SEED_SQL
+from app.core.sql_scripts import TRIGGERS_SQL, SEED_SQL
+from seed_html_templates import seed_templates
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -51,16 +51,21 @@ async def init_database():
         await conn.execute(text("ALTER TABLE employee_risk_profiles ALTER COLUMN id SET DEFAULT gen_random_uuid();"))
         await conn.execute(text("ALTER TABLE employees ALTER COLUMN id SET DEFAULT gen_random_uuid();"))
 
-        # 2. Default landing page templates (only if empty)
-        res_lp = await conn.execute(text("SELECT COUNT(*) FROM landing_page_templates"))
-        if res_lp.scalar() == 0:
-            await run_sql_string(conn, TEMPLATES_SQL, "002_landing_page_templates.sql")
+        # No longer seed dummy landing page templates here
+        # The script seed_html_templates.py handles seeding the custom HTML templates
             
         # 3. Seed data (only if empty)
         res_users = await conn.execute(text("SELECT COUNT(*) FROM users"))
         if res_users.scalar() == 0:
             await run_sql_string(conn, SEED_SQL, "seed.sql")
             
+    # Run HTML seeding outside of the transaction block since it uses its own session
+    logger.info("[*] Seeding HTML landing page templates...")
+    try:
+        await seed_templates()
+    except Exception as e:
+        logger.error(f"[!] Error seeding HTML templates: {str(e)}")
+        
     logger.info("[*] Database initialization fully completed!")
     await engine.dispose()
 

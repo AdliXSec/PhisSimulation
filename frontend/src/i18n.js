@@ -142,7 +142,8 @@ const resources = {
         menus: {
           dashboard: "Dashboard",
           campaigns: "Campaigns",
-          templates: "Template Gallery",
+          templates: "Email Gallery",
+          landing_pages: "Landing Page Gallery",
           osint: "OSINT & SocEng",
           intel: "Threat Intel",
           employees: "Employees",
@@ -792,7 +793,8 @@ const resources = {
         menus: {
           dashboard: "Dasbor",
           campaigns: "Kampanye",
-          templates: "Galeri Template",
+          templates: "Galeri Email",
+          landing_pages: "Galeri Landing Page",
           osint: "OSINT & SocEng",
           intel: "Threat Intel",
           employees: "Karyawan",
