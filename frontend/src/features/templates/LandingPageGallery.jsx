@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { HiOutlineDocumentText, HiOutlineTrash, HiOutlineEye, HiXMark, HiOutlinePlus } from 'react-icons/hi2';
 
 export default function LandingPageGallery() {
+  const { t } = useTranslation();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [previewTemplate, setPreviewTemplate] = useState(null);
@@ -18,7 +19,7 @@ export default function LandingPageGallery() {
       const res = await api.get('landing-pages');
       setTemplates(res.data);
     } catch (_err) {
-      toast.error('Gagal memuat template landing page');
+      toast.error(t('admin_dashboard.landing_pages.messages.load_failed', 'Gagal memuat template landing page'));
     } finally {
       setLoading(false);
     }
@@ -30,16 +31,16 @@ export default function LandingPageGallery() {
 
   const handleDelete = async (id, name, is_default) => {
     if (is_default) {
-      toast.error('Template default tidak bisa dihapus');
+      toast.error(t('admin_dashboard.landing_pages.messages.delete_default_error', 'Template default tidak bisa dihapus'));
       return;
     }
-    if (!confirm(`Hapus template ${name}?`)) return;
+    if (!confirm(t('admin_dashboard.landing_pages.messages.delete_confirm', 'Hapus template {{name}}?').replace('{{name}}', name))) return;
     try {
       await api.delete(`landing-pages/${id}`);
-      toast.success('Template berhasil dihapus');
+      toast.success(t('admin_dashboard.landing_pages.messages.delete_success', 'Template berhasil dihapus'));
       loadTemplates();
     } catch (_err) {
-      toast.error('Gagal menghapus template');
+      toast.error(t('admin_dashboard.landing_pages.messages.delete_failed', 'Gagal menghapus template'));
     }
   };
 
@@ -56,12 +57,12 @@ export default function LandingPageGallery() {
         }
       };
       await api.post('landing-pages', payload);
-      toast.success('Template berhasil disimpan');
+      toast.success(t('admin_dashboard.landing_pages.messages.save_success', 'Template berhasil disimpan'));
       setShowAddModal(false);
       setNewTemplate({ name: '', description: '', raw_html: '' });
       loadTemplates();
     } catch (_err) {
-      toast.error('Gagal menyimpan template');
+      toast.error(t('admin_dashboard.landing_pages.messages.save_failed', 'Gagal menyimpan template'));
     }
   };
 
@@ -76,7 +77,7 @@ export default function LandingPageGallery() {
         setPreviewTemplate(res.data);
       } catch (_err) {
         console.error("Fetch error:", _err);
-        toast.error('Gagal memuat detail template');
+        toast.error(t('admin_dashboard.landing_pages.messages.load_detail_failed', 'Gagal memuat detail template'));
       } finally {
         setLoading(false);
       }
@@ -126,7 +127,7 @@ export default function LandingPageGallery() {
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '50%', color: 'var(--text-secondary)' }}
             onMouseOver={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'var(--danger-soft)'; }}
             onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            title="Tutup Preview"
+            title={t('admin_dashboard.landing_pages.btn_cancel', 'Tutup')}
           >
             <HiXMark size={24} />
           </button>
@@ -141,7 +142,7 @@ export default function LandingPageGallery() {
             />
           ) : (
             <div style={{ padding: '24px', textAlign: 'center', color: '#666' }}>
-              Preview tidak tersedia untuk builder custom.
+              {t('admin_dashboard.landing_pages.preview_unavailable', 'Preview tidak tersedia untuk builder custom.')}
             </div>
           )}
         </div>
@@ -176,7 +177,7 @@ export default function LandingPageGallery() {
       >
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', background: 'var(--bg-sidebar)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <HiOutlinePlus size={20} style={{ color: 'var(--neon-cyan)' }} /> Tambah Landing Page Template
+            <HiOutlinePlus size={20} style={{ color: 'var(--neon-cyan)' }} /> {t('admin_dashboard.landing_pages.modal_add_title', 'Tambah Landing Page Template')}
           </h3>
           <button 
             type="button"
@@ -185,27 +186,27 @@ export default function LandingPageGallery() {
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '50%', color: 'var(--text-secondary)' }}
             onMouseOver={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'var(--danger-soft)'; }}
             onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'transparent'; }}
-            title="Tutup"
+            title={t('admin_dashboard.landing_pages.btn_cancel', 'Batal')}
           >
             <HiXMark size={24} />
           </button>
         </div>
         <form onSubmit={handleSaveNew} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="input-group">
-            <label>Nama Template</label>
-            <input required className="input" value={newTemplate.name} onChange={e => setNewTemplate({...newTemplate, name: e.target.value})} placeholder="Contoh: Login Portal 2" />
+            <label>{t('admin_dashboard.landing_pages.form_name', 'Nama Template')}</label>
+            <input required className="input" value={newTemplate.name} onChange={e => setNewTemplate({...newTemplate, name: e.target.value})} placeholder={t('admin_dashboard.landing_pages.form_name_placeholder', 'Contoh: Login Portal 2')} />
           </div>
           <div className="input-group">
-            <label>Deskripsi</label>
-            <input className="input" value={newTemplate.description} onChange={e => setNewTemplate({...newTemplate, description: e.target.value})} placeholder="Deskripsi singkat" />
+            <label>{t('admin_dashboard.landing_pages.form_desc', 'Deskripsi')}</label>
+            <input className="input" value={newTemplate.description} onChange={e => setNewTemplate({...newTemplate, description: e.target.value})} placeholder={t('admin_dashboard.landing_pages.form_desc_placeholder', 'Deskripsi singkat')} />
           </div>
           <div className="input-group">
-            <label>Raw HTML Code</label>
+            <label>{t('admin_dashboard.landing_pages.form_html', 'Raw HTML Code')}</label>
             <textarea required className="input" rows="8" value={newTemplate.raw_html} onChange={e => setNewTemplate({...newTemplate, raw_html: e.target.value})} style={{ fontFamily: 'monospace' }} placeholder="<html>..." />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
-            <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Batal</button>
-            <button type="submit" className="btn btn-primary">Simpan Template</button>
+            <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>{t('admin_dashboard.landing_pages.btn_cancel', 'Batal')}</button>
+            <button type="submit" className="btn btn-primary">{t('admin_dashboard.landing_pages.btn_save', 'Simpan Template')}</button>
           </div>
         </form>
       </div>
@@ -217,11 +218,11 @@ export default function LandingPageGallery() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Galeri Landing Page</h1>
-          <p>Kelola template landing page phishing (HTML kustom & default).</p>
+          <h1>{t('admin_dashboard.landing_pages.title', 'Galeri Landing Page')}</h1>
+          <p>{t('admin_dashboard.landing_pages.subtitle', 'Kelola template landing page phishing (HTML kustom & default).')}</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-          <HiOutlinePlus size={18} /> Tambah Template
+          <HiOutlinePlus size={18} /> {t('admin_dashboard.landing_pages.btn_add', 'Tambah Template')}
         </button>
       </div>
 
@@ -231,19 +232,19 @@ export default function LandingPageGallery() {
         ) : templates.length === 0 ? (
           <div className="empty-state">
             <HiOutlineDocumentText size={48} style={{ color: 'var(--border)' }} />
-            <h3>Belum Ada Template</h3>
-            <p>Klik tombol tambah template untuk membuat landing page baru.</p>
+            <h3>{t('admin_dashboard.landing_pages.empty_title', 'Belum Ada Template')}</h3>
+            <p>{t('admin_dashboard.landing_pages.empty_desc', 'Klik tombol tambah template untuk membuat landing page baru.')}</p>
           </div>
         ) : (
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Nama</th>
-                  <th>Tipe</th>
-                  <th>Deskripsi</th>
-                  <th>Tanggal Dibuat</th>
-                  <th>Aksi</th>
+                  <th>{t('admin_dashboard.landing_pages.table_name', 'Nama')}</th>
+                  <th>{t('admin_dashboard.landing_pages.table_type', 'Tipe')}</th>
+                  <th>{t('admin_dashboard.landing_pages.table_desc', 'Deskripsi')}</th>
+                  <th>{t('admin_dashboard.landing_pages.table_date', 'Tanggal Dibuat')}</th>
+                  <th>{t('admin_dashboard.landing_pages.table_actions', 'Aksi')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -251,7 +252,7 @@ export default function LandingPageGallery() {
                   <tr key={tmpl.id}>
                     <td style={{ fontWeight: 500, color: 'var(--neon-cyan)' }}>
                       {tmpl.name}
-                      {tmpl.is_default && <span className="badge badge-info" style={{ marginLeft: '8px', fontSize: '10px' }}>Default</span>}
+                      {tmpl.is_default && <span className="badge badge-info" style={{ marginLeft: '8px', fontSize: '10px' }}> Default</span>}
                     </td>
                     <td>{tmpl.config?.theme_style === 'raw_html' ? 'Raw HTML' : 'Custom Builder'}</td>
                     <td><span className="truncate-mobile" title={tmpl.description}>{tmpl.description || '-'}</span></td>
@@ -261,7 +262,7 @@ export default function LandingPageGallery() {
                         <button 
                           className="btn-icon" 
                           onClick={() => handlePreview(tmpl)} 
-                          title="Preview"
+                          title={t('admin_dashboard.landing_pages.action_preview', 'Preview')}
                           style={{ 
                             background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)', 
                             color: 'var(--neon-cyan)', padding: '6px', borderRadius: '4px', cursor: 'pointer'
@@ -273,7 +274,7 @@ export default function LandingPageGallery() {
                           <button 
                             className="btn-icon text-danger" 
                             onClick={() => handleDelete(tmpl.id, tmpl.name, tmpl.is_default)} 
-                            title="Hapus"
+                            title={t('admin_dashboard.landing_pages.action_delete', 'Hapus')}
                             style={{ 
                               background: 'transparent', border: '1px solid transparent', 
                               color: 'var(--text-muted)', padding: '6px', borderRadius: '4px', cursor: 'pointer'

@@ -164,8 +164,8 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
                     className={`lpb-template-card ${selectedTemplate === t.id ? 'selected' : ''}`}
                     onClick={() => loadTemplate(t.id)}
                   >
-                    <div className="lpb-template-header">
-                      <h5>{t.name}</h5>
+                    <div className="lpb-template-header" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <h5 style={{ margin: 0 }}>{t.name}</h5>
                       {t.is_default && <span className="badge badge-info">Default</span>}
                     </div>
                     <p>{t.description}</p>
@@ -221,8 +221,8 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
             <div className="lpb-editor">
               {activeTab === 'template' && !selectedTemplate ? (
                 <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  <h5>Pilih Template</h5>
-                  <p>Silakan pilih template dari daftar di atas untuk melihat pratinjau.</p>
+                  <h5>{t('admin_dashboard.campaigns.form.lpb.select_template_title', 'Pilih Template')}</h5>
+                  <p>{t('admin_dashboard.campaigns.form.lpb.select_template_desc', 'Silakan pilih template dari daftar di atas untuk melihat pratinjau.')}</p>
                 </div>
               ) : value.theme_style === 'raw_html' ? (
                 <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -343,7 +343,7 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
               <h5>{t('admin_dashboard.campaigns.form.lpb.preview_title')}</h5>
               {activeTab === 'template' && !selectedTemplate ? (
                 <div className="lpb-preview-wrapper" style={{ height: '500px', backgroundColor: '#fff', overflow: 'hidden', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ padding: '20px', color: '#999' }}>Pratinjau akan muncul di sini</div>
+                  <div style={{ padding: '20px', color: '#999' }}>{t('admin_dashboard.campaigns.form.lpb.preview_placeholder', 'Pratinjau akan muncul di sini')}</div>
                 </div>
               ) : value.theme_style === 'raw_html' ? (
                 <div className="lpb-preview-wrapper" style={{ height: '500px', backgroundColor: '#fff', overflow: 'hidden', padding: 0 }}>

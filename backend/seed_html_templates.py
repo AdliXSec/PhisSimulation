@@ -54,6 +54,7 @@ async def seed_templates():
 
             if existing:
                 existing.config = config
+                existing.is_default = True
                 print(f"Updated {name}")
             else:
                 tmpl = LandingPageTemplate(
