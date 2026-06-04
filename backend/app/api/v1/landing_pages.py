@@ -55,12 +55,17 @@ class LandingPageTemplateUpdate(BaseModel):
 
 # ---- Helpers ----
 
-def _serialize_template(t: LandingPageTemplate) -> dict:
+def _serialize_template(t: LandingPageTemplate, exclude_raw_html: bool = False) -> dict:
+    config = t.config
+    if exclude_raw_html and isinstance(config, dict) and "raw_html" in config:
+        config = config.copy()
+        config.pop("raw_html", None)
+
     return {
         "id": str(t.id),
         "name": t.name,
         "description": t.description,
-        "config": t.config,
+        "config": config,
         "is_default": t.is_default,
         "created_at": t.created_at.isoformat(),
         "updated_at": t.updated_at.isoformat(),
@@ -82,7 +87,7 @@ async def list_landing_page_templates(
         )
     )
     templates = result.scalars().all()
-    return [_serialize_template(t) for t in templates]
+    return [_serialize_template(t, exclude_raw_html=True) for t in templates]
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)

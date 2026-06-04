@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineSparkles, HiOutlineCheckCircle, HiOutlinePlus, HiOutlineTrash } from 'react-icons/hi2';
+import api from '../../services/api';
+import toast from 'react-hot-toast';
 import './LandingPageBuilder.css';
 
 const THEME_STYLES = [
@@ -38,12 +40,21 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
     handleFieldChange('form_fields', newFields);
   };
 
-  const loadTemplate = (id) => {
+  const loadTemplate = async (id) => {
     const tmpl = templates.find(t => t.id === id);
     if (tmpl) {
-      onChange(tmpl.config);
-      setSelectedTemplate(id);
-      // We no longer switch to 'raw' tab so the user stays on the template gallery view
+      if (tmpl.config?.theme_style === 'raw_html' && !tmpl.config.raw_html) {
+        try {
+          const res = await api.get(`landing-pages/${id}`);
+          onChange(res.data.config);
+          setSelectedTemplate(id);
+        } catch (err) {
+          toast.error('Gagal memuat detail template');
+        }
+      } else {
+        onChange(tmpl.config);
+        setSelectedTemplate(id);
+      }
     }
   };
 

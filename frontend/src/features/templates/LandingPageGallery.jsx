@@ -66,6 +66,22 @@ export default function LandingPageGallery() {
     }
   };
 
+  const handlePreview = async (tmpl) => {
+    if (tmpl.config?.theme_style === 'raw_html' && !tmpl.config.raw_html) {
+      setLoading(true);
+      try {
+        const res = await api.get(`landing-pages/${tmpl.id}`);
+        setPreviewTemplate(res.data);
+      } catch (err) {
+        toast.error('Gagal memuat detail template');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setPreviewTemplate(tmpl);
+    }
+  };
+
   // Preview Modal
   const previewModal = previewTemplate ? createPortal(
     <div 
@@ -224,7 +240,7 @@ export default function LandingPageGallery() {
                       <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
                         <button 
                           className="btn-icon" 
-                          onClick={() => setPreviewTemplate(tmpl)} 
+                          onClick={() => handlePreview(tmpl)} 
                           title="Preview"
                           style={{ 
                             background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)', 
