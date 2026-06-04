@@ -103,9 +103,9 @@ export default function LandingPageGallery() {
         style={{ 
           width: '800px', maxWidth: '90vw', maxHeight: '85vh', height: '800px',
           display: 'flex', flexDirection: 'column', 
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-base)',
           borderRadius: '12px',
-          border: '1px solid rgba(0, 240, 255, 0.15)',
+          border: '1px solid var(--border)',
           boxShadow: '0 0 40px rgba(0, 240, 255, 0.1), 0 20px 60px rgba(0,0,0,0.5)',
           overflow: 'hidden'
         }}
@@ -113,18 +113,22 @@ export default function LandingPageGallery() {
         <div style={{ 
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
           padding: '16px 24px', 
-          borderBottom: '1px solid #ccc',
-          background: '#f5f5f5',
+          borderBottom: '1px solid var(--border)',
+          background: 'var(--bg-sidebar)',
           flexShrink: 0
         }}>
-          <h3 style={{ margin: 0, color: '#333', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.1rem' }}>
-            <HiOutlineEye size={20} /> Preview: {previewTemplate.name}
+          <h3 style={{ margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.1rem' }}>
+            <HiOutlineEye size={20} style={{ color: 'var(--neon-cyan)' }} /> Preview: {previewTemplate.name}
           </h3>
           <button 
             onClick={() => setPreviewTemplate(null)} 
-            style={{ background: '#fff', border: '1px solid #ccc', borderRadius: '6px', color: '#666', cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            className="btn-ghost"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '50%', color: 'var(--text-secondary)' }}
+            onMouseOver={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'var(--danger-soft)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'transparent'; }}
+            title="Tutup Preview"
           >
-            <HiXMark size={20} />
+            <HiXMark size={24} />
           </button>
         </div>
         
@@ -171,8 +175,20 @@ export default function LandingPageGallery() {
         }}
       >
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', background: 'var(--bg-sidebar)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>Tambah Landing Page Template</h3>
-          <button onClick={() => setShowAddModal(false)} className="btn-icon"><HiXMark size={20} /></button>
+          <h3 style={{ margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <HiOutlinePlus size={20} style={{ color: 'var(--neon-cyan)' }} /> Tambah Landing Page Template
+          </h3>
+          <button 
+            type="button"
+            onClick={() => setShowAddModal(false)} 
+            className="btn-ghost"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '50%', color: 'var(--text-secondary)' }}
+            onMouseOver={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'var(--danger-soft)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'transparent'; }}
+            title="Tutup"
+          >
+            <HiXMark size={24} />
+          </button>
         </div>
         <form onSubmit={handleSaveNew} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="input-group">

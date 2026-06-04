@@ -89,9 +89,13 @@ export default function TemplateLibrary() {
           </h3>
           <button 
             onClick={() => setPreviewTemplate(null)} 
-            style={{ background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-secondary)', cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            className="btn-ghost"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '50%', color: 'var(--text-secondary)' }}
+            onMouseOver={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'var(--danger-soft)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'transparent'; }}
+            title="Tutup Preview"
           >
-            <HiXMark size={20} />
+            <HiXMark size={24} />
           </button>
         </div>
         
@@ -148,8 +152,20 @@ export default function TemplateLibrary() {
         }}
       >
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', background: 'var(--bg-sidebar)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>Tambah Email Template</h3>
-          <button onClick={() => setShowAddModal(false)} className="btn-icon"><HiXMark size={20} /></button>
+          <h3 style={{ margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <HiOutlinePlus size={20} style={{ color: 'var(--neon-cyan)' }} /> Tambah Email Template
+          </h3>
+          <button 
+            type="button"
+            onClick={() => setShowAddModal(false)} 
+            className="btn-ghost"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '50%', color: 'var(--text-secondary)' }}
+            onMouseOver={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'var(--danger-soft)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'transparent'; }}
+            title="Tutup"
+          >
+            <HiXMark size={24} />
+          </button>
         </div>
         <form onSubmit={handleSaveNew} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="input-group">
