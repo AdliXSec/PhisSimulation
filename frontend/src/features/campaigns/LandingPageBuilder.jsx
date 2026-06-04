@@ -41,17 +41,23 @@ export default function LandingPageBuilder({ value, onChange, templates = [] }) 
   };
 
   const loadTemplate = async (id) => {
+    console.log("loadTemplate called with id:", id);
     const tmpl = templates.find(t => t.id === id);
+    console.log("Found template in list:", tmpl);
     if (tmpl) {
       if (tmpl.config?.theme_style === 'raw_html' && !tmpl.config.raw_html) {
+        console.log("Fetching full config from API...");
         try {
           const res = await api.get(`landing-pages/${id}`);
+          console.log("Fetch success, config:", res.data.config);
           onChange(res.data.config);
           setSelectedTemplate(id);
-        } catch (err) {
+        } catch (_err) {
+          console.error("Fetch error:", _err);
           toast.error('Gagal memuat detail template');
         }
       } else {
+        console.log("No fetch needed, using config directly");
         onChange(tmpl.config);
         setSelectedTemplate(id);
       }

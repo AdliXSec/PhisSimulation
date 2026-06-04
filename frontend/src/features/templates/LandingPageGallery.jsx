@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 import { HiOutlineDocumentText, HiOutlineTrash, HiOutlineEye, HiXMark, HiOutlinePlus } from 'react-icons/hi2';
 
 export default function LandingPageGallery() {
-  const { t } = useTranslation();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [previewTemplate, setPreviewTemplate] = useState(null);
@@ -14,20 +13,20 @@ export default function LandingPageGallery() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTemplate, setNewTemplate] = useState({ name: '', description: '', raw_html: '' });
 
-  useEffect(() => {
-    loadTemplates();
-  }, []);
-
   const loadTemplates = async () => {
     try {
       const res = await api.get('landing-pages');
       setTemplates(res.data);
-    } catch (err) {
+    } catch (_err) {
       toast.error('Gagal memuat template landing page');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadTemplates();
+  }, []);
 
   const handleDelete = async (id, name, is_default) => {
     if (is_default) {
@@ -39,7 +38,7 @@ export default function LandingPageGallery() {
       await api.delete(`landing-pages/${id}`);
       toast.success('Template berhasil dihapus');
       loadTemplates();
-    } catch (err) {
+    } catch (_err) {
       toast.error('Gagal menghapus template');
     }
   };
@@ -61,23 +60,28 @@ export default function LandingPageGallery() {
       setShowAddModal(false);
       setNewTemplate({ name: '', description: '', raw_html: '' });
       loadTemplates();
-    } catch (err) {
+    } catch (_err) {
       toast.error('Gagal menyimpan template');
     }
   };
 
   const handlePreview = async (tmpl) => {
+    console.log("handlePreview called with:", tmpl);
     if (tmpl.config?.theme_style === 'raw_html' && !tmpl.config.raw_html) {
       setLoading(true);
       try {
+        console.log("Fetching full template for id:", tmpl.id);
         const res = await api.get(`landing-pages/${tmpl.id}`);
+        console.log("Fetch success, res.data:", res.data);
         setPreviewTemplate(res.data);
-      } catch (err) {
+      } catch (_err) {
+        console.error("Fetch error:", _err);
         toast.error('Gagal memuat detail template');
       } finally {
         setLoading(false);
       }
     } else {
+      console.log("No fetch needed, setting preview directly");
       setPreviewTemplate(tmpl);
     }
   };
