@@ -222,3 +222,72 @@ async def send_campaign_emails(campaign_id: str):
         except Exception as e:
             logger.error(f"Campaign email sending system failure: {e}")
             await db.rollback()
+
+
+async def send_verification_email(email: str, token: str, full_name: str | None = None):
+    """Send an email verification link to a new user."""
+    frontend_url = getattr(settings, "FRONTEND_URL", "http://localhost:5173")
+    # Ensure no trailing slash
+    if frontend_url.endswith("/"):
+        frontend_url = frontend_url[:-1]
+        
+    verify_url = f"{frontend_url}/auth/verify-email?token={token}"
+    
+    name_greeting = full_name if full_name else "Pengguna Baru"
+    
+    html_content = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2>Halo {name_greeting},</h2>
+        <p>Terima kasih telah mendaftar di PhiSimulation. Untuk menyelesaikan proses pendaftaran dan mengaktifkan akun Anda, silakan klik tombol di bawah ini:</p>
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{verify_url}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Verifikasi Email Anda</a>
+        </div>
+        <p>Atau Anda juga bisa menyalin tautan berikut ke browser Anda:</p>
+        <p style="word-break: break-all; color: #666;"><a href="{verify_url}">{verify_url}</a></p>
+        <p>Tautan ini akan kedaluwarsa dalam 24 jam.</p>
+        <p>Jika Anda tidak mendaftar di platform ini, abaikan saja email ini.</p>
+        <br>
+        <p>Salam,<br>Tim PhiSimulation</p>
+    </body>
+    </html>
+    """
+    
+    subject = "Verifikasi Akun PhiSimulation Anda"
+
+    try:
+        if settings.RESEND and resend:
+            params = {
+                "from": f"PhiSimulation <{settings.MAIL_FROM}>",
+                "to": [email],
+                "subject": subject,
+                "html": html_content,
+            }
+            resend.Emails.send(params)
+            logger.info(f"Verification email sent to {email} via Resend")
+        elif fast_mail:
+            custom_config = ConnectionConfig(
+                MAIL_USERNAME=settings.MAIL_USERNAME,
+                MAIL_PASSWORD=settings.MAIL_PASSWORD,
+                MAIL_FROM=settings.MAIL_FROM,
+                MAIL_FROM_NAME="PhiSimulation",
+                MAIL_PORT=settings.MAIL_PORT,
+                MAIL_SERVER=settings.MAIL_SERVER,
+                MAIL_STARTTLS=settings.MAIL_STARTTLS,
+                MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
+                USE_CREDENTIALS=True,
+            )
+            custom_fast_mail = FastMail(custom_config)
+            message = MessageSchema(
+                subject=subject,
+                recipients=[email],
+                body=html_content,
+                subtype=MessageType.html,
+            )
+            await custom_fast_mail.send_message(message)
+            logger.info(f"Verification email sent to {email} via FastMail")
+        else:
+            logger.info(f"[MOCK EMAIL VERIFICATION] To: {email} | URL: {verify_url}")
+    except Exception as e:
+        logger.error(f"Failed to send verification email to {email}: {e}")
+

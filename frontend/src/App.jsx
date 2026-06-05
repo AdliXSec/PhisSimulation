@@ -8,6 +8,7 @@ import SpaceLoader from './components/ui/SpaceLoader';
 import DashboardLayout from './components/layout/DashboardLayout';
 import Login from './features/auth/Login';
 import Register from './features/auth/Register';
+import VerifyEmail from './features/auth/VerifyEmail';
 import Dashboard from './features/dashboard/Dashboard';
 import Campaigns from './features/campaigns/Campaigns';
 import Employees from './features/employees/Employees';
@@ -36,6 +37,7 @@ const getPageTitle = (pathname) => {
   if (pathname === '/') return 'AI Phising Simulation';
   if (pathname === '/login') return 'Login - PhiSim';
   if (pathname === '/register') return 'Register - PhiSim';
+  if (pathname.startsWith('/auth/verify-email')) return 'Verify Email - PhiSim';
   if (pathname === '/dashboard') return 'Dashboard - PhiSim';
   if (pathname.startsWith('/dashboard/campaigns')) return 'Kampanye - PhiSim';
   if (pathname.startsWith('/dashboard/employees')) return 'Karyawan - PhiSim';
@@ -68,6 +70,7 @@ function AppRoutes() {
       <Route path="/" element={<LandingHome />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
+      <Route path="/auth/verify-email" element={<VerifyEmail />} />
       <Route path="/landing/:token" element={<LandingPage />} />
       <Route path="/education/:token" element={<EducationPage />} />
 

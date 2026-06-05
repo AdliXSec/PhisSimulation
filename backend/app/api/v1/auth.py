@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from pydantic import BaseModel, EmailStr
 import secrets
 from google.oauth2 import id_token
@@ -8,10 +8,11 @@ from google.auth.transport import requests
 
 from app.core.database import get_db
 from app.core.config import settings
-from app.core.security import hash_password, verify_password, create_access_token
+from app.core.security import hash_password, verify_password, create_access_token, create_verification_token, decode_verification_token
 from app.api.deps import get_current_user
 from app.models.user import User
 from app.core.limiter import limiter
+from app.services.email_service import send_verification_email
 
 
 router = APIRouter()
@@ -161,7 +162,14 @@ async def google_login(request: Request, login_data: GoogleLoginRequest, db: Asy
 @limiter.limit("5/minute")
 async def login(request: Request, login_data: LoginRequest, db: AsyncSession = Depends(get_db)):
     """Authenticate admin and return JWT token."""
-    result = await db.execute(select(User).where(User.username == login_data.username))
+    result = await db.execute(
+        select(User).where(
+            or_(
+                User.username == login_data.username, 
+                User.email == login_data.username
+            )
+        )
+    )
     user = result.scalar_one_or_none()
 
     if not user or not verify_password(login_data.password, user.password_hash):
@@ -194,13 +202,13 @@ async def login(request: Request, login_data: LoginRequest, db: AsyncSession = D
 @limiter.limit("3/minute")
 async def register(request: Request, reg_data: RegisterRequest, db: AsyncSession = Depends(get_db)):
     """Register a new admin user."""
-    # Check registration secret if configured
-    if settings.REGISTRATION_SECRET:
-        if reg_data.registration_secret != settings.REGISTRATION_SECRET:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Token registrasi tidak valid atau tidak ditemukan."
-            )
+    # Check registration secret if configured (Disabled for email verification)
+    # if settings.REGISTRATION_SECRET:
+    #     if reg_data.registration_secret != settings.REGISTRATION_SECRET:
+    #         raise HTTPException(
+    #             status_code=status.HTTP_403_FORBIDDEN,
+    #             detail="Token registrasi tidak valid atau tidak ditemukan."
+    #         )
 
     # Check duplicate username
     existing = await db.execute(select(User).where(User.username == reg_data.username))
@@ -217,9 +225,14 @@ async def register(request: Request, reg_data: RegisterRequest, db: AsyncSession
         email=reg_data.email,
         password_hash=hash_password(reg_data.password),
         full_name=reg_data.full_name,
+        is_active=False,  # Require email verification
     )
     db.add(user)
     await db.flush()
+
+    # Generate token and send email
+    token = create_verification_token(str(user.id))
+    await send_verification_email(user.email, token, user.full_name)
 
     return UserResponse(
         id=str(user.id),
@@ -228,6 +241,35 @@ async def register(request: Request, reg_data: RegisterRequest, db: AsyncSession
         full_name=user.full_name,
         role=user.role,
     )
+
+
+@router.get("/verify-email")
+async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
+    """Verify user's email address using token."""
+    payload = decode_verification_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tautan verifikasi tidak valid atau sudah kedaluwarsa."
+        )
+    
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tautan verifikasi tidak valid.")
+        
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pengguna tidak ditemukan.")
+        
+    if user.is_active:
+        return {"message": "Email sudah diverifikasi sebelumnya. Silakan login."}
+        
+    user.is_active = True
+    await db.commit()
+    
+    return {"message": "Email berhasil diverifikasi! Akun Anda sekarang sudah aktif. Silakan login."}
 
 
 @router.get("/me", response_model=UserResponse)
