@@ -54,21 +54,21 @@ export default function TemplateLibrary() {
 
   // Preview Modal rendered via Portal
   const previewModal = previewTemplate ? createPortal(
-    <div 
+    <div
       style={{
         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
         backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', 
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
         zIndex: 99999,
         padding: '24px'
       }}
       onClick={(e) => { if (e.target === e.currentTarget) setPreviewTemplate(null); }}
     >
-      <div 
-        className="fade-in" 
-        style={{ 
-          width: '800px', maxWidth: '90vw', maxHeight: '85vh', 
-          display: 'flex', flexDirection: 'column', 
+      <div
+        className="fade-in"
+        style={{
+          width: '800px', maxWidth: '90vw', maxHeight: '85vh',
+          display: 'flex', flexDirection: 'column',
           backgroundColor: 'var(--bg-base, #0a0e17)',
           borderRadius: '12px',
           border: '1px solid rgba(0, 240, 255, 0.15)',
@@ -77,9 +77,9 @@ export default function TemplateLibrary() {
         }}
       >
         {/* Header */}
-        <div style={{ 
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-          padding: '16px 24px', 
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '16px 24px',
           borderBottom: '1px solid var(--border)',
           background: 'var(--bg-sidebar)',
           flexShrink: 0
@@ -87,8 +87,8 @@ export default function TemplateLibrary() {
           <h3 style={{ margin: 0, color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.1rem', fontFamily: 'var(--font-display)' }}>
             <HiOutlineEye size={20} /> {t('admin_dashboard.templates.modal_preview')}
           </h3>
-          <button 
-            onClick={() => setPreviewTemplate(null)} 
+          <button
+            onClick={() => setPreviewTemplate(null)}
             className="btn-ghost"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '50%', color: 'var(--text-secondary)' }}
             onMouseOver={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'var(--danger-soft)'; }}
@@ -98,52 +98,52 @@ export default function TemplateLibrary() {
             <HiXMark size={24} />
           </button>
         </div>
-        
+
         {/* Meta Info */}
         <div style={{ padding: '14px 24px', borderBottom: '1px solid var(--border)', background: 'var(--bg-primary)', display: 'flex', gap: '32px', flexWrap: 'wrap', flexShrink: 0 }}>
           <div style={{ fontSize: '13px' }}>
-            <strong style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{t('admin_dashboard.templates.modal_subject')}</strong> 
+            <strong style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{t('admin_dashboard.templates.modal_subject')}</strong>
             <span style={{ color: 'var(--text-primary)' }}>{previewTemplate.email_subject}</span>
           </div>
           <div style={{ fontSize: '13px' }}>
-            <strong style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{t('admin_dashboard.templates.modal_sender')}</strong> 
+            <strong style={{ color: 'var(--text-muted)', marginRight: '8px' }}>{t('admin_dashboard.templates.modal_sender')}</strong>
             <span style={{ color: 'var(--text-primary)' }}>{previewTemplate.email_sender_name}</span>
           </div>
         </div>
-        
+
         {/* Email Body */}
-        <div 
-          style={{ 
-            flex: 1, 
+        <div
+          style={{
+            flex: 1,
             overflowY: 'auto', overflowX: 'auto',
-            padding: '24px', 
-            background: '#ffffff', color: '#000000', 
+            padding: '24px',
+            background: '#ffffff', color: '#000000',
             minHeight: '300px'
-          }} 
-          dangerouslySetInnerHTML={{ __html: previewTemplate.email_body_html }} 
+          }}
+          dangerouslySetInnerHTML={{ __html: previewTemplate.email_body_html }}
         />
-        </div>
+      </div>
     </div>,
     document.body
   ) : null;
 
   // Add Modal
   const addModal = showAddModal ? createPortal(
-    <div 
+    <div
       style={{
         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
         backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', 
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
         zIndex: 99999,
         padding: '24px'
       }}
       onClick={(e) => { if (e.target === e.currentTarget) setShowAddModal(false); }}
     >
-      <div 
-        className="fade-in" 
-        style={{ 
+      <div
+        className="fade-in"
+        style={{
           width: '600px', maxWidth: '90vw',
-          display: 'flex', flexDirection: 'column', 
+          display: 'flex', flexDirection: 'column',
           backgroundColor: 'var(--bg-base)',
           borderRadius: '12px',
           border: '1px solid var(--border)',
@@ -153,11 +153,11 @@ export default function TemplateLibrary() {
       >
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', background: 'var(--bg-sidebar)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <HiOutlinePlus size={20} style={{ color: 'var(--neon-cyan)' }} /> Tambah Email Template
+            <HiOutlinePlus size={20} style={{ color: 'var(--neon-cyan)' }} /> {t('admin_dashboard.templates.modal_add_title')}
           </h3>
-          <button 
+          <button
             type="button"
-            onClick={() => setShowAddModal(false)} 
+            onClick={() => setShowAddModal(false)}
             className="btn-ghost"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: '50%', color: 'var(--text-secondary)' }}
             onMouseOver={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'var(--danger-soft)'; }}
@@ -169,24 +169,26 @@ export default function TemplateLibrary() {
         </div>
         <form onSubmit={handleSaveNew} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="input-group">
-            <label>Nama Template</label>
-            <input required className="input" value={newTemplate.name} onChange={e => setNewTemplate({...newTemplate, name: e.target.value})} placeholder="Contoh: IT Support Notif" />
+            <label>{t('admin_dashboard.templates.form_name_label')}</label>
+            <input required className="input" value={newTemplate.name} onChange={e => setNewTemplate({ ...newTemplate, name: e.target.value })} placeholder={t('admin_dashboard.templates.form_name_placeholder')} />
           </div>
           <div className="input-group">
-            <label>Subjek Email</label>
-            <input required className="input" value={newTemplate.email_subject} onChange={e => setNewTemplate({...newTemplate, email_subject: e.target.value})} placeholder="Action Required: ..." />
+            <label>{t('admin_dashboard.templates.form_subject_label')}</label>
+            <input required className="input" value={newTemplate.email_subject} onChange={e => setNewTemplate({ ...newTemplate, email_subject: e.target.value })} placeholder={t('admin_dashboard.templates.form_subject_placeholder')} />
           </div>
           <div className="input-group">
-            <label>Nama Pengirim</label>
-            <input required className="input" value={newTemplate.email_sender_name} onChange={e => setNewTemplate({...newTemplate, email_sender_name: e.target.value})} placeholder="IT Department" />
+            <label>{t('admin_dashboard.templates.form_sender_label')}</label>
+            <input required className="input" value={newTemplate.email_sender_name} onChange={e => setNewTemplate({ ...newTemplate, email_sender_name: e.target.value })} placeholder={t('admin_dashboard.templates.form_sender_placeholder')} />
           </div>
           <div className="input-group">
-            <label>HTML Body</label>
-            <textarea required className="input" rows="6" value={newTemplate.email_body_html} onChange={e => setNewTemplate({...newTemplate, email_body_html: e.target.value})} style={{ fontFamily: 'monospace' }} placeholder="<p>Dear Employee...</p>" />
+            <label>{t('admin_dashboard.templates.form_body_label')}</label>
+            <textarea required className="input" rows="6" value={newTemplate.email_body_html} onChange={e => setNewTemplate({ ...newTemplate, email_body_html: e.target.value })} style={{ fontFamily: 'monospace' }} placeholder={t('admin_dashboard.templates.form_body_placeholder')} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
-            <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Batal</button>
-            <button type="submit" className="btn btn-primary">Simpan Template</button>
+            <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>{t('admin_dashboard.templates.btn_cancel')}</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? <div className="spinner" style={{ width: '18px', height: '18px', borderWidth: '2px' }}></div> : t('admin_dashboard.templates.btn_save')}
+            </button>
           </div>
         </form>
       </div>
@@ -198,11 +200,11 @@ export default function TemplateLibrary() {
     <div className="fade-in">
       <div className="page-header">
         <div>
-          <h1>Galeri Email</h1>
+          <h1>{t('admin_dashboard.templates.title')}</h1>
           <p>{t('admin_dashboard.templates.desc')}</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-          <HiOutlinePlus size={18} /> Tambah Template
+          <HiOutlinePlus size={18} /> {t('admin_dashboard.templates.btn_add')}
         </button>
       </div>
 
@@ -244,13 +246,13 @@ export default function TemplateLibrary() {
                     <td>{new Date(tmpl.created_at).toLocaleDateString(t('admin_dashboard.templates.table_date') === 'Date Saved' ? 'en-US' : 'id-ID')}</td>
                     <td>
                       <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
-                        <button 
-                          className="btn-icon" 
-                          onClick={() => setPreviewTemplate(tmpl)} 
+                        <button
+                          className="btn-icon"
+                          onClick={() => setPreviewTemplate(tmpl)}
                           title={t('admin_dashboard.templates.action_preview')}
-                          style={{ 
-                            background: 'rgba(0, 240, 255, 0.1)', 
-                            border: '1px solid rgba(0, 240, 255, 0.2)', 
+                          style={{
+                            background: 'rgba(0, 240, 255, 0.1)',
+                            border: '1px solid rgba(0, 240, 255, 0.2)',
                             color: 'var(--neon-cyan)',
                             padding: '6px',
                             borderRadius: '4px',
@@ -260,13 +262,13 @@ export default function TemplateLibrary() {
                         >
                           <HiOutlineEye size={18} />
                         </button>
-                        <button 
-                          className="btn-icon" 
-                          onClick={() => handleDelete(tmpl.id, tmpl.name)} 
+                        <button
+                          className="btn-icon"
+                          onClick={() => handleDelete(tmpl.id, tmpl.name)}
                           title={t('admin_dashboard.templates.action_delete')}
-                          style={{ 
-                            background: 'transparent', 
-                            border: '1px solid transparent', 
+                          style={{
+                            background: 'transparent',
+                            border: '1px solid transparent',
                             color: 'var(--text-muted)',
                             padding: '6px',
                             borderRadius: '4px',

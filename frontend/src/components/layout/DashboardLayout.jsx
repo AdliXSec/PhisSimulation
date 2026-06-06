@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { HiOutlineBars3 } from 'react-icons/hi2';
+import { HiOutlineBars3, HiOutlineChevronDoubleRight } from 'react-icons/hi2';
 import Sidebar from './Sidebar';
 import './DashboardLayout.css';
 
 export default function DashboardLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktopOpen, setIsDesktopOpen] = useState(true);
 
   return (
     <div className="dashboard-layout">
@@ -52,14 +53,14 @@ export default function DashboardLayout() {
         </button>
       </div>
 
-      <Sidebar isOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)} />
+      <Sidebar isOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)} isDesktopOpen={isDesktopOpen} onToggleDesktop={() => setIsDesktopOpen(!isDesktopOpen)} />
       
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div className="sidebar-overlay" onClick={() => setIsMobileOpen(false)}></div>
       )}
 
-      <main className="main-content">
+      <main className={`main-content ${!isDesktopOpen ? 'expanded' : ''}`}>
         <div className="content-wrapper">
           <Outlet />
         </div>

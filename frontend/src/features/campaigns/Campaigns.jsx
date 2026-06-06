@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { HiOutlinePlus, HiOutlineRocketLaunch, HiOutlineSparkles, HiOutlinePencil, HiOutlineTrash, HiOutlineArrowRight, HiOutlineArrowLeft } from 'react-icons/hi2';
 import LandingPageBuilder from './LandingPageBuilder';
 import StepWizard from '../../components/wizard/StepWizard';
+import CampaignCanvas from './CampaignCanvas';
 
 // We will move WIZARD_STEPS inside the component to support i18n
 
@@ -226,15 +227,7 @@ export default function Campaigns() {
 
   return (
     <div className="fade-in">
-      <div className="page-header">
-        <div>
-          <h1>{t('admin_dashboard.campaigns.title')}</h1>
-          <p>{t('admin_dashboard.campaigns.desc')}</p>
-        </div>
-        <button className="btn btn-primary" onClick={openNewForm}>
-          <HiOutlinePlus size={18} /> {t('admin_dashboard.campaigns.btn_new')}
-        </button>
-      </div>
+      {/* Header moved to inside the canvas */}
 
       {showForm && (
         <div className="card-glow" style={{ marginBottom: 'var(--space-2xl)' }}>
@@ -535,81 +528,16 @@ export default function Campaigns() {
         </div>
       )}
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>{t('admin_dashboard.campaigns.table.name')}</th>
-              <th>{t('admin_dashboard.campaigns.table.status')}</th>
-              <th>{t('admin_dashboard.campaigns.table.difficulty')}</th>
-              <th>Tema</th>
-              <th>{t('admin_dashboard.campaigns.table.targets')}</th>
-              <th>{t('admin_dashboard.campaigns.table.created')}</th>
-              <th>{t('admin_dashboard.campaigns.table.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {campaigns.length === 0 ? (
-              <tr><td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Belum ada kampanye</td></tr>
-            ) : campaigns.map(c => (
-              <tr key={c.id}>
-                <td><strong>{c.name}</strong></td>
-                <td>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span className={statusBadge(c.status)}>{c.status}</span>
-                    {(c.status === 'LAUNCHING' || c.status === 'ACTIVE' || c.status === 'COMPLETED') && (
-                      <div style={{ width: '100%', minWidth: '100px' }}>
-                        <div style={{ height: '6px', width: '100%', backgroundColor: 'var(--divider)', borderRadius: '3px', overflow: 'hidden' }}>
-                          <div style={{ 
-                            height: '100%', 
-                            width: `${(c.processed_count / c.target_count) * 100}%`, 
-                            backgroundColor: 'var(--neon-cyan)',
-                            transition: 'width 0.3s ease'
-                          }}></div>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-xs)', marginTop: '2px' }}>
-                          <span>{c.processed_count}/{c.target_count}</span>
-                          {c.error_count > 0 && <span style={{ color: 'var(--danger)' }}>{c.error_count} gagal</span>}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </td>
-                <td>{c.difficulty}</td>
-                <td>{c.theme || '-'}</td>
-                <td>{c.target_count} {t('admin_dashboard.campaigns.table.people', 'orang')}</td>
-                <td>{new Date(c.created_at).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'id-ID')}</td>
-                <td>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', gap: '4px', opacity: 0.8 }} className="row-actions">
-                      {c.status === 'READY' && (
-                        <button className="btn btn-ghost" onClick={() => handleLaunch(c.id)} title={t('admin_dashboard.campaigns.actions.launch', 'Luncurkan')}>
-                          <HiOutlineRocketLaunch size={18} />
-                        </button>
-                      )}
-                      <Link to={`/dashboard/reports/${c.id}`} className="btn btn-ghost" title={t('admin_dashboard.campaigns.actions.detail', 'Detail')}>
-                        <HiOutlineArrowRight size={18} />
-                      </Link>
-                      {c.status === 'DRAFT' && (
-                        <>
-                          <button className="btn btn-ghost" onClick={() => handleEdit(c)} title={t('admin_dashboard.campaigns.actions.edit', 'Edit')}>
-                            <HiOutlinePencil size={18} />
-                          </button>
-                          <button className="btn btn-ghost" onClick={() => handleGenerate(c.id)} title={t('admin_dashboard.campaigns.actions.generate', 'Generate Template')}>
-                            <HiOutlineSparkles size={18} />
-                          </button>
-                        </>
-                      )}
-                      <button className="btn btn-ghost text-danger" onClick={() => handleDelete(c.id, c.name)} title={t('admin_dashboard.campaigns.actions.delete', 'Hapus')}>
-                        <HiOutlineTrash size={18} />
-                      </button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="campaign-canvas-wrapper">
+        <CampaignCanvas 
+          campaigns={campaigns}
+          departments={departments}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onLaunch={handleLaunch}
+          onGenerate={handleGenerate}
+          onNewCampaign={openNewForm}
+        />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -18,6 +19,9 @@ import {
   HiOutlineSun,
   HiOutlineMoon,
   HiOutlineDocumentText,
+  HiOutlineChevronDoubleLeft,
+  HiOutlineChevronDoubleRight,
+  HiOutlineEllipsisVertical,
 } from 'react-icons/hi2';
 import './Sidebar.css';
 
@@ -32,14 +36,26 @@ const navItems = [
   { path: '/dashboard/departments', labelKey: 'departments', icon: HiOutlineBuildingOffice2 },
   { path: '/dashboard/reports', labelKey: 'reports', icon: HiOutlineChartBarSquare },
   { path: '/dashboard/api-keys', labelKey: 'api_keys', icon: HiOutlineKey },
-  { path: '/dashboard/profile', labelKey: 'profile', icon: HiOutlineUser },
 ];
 
-export default function Sidebar({ isOpen, onClose }) {
+export default function Sidebar({ isOpen, onClose, isDesktopOpen = true, onToggleDesktop }) {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const popupRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isMenuOpen && popupRef.current && !popupRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'id' : 'en';
@@ -47,7 +63,8 @@ export default function Sidebar({ isOpen, onClose }) {
   };
 
   return (
-    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+    <>
+    <aside className={`sidebar ${isOpen ? 'open' : ''} ${!isDesktopOpen ? 'desktop-closed' : ''}`}>
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <HiOutlineShieldCheck size={28} />
@@ -56,6 +73,10 @@ export default function Sidebar({ isOpen, onClose }) {
             <span>Security Platform</span>
           </div>
         </div>
+        {/* Desktop collapse button */}
+        <button className="btn-ghost desktop-close-btn" onClick={onToggleDesktop} title={isDesktopOpen ? "Hide Sidebar" : "Expand Sidebar"}>
+          {isDesktopOpen ? <HiOutlineChevronDoubleLeft size={20} /> : <HiOutlineChevronDoubleRight size={20} />}
+        </button>
         {/* Mobile close button */}
         <button className="btn-ghost mobile-close-btn" onClick={onClose}>
           <HiOutlineXMark size={24} />
@@ -79,7 +100,7 @@ export default function Sidebar({ isOpen, onClose }) {
       </nav>
 
       <div className="sidebar-footer">
-        <div className="user-info">
+        <div className="user-info" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="Menu Profil">
           <div className="user-avatar">
             {user?.full_name?.[0] || user?.username?.[0] || 'A'}
           </div>
@@ -88,26 +109,42 @@ export default function Sidebar({ isOpen, onClose }) {
             <span className="user-role">{user?.role}</span>
           </div>
         </div>
-        <button
-          className="btn-ghost logout-btn"
-          onClick={toggleLanguage}
-          title="Ubah Bahasa / Change Language"
-          style={{ color: 'var(--neon-cyan)', fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.8rem' }}
-        >
-          {i18n.language === 'en' ? 'ID' : 'EN'}
-        </button>
-        <button
-          className="btn-ghost logout-btn"
-          onClick={toggleTheme}
-          title={theme === 'dark' ? t('dashboard_layout.light_mode') : t('dashboard_layout.dark_mode')}
-          style={{ color: 'var(--neon-cyan)' }}
-        >
-          {theme === 'dark' ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
-        </button>
-        <button className="btn-ghost logout-btn" onClick={logout} title={t('dashboard_layout.logout')}>
-          <HiOutlineArrowRightOnRectangle size={20} />
-        </button>
+        
+        <div className="menu-toggle-icon" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }}>
+          <HiOutlineEllipsisVertical size={20} />
+        </div>
       </div>
     </aside>
+
+    {isMenuOpen && (
+      <div className={`user-menu-popup fade-in ${!isDesktopOpen ? 'minimized' : ''}`} ref={popupRef}>
+        <button 
+          className="popup-menu-item"
+          onClick={() => {
+            navigate('/dashboard/profile');
+            setIsMenuOpen(false);
+            if (!isDesktopOpen) onClose();
+          }}
+        >
+          <HiOutlineUser size={18} />
+          Profile Management
+        </button>
+        <div className="popup-divider"></div>
+        <button className="popup-menu-item" onClick={toggleLanguage}>
+          <HiOutlineGlobeAlt size={18} />
+          {i18n.language === 'en' ? 'Bahasa: English' : 'Bahasa: Indonesia'}
+        </button>
+        <button className="popup-menu-item" onClick={toggleTheme}>
+          {theme === 'dark' ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
+          {theme === 'dark' ? t('dashboard_layout.light_mode') : t('dashboard_layout.dark_mode')}
+        </button>
+        <div className="popup-divider"></div>
+        <button className="popup-menu-item danger" onClick={logout}>
+          <HiOutlineArrowRightOnRectangle size={18} />
+          {t('dashboard_layout.logout')}
+        </button>
+      </div>
+    )}
+    </>
   );
 }

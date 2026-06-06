@@ -144,6 +144,7 @@ async def list_campaigns(
             "status": c.status,
             "difficulty": c.difficulty,
             "theme": c.theme,
+            "target_departments": c.target_departments,
             "target_count": count,
             "processed_count": c.processed_count,
             "error_count": c.error_count,
