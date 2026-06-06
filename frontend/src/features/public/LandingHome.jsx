@@ -776,6 +776,17 @@ export default function LandingHome() {
                   {t('landing.hero.btn_how_it_works')}
                 </a>
               </div>
+              
+              <p style={{
+                marginTop: '32px',
+                fontSize: 'clamp(0.8rem, 1.5vw, 0.95rem)',
+                color: 'var(--text-muted)',
+                fontWeight: 500,
+                letterSpacing: '0.02em',
+                opacity: 0.8
+              }}>
+                {t('landing.hero.supported_platforms')}
+              </p>
             </motion.div>
 
             {/* Dark transition overlay — fades in at phase 3 */}

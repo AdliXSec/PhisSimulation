@@ -17,7 +17,8 @@ const resources = {
           words: ["Phishing", "Social Engineering", "Cyber Attack"],
           desc: "Create AI phishing simulations, send them to all departments, and see who clicks all in one intuitive dashboard. Free to try.",
           btn_start: "Get Started",
-          btn_how_it_works: "See How It Works ↓"
+          btn_how_it_works: "See How It Works ↓",
+          supported_platforms: "🌟 Includes ready-to-use decoy templates for top platforms: Google, Meta, Microsoft, Spotify, Tiktok, etc."
         },
         stats: {
           delivery: "Delivery Rate",
@@ -716,7 +717,8 @@ const resources = {
           words: ["Phishing", "Social Engineering", "Cyber Attack"],
           desc: "Buat simulasi phishing dengan AI, kirim ke seluruh departemen, dan lihat siapa yang klik semua dalam satu dashboard yang intuitif. Gratis untuk dicoba.",
           btn_start: "Mulai Sekarang",
-          btn_how_it_works: "Lihat Cara Kerja ↓"
+          btn_how_it_works: "Lihat Cara Kerja ↓",
+          supported_platforms: "🌟 Mendukung simulasi pancingan (decoy) platform raksasa: Google, Meta, Microsoft, Spotify, Tiktok, dll."
         },
         stats: {
           delivery: "Delivery Rate",
