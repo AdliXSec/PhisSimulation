@@ -64,87 +64,87 @@ export default function Sidebar({ isOpen, onClose, isDesktopOpen = true, onToggl
 
   return (
     <>
-    <aside className={`sidebar ${isOpen ? 'open' : ''} ${!isDesktopOpen ? 'desktop-closed' : ''}`}>
-      <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <HiOutlineShieldCheck size={28} />
-          <div>
-            <h2>PhiSim</h2>
-            <span>Security Platform</span>
+      <aside className={`sidebar ${isOpen ? 'open' : ''} ${!isDesktopOpen ? 'desktop-closed' : ''}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <HiOutlineShieldCheck size={28} />
+            <div>
+              <h2>PhiSim</h2>
+              <span>Security Platform</span>
+            </div>
+          </div>
+          {/* Desktop collapse button */}
+          <button className="btn-ghost desktop-close-btn" onClick={onToggleDesktop} title={isDesktopOpen ? "Hide Sidebar" : "Expand Sidebar"}>
+            {isDesktopOpen ? <HiOutlineChevronDoubleLeft size={20} /> : <HiOutlineChevronDoubleRight size={20} />}
+          </button>
+          {/* Mobile close button */}
+          <button className="btn-ghost mobile-close-btn" onClick={onClose}>
+            <HiOutlineXMark size={24} />
+          </button>
+        </div>
+
+        <nav className="sidebar-nav">
+          <div className="nav-section-label">{t('dashboard_layout.mobile_menu').toUpperCase()}</div>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={onClose}
+              end={item.path === '/dashboard'}
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            >
+              <item.icon size={20} />
+              <span>{t(`dashboard_layout.menus.${item.labelKey}`)}</span>
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="user-info" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="Menu Profil">
+            <div className="user-avatar">
+              {user?.full_name?.[0] || user?.username?.[0] || 'A'}
+            </div>
+            <div className="user-details">
+              <span className="user-name">{user?.full_name || user?.username}</span>
+              <span className="user-role">{user?.role}</span>
+            </div>
+          </div>
+
+          <div className="menu-toggle-icon" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }}>
+            <HiOutlineEllipsisVertical size={20} />
           </div>
         </div>
-        {/* Desktop collapse button */}
-        <button className="btn-ghost desktop-close-btn" onClick={onToggleDesktop} title={isDesktopOpen ? "Hide Sidebar" : "Expand Sidebar"}>
-          {isDesktopOpen ? <HiOutlineChevronDoubleLeft size={20} /> : <HiOutlineChevronDoubleRight size={20} />}
-        </button>
-        {/* Mobile close button */}
-        <button className="btn-ghost mobile-close-btn" onClick={onClose}>
-          <HiOutlineXMark size={24} />
-        </button>
-      </div>
+      </aside>
 
-      <nav className="sidebar-nav">
-        <div className="nav-section-label">{t('dashboard_layout.mobile_menu').toUpperCase()}</div>
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            onClick={onClose}
-            end={item.path === '/dashboard'}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+      {isMenuOpen && (
+        <div className={`user-menu-popup fade-in ${!isDesktopOpen ? 'minimized' : ''}`} ref={popupRef}>
+          <button
+            className="popup-menu-item"
+            onClick={() => {
+              navigate('/dashboard/profile');
+              setIsMenuOpen(false);
+              if (!isDesktopOpen) onClose();
+            }}
           >
-            <item.icon size={20} />
-            <span>{t(`dashboard_layout.menus.${item.labelKey}`)}</span>
-          </NavLink>
-        ))}
-      </nav>
-
-      <div className="sidebar-footer">
-        <div className="user-info" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} title="Menu Profil">
-          <div className="user-avatar">
-            {user?.full_name?.[0] || user?.username?.[0] || 'A'}
-          </div>
-          <div className="user-details">
-            <span className="user-name">{user?.full_name || user?.username}</span>
-            <span className="user-role">{user?.role}</span>
-          </div>
+            <HiOutlineUser size={18} />
+            Profile Management
+          </button>
+          <div className="popup-divider"></div>
+          <button className="popup-menu-item" onClick={toggleLanguage}>
+            <HiOutlineGlobeAlt size={18} />
+            {i18n.language === 'en' ? 'Language: English' : 'Bahasa: Indonesia'}
+          </button>
+          <button className="popup-menu-item" onClick={toggleTheme}>
+            {theme === 'dark' ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
+            {theme === 'dark' ? t('dashboard_layout.light_mode') : t('dashboard_layout.dark_mode')}
+          </button>
+          <div className="popup-divider"></div>
+          <button className="popup-menu-item danger" onClick={logout}>
+            <HiOutlineArrowRightOnRectangle size={18} />
+            {t('dashboard_layout.logout')}
+          </button>
         </div>
-        
-        <div className="menu-toggle-icon" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }}>
-          <HiOutlineEllipsisVertical size={20} />
-        </div>
-      </div>
-    </aside>
-
-    {isMenuOpen && (
-      <div className={`user-menu-popup fade-in ${!isDesktopOpen ? 'minimized' : ''}`} ref={popupRef}>
-        <button 
-          className="popup-menu-item"
-          onClick={() => {
-            navigate('/dashboard/profile');
-            setIsMenuOpen(false);
-            if (!isDesktopOpen) onClose();
-          }}
-        >
-          <HiOutlineUser size={18} />
-          Profile Management
-        </button>
-        <div className="popup-divider"></div>
-        <button className="popup-menu-item" onClick={toggleLanguage}>
-          <HiOutlineGlobeAlt size={18} />
-          {i18n.language === 'en' ? 'Bahasa: English' : 'Bahasa: Indonesia'}
-        </button>
-        <button className="popup-menu-item" onClick={toggleTheme}>
-          {theme === 'dark' ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
-          {theme === 'dark' ? t('dashboard_layout.light_mode') : t('dashboard_layout.dark_mode')}
-        </button>
-        <div className="popup-divider"></div>
-        <button className="popup-menu-item danger" onClick={logout}>
-          <HiOutlineArrowRightOnRectangle size={18} />
-          {t('dashboard_layout.logout')}
-        </button>
-      </div>
-    )}
+      )}
     </>
   );
 }
