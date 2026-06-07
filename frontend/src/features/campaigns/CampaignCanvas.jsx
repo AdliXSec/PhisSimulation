@@ -1,7 +1,8 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { ReactFlow, MiniMap, Controls, ControlButton, Background, useNodesState, useEdgesState } from '@xyflow/react';
-import { HiOutlineLockClosed, HiOutlineLockOpen } from 'react-icons/hi2';
+import { HiOutlineLockClosed, HiOutlineLockOpen, HiOutlineRocketLaunch, HiOutlineBuildingOffice2, HiOutlineUserGroup, HiChevronRight } from 'react-icons/hi2';
 import '@xyflow/react/dist/style.css';
 import { CampaignNode, DepartmentNode, EmployeeNode } from './CanvasNodes';
 import CampaignSidebar from './CampaignSidebar';
@@ -258,16 +259,44 @@ export default function CampaignCanvas({ campaigns, departments, employees, onEd
           </p> */}
         </div>
         <div style={{ display: 'flex', gap: '12px', pointerEvents: 'auto' }}>
-          <div style={{ position: 'relative' }}>
-            <button className="btn btn-primary" onClick={() => setShowAddMenu(!showAddMenu)} style={{ boxShadow: '0 4px 12px rgba(0,240,255,0.3)' }}>
-              + Add ▾
+          <div>
+            <button className="btn btn-primary" onClick={() => setShowAddMenu(true)} style={{ boxShadow: '0 4px 12px rgba(0,240,255,0.3)', transform: 'none' }}>
+              + Add
             </button>
-            {showAddMenu && (
-              <div className="card-glow" style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '150px' }}>
-                <button className="btn btn-ghost" style={{ justifyContent: 'flex-start' }} onClick={() => { setShowAddMenu(false); onNewCampaign?.(); }}>Campaign</button>
-                <button className="btn btn-ghost" style={{ justifyContent: 'flex-start' }} onClick={() => { setShowAddMenu(false); onNewDepartment?.(); }}>Department</button>
-                <button className="btn btn-ghost" style={{ justifyContent: 'flex-start' }} onClick={() => { setShowAddMenu(false); onNewEmployee?.(); }} disabled={!departments || departments.length === 0}>Employee</button>
-              </div>
+            {showAddMenu && createPortal(
+              <div className="modal-overlay" onClick={() => setShowAddMenu(false)} style={{ zIndex: 9999 }}>
+                <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', width: '100%', padding: '0', background: 'var(--bg-secondary)', border: '1px solid var(--border)', backdropFilter: 'none', borderRadius: '12px' }}>
+                  <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--divider)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-primary)' }}>What would you like to create?</h3>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', padding: '12px', gap: '8px' }}>
+                    <button className="btn btn-ghost" style={{ justifyContent: 'flex-start', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', width: '100%', background: 'rgba(255,255,255,0.02)' }} onClick={() => { setShowAddMenu(false); onNewCampaign?.(); }}>
+                      <div style={{ background: 'rgba(0, 240, 255, 0.1)', padding: '8px', borderRadius: '8px', marginRight: '16px', display: 'flex' }}>
+                        <HiOutlineRocketLaunch size={20} style={{ color: 'var(--neon-cyan)' }} />
+                      </div>
+                      <span style={{ flex: 1, textAlign: 'left', fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)' }}>Campaign</span>
+                      <HiChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
+                    </button>
+                    
+                    <button className="btn btn-ghost" style={{ justifyContent: 'flex-start', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', width: '100%', background: 'rgba(255,255,255,0.02)' }} onClick={() => { setShowAddMenu(false); onNewDepartment?.(); }}>
+                      <div style={{ background: 'rgba(255, 0, 255, 0.1)', padding: '8px', borderRadius: '8px', marginRight: '16px', display: 'flex' }}>
+                        <HiOutlineBuildingOffice2 size={20} style={{ color: 'var(--neon-magenta)' }} />
+                      </div>
+                      <span style={{ flex: 1, textAlign: 'left', fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)' }}>Department</span>
+                      <HiChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
+                    </button>
+
+                    <button className="btn btn-ghost" style={{ justifyContent: 'flex-start', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', width: '100%', background: 'rgba(255,255,255,0.02)' }} onClick={() => { setShowAddMenu(false); onNewEmployee?.(); }} disabled={!departments || departments.length === 0}>
+                      <div style={{ background: 'rgba(0, 255, 136, 0.1)', padding: '8px', borderRadius: '8px', marginRight: '16px', display: 'flex' }}>
+                        <HiOutlineUserGroup size={20} style={{ color: '#00ff88' }} />
+                      </div>
+                      <span style={{ flex: 1, textAlign: 'left', fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)' }}>Employee</span>
+                      <HiChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
+                    </button>
+                  </div>
+                </div>
+              </div>,
+              document.body
             )}
           </div>
           <button className="btn btn-secondary" onClick={handleResetPositions} style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)' }}>
