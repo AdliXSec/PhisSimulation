@@ -2,12 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { motion, useMotionValue } from 'framer-motion';
 
 export default function CustomCursor() {
-  // Gunakan useMotionValue untuk update posisi tanpa menunggu re-render React (0 delay)
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
   const [isHovering, setIsHovering] = useState(false);
+  
+  // Deteksi mode mobile atau perangkat layar sentuh
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' && (window.innerWidth <= 768 || 'ontouchstart' in window)
+  );
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return; // Jika mobile, jangan eksekusi kustom kursor sama sekali
+
     // Sembunyikan semua kursor bawaan sistem secara paksa
     const style = document.createElement('style');
     style.innerHTML = `* { cursor: none !important; }`;
@@ -37,11 +51,16 @@ export default function CustomCursor() {
     window.addEventListener('mouseover', handleMouseOver);
 
     return () => {
-      document.head.removeChild(style); // Hapus style saat komponen di-unmount
+      if (document.head.contains(style)) {
+        document.head.removeChild(style); // Hapus style saat komponen di-unmount
+      }
       window.removeEventListener('mousemove', updateMousePosition);
       window.removeEventListener('mouseover', handleMouseOver);
     };
-  }, [cursorX, cursorY]);
+  }, [cursorX, cursorY, isMobile]);
+
+  // Jika di mode mobile, jangan render komponen kursor roket sama sekali
+  if (isMobile) return null;
 
   return (
     <>
@@ -77,33 +96,6 @@ export default function CustomCursor() {
           }}
         />
       </motion.div>
-      {/* <motion.div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '48px',
-          height: '48px',
-          border: '2px solid var(--neon-cyan)',
-          backgroundColor: isHovering ? 'rgba(0, 240, 255, 0.1)' : 'transparent',
-          borderRadius: '50%',
-          pointerEvents: 'none',
-          zIndex: 999998,
-          boxShadow: '0 0 15px rgba(0, 240, 255, 0.3)',
-        }}
-        animate={{
-          x: mousePosition.x - 24,
-          y: mousePosition.y - 24,
-          scale: isHovering ? 1.5 : 1,
-          opacity: isHovering ? 1 : 0.5,
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 150,
-          damping: 15,
-          mass: 0.5,
-        }}
-      /> */}
     </>
   );
 }
