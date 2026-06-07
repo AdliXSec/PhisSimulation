@@ -115,6 +115,8 @@ class CampaignUpdate(BaseModel):
     theme: str | None = None
     landing_page_mode: str | None = None
     external_url: str | None = None
+    ui_position_x: float | None = None
+    ui_position_y: float | None = None
 
 
 # ---- Endpoints ----
@@ -148,6 +150,8 @@ async def list_campaigns(
             "target_count": count,
             "processed_count": c.processed_count,
             "error_count": c.error_count,
+            "ui_position_x": c.ui_position_x,
+            "ui_position_y": c.ui_position_y,
             "created_at": c.created_at.isoformat(),
             "started_at": c.started_at.isoformat() if c.started_at else None,
             "ended_at": c.ended_at.isoformat() if c.ended_at else None,
@@ -365,6 +369,14 @@ async def update_campaign(
         campaign.difficulty = data.difficulty
     if data.theme is not None:
         campaign.theme = data.theme
+    if data.ui_position_x is not None:
+        campaign.ui_position_x = data.ui_position_x
+    if data.ui_position_y is not None:
+        campaign.ui_position_y = data.ui_position_y
+    # special case for resetting position to null
+    if data.ui_position_x == -9999.0 and data.ui_position_y == -9999.0:
+        campaign.ui_position_x = None
+        campaign.ui_position_y = None
 
     if data.landing_page_mode is not None or data.external_url is not None:
         template_result = await db.execute(select(CampaignTemplate).where(CampaignTemplate.campaign_id == campaign.id))

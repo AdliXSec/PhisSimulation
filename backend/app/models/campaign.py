@@ -25,5 +25,7 @@ class Campaign(Base):
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     processed_count: Mapped[int] = mapped_column(default=0)
     error_count: Mapped[int] = mapped_column(default=0)
+    ui_position_x: Mapped[float | None] = mapped_column(default=None)
+    ui_position_y: Mapped[float | None] = mapped_column(default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

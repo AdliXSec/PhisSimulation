@@ -41,13 +41,30 @@ export function CampaignNode({ data, selected }) {
       }}>
         <HiOutlineRocketLaunch size={20} style={{ color: statusColor }} />
       </div>
-      <div>
-        <div style={{ fontWeight: 600, color: '#ffffff', fontSize: '0.95rem' }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: 600, color: '#ffffff', fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '150px' }}>
           {data.name}
         </div>
         <div style={{ fontSize: '0.75rem', color: statusColor, marginTop: '2px', fontWeight: 500, letterSpacing: '0.05em' }}>
           {data.status}
         </div>
+        
+        {data.raw && data.raw.target_count > 0 && (data.status === 'LAUNCHING' || data.status === 'ACTIVE' || data.status === 'COMPLETED' || data.status === 'STOPPED') && (
+          <div style={{ marginTop: '2px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              <span>{data.raw.processed_count || 0} / {data.raw.target_count} Terkirim</span>
+              <span>{Math.round(((data.raw.processed_count || 0) / data.raw.target_count) * 100)}%</span>
+            </div>
+            <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ 
+                height: '100%', 
+                background: statusColor, 
+                width: `${Math.round(((data.raw.processed_count || 0) / data.raw.target_count) * 100)}%`,
+                transition: 'width 0.5s ease'
+              }} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

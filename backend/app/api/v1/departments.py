@@ -23,6 +23,8 @@ class DepartmentCreate(BaseModel):
 class DepartmentUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
+    ui_position_x: float | None = None
+    ui_position_y: float | None = None
 
 
 class DepartmentResponse(BaseModel):
@@ -30,6 +32,8 @@ class DepartmentResponse(BaseModel):
     name: str
     description: str | None
     employee_count: int = 0
+    ui_position_x: float | None = None
+    ui_position_y: float | None = None
     created_at: str
 
 
@@ -59,6 +63,8 @@ async def list_departments(
             name=dept.name,
             description=dept.description,
             employee_count=count,
+            ui_position_x=dept.ui_position_x,
+            ui_position_y=dept.ui_position_y,
             created_at=dept.created_at.isoformat(),
         )
         for dept, count in rows
@@ -106,6 +112,8 @@ async def get_department(
         name=dept.name,
         description=dept.description,
         employee_count=employee_count,
+        ui_position_x=dept.ui_position_x,
+        ui_position_y=dept.ui_position_y,
         created_at=dept.created_at.isoformat(),
     )
 
@@ -132,6 +140,14 @@ async def update_department(
         dept.name = data.name
     if data.description is not None:
         dept.description = data.description
+    if data.ui_position_x is not None:
+        dept.ui_position_x = data.ui_position_x
+    if data.ui_position_y is not None:
+        dept.ui_position_y = data.ui_position_y
+    # special case for resetting position to null
+    if data.ui_position_x == -9999.0 and data.ui_position_y == -9999.0:
+        dept.ui_position_x = None
+        dept.ui_position_y = None
 
     await db.flush()
     return {"id": dept.id, "name": dept.name, "description": dept.description}

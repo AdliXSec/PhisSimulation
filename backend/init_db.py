@@ -51,6 +51,15 @@ async def init_database():
         await conn.execute(text("ALTER TABLE employee_risk_profiles ALTER COLUMN id SET DEFAULT gen_random_uuid();"))
         await conn.execute(text("ALTER TABLE employees ALTER COLUMN id SET DEFAULT gen_random_uuid();"))
 
+        # Add UI position columns if they don't exist (for existing tables)
+        try:
+            await conn.execute(text("ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS ui_position_x FLOAT;"))
+            await conn.execute(text("ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS ui_position_y FLOAT;"))
+            await conn.execute(text("ALTER TABLE departments ADD COLUMN IF NOT EXISTS ui_position_x FLOAT;"))
+            await conn.execute(text("ALTER TABLE departments ADD COLUMN IF NOT EXISTS ui_position_y FLOAT;"))
+        except Exception as e:
+            logger.warning(f"[!] Could not add ui_position columns: {e}")
+
         # No longer seed dummy landing page templates here
         # The script seed_html_templates.py handles seeding the custom HTML templates
             

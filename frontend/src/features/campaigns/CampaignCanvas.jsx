@@ -5,13 +5,14 @@ import '@xyflow/react/dist/style.css';
 import { CampaignNode, DepartmentNode } from './CanvasNodes';
 import CampaignSidebar from './CampaignSidebar';
 import DepartmentSidebar from './DepartmentSidebar';
+import api from '../../services/api';
 
 const nodeTypes = {
   campaign: CampaignNode,
   department: DepartmentNode,
 };
 
-export default function CampaignCanvas({ campaigns, departments, onEdit, onDelete, onLaunch, onGenerate, onNewCampaign }) {
+export default function CampaignCanvas({ campaigns, departments, onEdit, onDelete, onLaunch, onGenerate, onNewCampaign, onReload }) {
   const { t } = useTranslation();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -24,9 +25,6 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
     const newNodes = [];
     const newEdges = [];
 
-    const savedPositionsStr = localStorage.getItem('campaignCanvasPositions');
-    const savedPositions = savedPositionsStr ? JSON.parse(savedPositionsStr) : {};
-
     // Departments at the bottom
     const deptY = 400;
     const deptSpacing = 200;
@@ -37,7 +35,10 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
     departments.forEach((d, i) => {
       deptMap[d.id] = true;
       const id = `dept-${d.id}`;
-      const pos = savedPositions[id] || { x: startXDept + i * deptSpacing, y: deptY };
+      const pos = {
+        x: d.ui_position_x != null ? d.ui_position_x : startXDept + i * deptSpacing,
+        y: d.ui_position_y != null ? d.ui_position_y : deptY
+      };
 
       newNodes.push({
         id,
@@ -54,7 +55,10 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
 
     campaigns.forEach((c, i) => {
       const id = `camp-${c.id}`;
-      const pos = savedPositions[id] || { x: startXCamp + i * campSpacing, y: campY };
+      const pos = {
+        x: c.ui_position_x != null ? c.ui_position_x : startXCamp + i * campSpacing,
+        y: c.ui_position_y != null ? c.ui_position_y : campY
+      };
 
       newNodes.push({
         id,
@@ -108,23 +112,35 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
     }
   }, []);
 
-  const onNodeDragStop = useCallback(() => {
-    // Save current positions to localStorage using the latest nodes array
-    // However, nodes array in this closure might be stale depending on how ReactFlow updates it.
-    // ReactFlow mutates nodes position, so we can read it directly.
-    setNodes((nds) => {
-      const positions = {};
-      nds.forEach(n => {
-        positions[n.id] = n.position;
-      });
-      localStorage.setItem('campaignCanvasPositions', JSON.stringify(positions));
-      return nds;
+  const onNodeDragStop = useCallback((event, node) => {
+    if (!node || !node.id) return;
+    const isCamp = node.type === 'campaign';
+    const id = node.id.replace(isCamp ? 'camp-' : 'dept-', '');
+    const payload = {
+      ui_position_x: node.position.x,
+      ui_position_y: node.position.y
+    };
+    
+    api.put(`/${isCamp ? 'campaigns' : 'departments'}/${id}`, payload).catch(err => {
+      console.error('Failed to save node position', err);
     });
-  }, [setNodes]);
+  }, []);
 
-  const handleResetPositions = () => {
-    localStorage.removeItem('campaignCanvasPositions');
-    setLayoutKey(k => k + 1);
+  const handleResetPositions = async () => {
+    try {
+      const promises = [];
+      campaigns.forEach(c => {
+        promises.push(api.put(`/campaigns/${c.id}`, { ui_position_x: -9999.0, ui_position_y: -9999.0 }));
+      });
+      departments.forEach(d => {
+        promises.push(api.put(`/departments/${d.id}`, { ui_position_x: -9999.0, ui_position_y: -9999.0 }));
+      });
+      await Promise.all(promises);
+      if (onReload) onReload();
+      else window.location.reload();
+    } catch (err) {
+      console.error('Failed to reset positions', err);
+    }
   };
 
   const onPaneClick = useCallback(() => {

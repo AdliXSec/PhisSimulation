@@ -545,6 +545,7 @@ export default function Campaigns() {
           onLaunch={handleLaunch}
           onGenerate={handleGenerate}
           onNewCampaign={openNewForm}
+          onReload={loadData}
         />
       </div>
     </div>
