@@ -57,6 +57,8 @@ async def init_database():
             await conn.execute(text("ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS ui_position_y FLOAT;"))
             await conn.execute(text("ALTER TABLE departments ADD COLUMN IF NOT EXISTS ui_position_x FLOAT;"))
             await conn.execute(text("ALTER TABLE departments ADD COLUMN IF NOT EXISTS ui_position_y FLOAT;"))
+            await conn.execute(text("ALTER TABLE departments ADD COLUMN IF NOT EXISTS emp_ui_position_x FLOAT;"))
+            await conn.execute(text("ALTER TABLE departments ADD COLUMN IF NOT EXISTS emp_ui_position_y FLOAT;"))
             await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS canvas_locked BOOLEAN DEFAULT FALSE;"))
         except Exception as e:
             logger.warning(f"[!] Could not add new columns: {e}")

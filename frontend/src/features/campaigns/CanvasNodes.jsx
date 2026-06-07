@@ -1,5 +1,5 @@
 import { Handle, Position } from '@xyflow/react';
-import { HiOutlineRocketLaunch, HiOutlineBuildingOffice } from 'react-icons/hi2';
+import { HiOutlineRocketLaunch, HiOutlineBuildingOffice, HiOutlineUserGroup } from 'react-icons/hi2';
 
 export function CampaignNode({ data, selected }) {
   const statusColor = {
@@ -95,6 +95,45 @@ export function DepartmentNode({ data }) {
         <div style={{ fontSize: '0.7rem', color: '#a0aec0' }}>
           {data.count} target
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function EmployeeNode({ data }) {
+  return (
+    <div style={{
+      padding: '12px',
+      background: 'rgba(20, 30, 50, 0.9)',
+      border: '1px solid rgba(0, 240, 255, 0.3)',
+      borderRadius: '8px',
+      minWidth: '200px',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '8px',
+      backdropFilter: 'blur(10px)',
+      maxHeight: '200px'
+    }}>
+      <Handle type="target" position={Position.Top} style={{ background: 'var(--neon-cyan)' }} />
+      
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '8px' }}>
+        <HiOutlineUserGroup size={16} style={{ color: 'var(--neon-cyan)' }} />
+        <span style={{ fontWeight: 600, color: '#fff', fontSize: '0.85rem' }}>Daftar Karyawan</span>
+      </div>
+      
+      <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px', paddingRight: '4px' }}>
+        {(data?.employees || []).slice(0, 10).map(emp => (
+          <div key={emp.id} style={{ display: 'flex', flexDirection: 'column', padding: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '4px' }}>
+            <span style={{ fontSize: '0.8rem', color: '#e2e8f0', fontWeight: 500 }}>{emp?.name || 'Unknown'}</span>
+            <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>{emp?.email || ''}</span>
+          </div>
+        ))}
+        {(data?.employees?.length || 0) > 10 && (
+          <div style={{ textAlign: 'center', padding: '4px', fontSize: '0.75rem', color: 'var(--neon-cyan)', fontStyle: 'italic', cursor: 'pointer' }}>
+            + {(data?.employees?.length || 0) - 10} lainnya (Klik node untuk detail)
+          </div>
+        )}
       </div>
     </div>
   );

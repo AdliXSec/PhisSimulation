@@ -4,7 +4,7 @@ import { HiOutlineXMark, HiOutlineUserGroup, HiOutlineUser } from 'react-icons/h
 import api from '../../services/api';
 import './CampaignSidebar.css'; // Reusing the same CSS
 
-export default function DepartmentSidebar({ departmentId, departmentName, onClose }) {
+export default function DepartmentSidebar({ department, departmentId, departmentName, onClose, onEdit, onDelete }) {
   const { t } = useTranslation();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -105,6 +105,15 @@ export default function DepartmentSidebar({ departmentId, departmentName, onClos
             )}
           </div>
         )}
+      </div>
+
+      <div style={{ padding: '20px 24px', borderTop: '1px solid var(--divider)', background: 'rgba(0,0,0,0.3)', display: 'flex', gap: '8px', flexWrap: 'wrap', flexShrink: 0 }}>
+        <button className="btn btn-sm btn-secondary" onClick={() => onEdit(department)} style={{ flex: 1, justifyContent: 'center' }}>
+          {t('admin_dashboard.campaigns.btn_edit', 'Edit')}
+        </button>
+        <button className="btn btn-sm btn-danger" onClick={() => onDelete(departmentId, departmentName)} style={{ flex: 1, justifyContent: 'center' }}>
+          {t('admin_dashboard.campaigns.btn_delete', 'Hapus')}
+        </button>
       </div>
     </div>
   );

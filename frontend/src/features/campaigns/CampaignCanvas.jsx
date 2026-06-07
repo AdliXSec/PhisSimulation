@@ -3,24 +3,28 @@ import { useTranslation } from 'react-i18next';
 import { ReactFlow, MiniMap, Controls, ControlButton, Background, useNodesState, useEdgesState } from '@xyflow/react';
 import { HiOutlineLockClosed, HiOutlineLockOpen } from 'react-icons/hi2';
 import '@xyflow/react/dist/style.css';
-import { CampaignNode, DepartmentNode } from './CanvasNodes';
+import { CampaignNode, DepartmentNode, EmployeeNode } from './CanvasNodes';
 import CampaignSidebar from './CampaignSidebar';
 import DepartmentSidebar from './DepartmentSidebar';
+import EmployeeSidebar from './EmployeeSidebar';
 import api from '../../services/api';
 
 const nodeTypes = {
   campaign: CampaignNode,
   department: DepartmentNode,
+  employee: EmployeeNode,
 };
 
-export default function CampaignCanvas({ campaigns, departments, onEdit, onDelete, onLaunch, onGenerate, onNewCampaign, onReload }) {
+export default function CampaignCanvas({ campaigns, departments, employees, onEdit, onDelete, onLaunch, onGenerate, onNewCampaign, onNewDepartment, onNewEmployee, onEditDepartment, onDeleteDepartment, onEditEmployee, onDeleteEmployee, onReload }) {
   const { t } = useTranslation();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
+  const [selectedEmployeeDeptId, setSelectedEmployeeDeptId] = useState(null);
   const [layoutKey, setLayoutKey] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
+  const [showAddMenu, setShowAddMenu] = useState(false);
 
   useEffect(() => {
     // Fetch initial lock status from database
@@ -44,10 +48,9 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
     const newEdges = [];
 
     // Departments at the bottom
-    const deptY = 400;
+    const deptY = 300;
     const deptSpacing = 200;
-    const startXDept = -(departments.length * deptSpacing) / 2;
-
+    const startXDept = (departments.length - 1) * -100;
     const deptMap = {};
 
     departments.forEach((d, i) => {
@@ -62,12 +65,37 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
         id,
         type: 'department',
         position: pos,
-        data: { name: d.name, count: d.employee_count },
+        data: { name: d.name, count: d.employee_count }
       });
+      
+      // Add EmployeeNode below Department
+      const deptEmployees = employees?.filter(e => e.department_id === d.id) || [];
+      if (deptEmployees.length > 0) {
+        const empId = `emp-${d.id}`;
+        const empPos = {
+          x: d.emp_ui_position_x != null ? d.emp_ui_position_x : pos.x,
+          y: d.emp_ui_position_y != null ? d.emp_ui_position_y : pos.y + 180
+        };
+        newNodes.push({
+          id: empId,
+          type: 'employee',
+          position: empPos, // Positioned right beneath dept by default
+          data: { employees: deptEmployees, departmentName: d.name },
+        });
+        
+        newEdges.push({
+          id: `e-dept-${d.id}-emp`,
+          source: id,
+          target: empId,
+          type: 'smoothstep',
+          animated: true,
+          style: { stroke: 'var(--neon-cyan)', strokeWidth: 2 }
+        });
+      }
     });
 
     // Campaigns at the top
-    const campY = 100;
+    const campY = 50;
     const campSpacing = 250;
     const startXCamp = -(campaigns.length * campSpacing) / 2;
 
@@ -120,19 +148,45 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
       const campId = node.id.replace('camp-', '');
       setSelectedCampaignId(campId);
       setSelectedDepartmentId(null);
+      setSelectedEmployeeDeptId(null);
     } else if (node.type === 'department') {
       const deptId = node.id.replace('dept-', '');
       setSelectedDepartmentId(deptId);
       setSelectedCampaignId(null);
+      setSelectedEmployeeDeptId(null);
+    } else if (node.type === 'employee') {
+      const deptId = node.id.replace('emp-', '');
+      setSelectedEmployeeDeptId(deptId);
+      setSelectedDepartmentId(null);
+      setSelectedCampaignId(null);
     } else {
       setSelectedCampaignId(null);
       setSelectedDepartmentId(null);
+      setSelectedEmployeeDeptId(null);
     }
   }, []);
 
   const onNodeDragStop = useCallback((event, node) => {
     if (!node || !node.id) return;
     const isCamp = node.type === 'campaign';
+    const isDept = node.type === 'department';
+    const isEmp = node.type === 'employee';
+    
+    // We only save positions for campaign, department, and employee
+    if (!isCamp && !isDept && !isEmp) return;
+    
+    if (isEmp) {
+      const id = node.id.replace('emp-', '');
+      const payload = {
+        emp_ui_position_x: node.position.x,
+        emp_ui_position_y: node.position.y
+      };
+      api.put(`/departments/${id}`, payload).catch(err => {
+        console.error('Failed to save employee node position', err);
+      });
+      return;
+    }
+
     const id = node.id.replace(isCamp ? 'camp-' : 'dept-', '');
     const payload = {
       ui_position_x: node.position.x,
@@ -151,7 +205,7 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
         promises.push(api.put(`/campaigns/${c.id}`, { ui_position_x: -9999.0, ui_position_y: -9999.0 }));
       });
       departments.forEach(d => {
-        promises.push(api.put(`/departments/${d.id}`, { ui_position_x: -9999.0, ui_position_y: -9999.0 }));
+        promises.push(api.put(`/departments/${d.id}`, { ui_position_x: -9999.0, ui_position_y: -9999.0, emp_ui_position_x: -9999.0, emp_ui_position_y: -9999.0 }));
       });
       await Promise.all(promises);
       if (onReload) onReload();
@@ -204,11 +258,18 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
           </p> */}
         </div>
         <div style={{ display: 'flex', gap: '12px', pointerEvents: 'auto' }}>
-          {onNewCampaign && (
-            <button className="btn btn-primary" onClick={onNewCampaign} style={{ boxShadow: '0 4px 12px rgba(0,240,255,0.3)' }}>
-              + {t('admin_dashboard.campaigns.btn_new')}
+          <div style={{ position: 'relative' }}>
+            <button className="btn btn-primary" onClick={() => setShowAddMenu(!showAddMenu)} style={{ boxShadow: '0 4px 12px rgba(0,240,255,0.3)' }}>
+              + Add ▾
             </button>
-          )}
+            {showAddMenu && (
+              <div className="card-glow" style={{ position: 'absolute', top: '100%', left: 0, marginTop: '8px', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '150px' }}>
+                <button className="btn btn-ghost" style={{ justifyContent: 'flex-start' }} onClick={() => { setShowAddMenu(false); onNewCampaign?.(); }}>Campaign</button>
+                <button className="btn btn-ghost" style={{ justifyContent: 'flex-start' }} onClick={() => { setShowAddMenu(false); onNewDepartment?.(); }}>Department</button>
+                <button className="btn btn-ghost" style={{ justifyContent: 'flex-start' }} onClick={() => { setShowAddMenu(false); onNewEmployee?.(); }} disabled={!departments || departments.length === 0}>Employee</button>
+              </div>
+            )}
+          </div>
           <button className="btn btn-secondary" onClick={handleResetPositions} style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)' }}>
             Reset Posisi
           </button>
@@ -228,9 +289,22 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
 
       {/* Department Sidebar Overlay */}
       <DepartmentSidebar
+        department={departments.find(x => x.id == selectedDepartmentId)}
         departmentId={selectedDepartmentId}
         departmentName={departments.find(x => x.id == selectedDepartmentId)?.name}
         onClose={() => setSelectedDepartmentId(null)}
+        onEdit={(dept) => onEditDepartment(dept)}
+        onDelete={(id, name) => { onDeleteDepartment(id, name); setSelectedDepartmentId(null); }}
+      />
+
+      {/* Employee Sidebar Overlay */}
+      <EmployeeSidebar
+        departmentId={selectedEmployeeDeptId}
+        departmentName={departments.find(x => x.id == selectedEmployeeDeptId)?.name}
+        employees={employees}
+        onClose={() => setSelectedEmployeeDeptId(null)}
+        onEdit={(emp) => onEditEmployee(emp)}
+        onDelete={(id, name) => { onDeleteEmployee(id, name); setSelectedEmployeeDeptId(null); }}
       />
     </div>
   );

@@ -8,6 +8,8 @@ import { HiOutlinePlus, HiOutlineRocketLaunch, HiOutlineSparkles, HiOutlinePenci
 import LandingPageBuilder from './LandingPageBuilder';
 import StepWizard from '../../components/wizard/StepWizard';
 import CampaignCanvas from './CampaignCanvas';
+import DepartmentModal from './DepartmentModal';
+import EmployeeModal from './EmployeeModal';
 
 // We will move WIZARD_STEPS inside the component to support i18n
 
@@ -35,10 +37,15 @@ export default function Campaigns() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [departments, setDepartments] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [form, setForm] = useState({ ...INITIAL_FORM });
   const [step, setStep] = useState(0);
+  const [showDeptForm, setShowDeptForm] = useState(false);
+  const [showEmpForm, setShowEmpForm] = useState(false);
+  const [editDeptData, setEditDeptData] = useState(null);
+  const [editEmpData, setEditEmpData] = useState(null);
 
   const WIZARD_STEPS = [
     { label: t('admin_dashboard.campaigns.form.step1_short', 'Informasi Dasar') },
@@ -71,14 +78,16 @@ export default function Campaigns() {
 
   const loadData = async () => {
     try {
-      const [campRes, deptRes, tmplRes, savedTmplRes] = await Promise.all([
+      const [campRes, deptRes, empRes, tmplRes, savedTmplRes] = await Promise.all([
         api.get('/campaigns'),
         api.get('/departments'),
+        api.get('/employees', { params: { limit: 1000 } }),
         api.get('landing-pages').catch(() => ({ data: [] })),
         api.get('/saved-templates').catch(() => ({ data: [] }))
       ]);
       setCampaigns(campRes.data);
       setDepartments(deptRes.data);
+      setEmployees(empRes.data.data || []);
       setTemplates(tmplRes.data);
       setSavedTemplates(savedTmplRes.data);
     } catch (err) {
@@ -193,6 +202,38 @@ export default function Campaigns() {
     } catch (err) {
       toast.error(err.response?.data?.detail || t('admin_dashboard.campaigns.messages.launch_failed'));
     }
+  };
+
+  const handleDeleteDepartment = async (id, name) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus departemen ${name}? Semua karyawan di dalamnya juga akan terhapus.`)) return;
+    try {
+      await api.delete(`/departments/${id}`);
+      toast.success('Departemen berhasil dihapus');
+      loadData();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Gagal menghapus departemen');
+    }
+  };
+
+  const handleDeleteEmployee = async (id, name) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus karyawan ${name}?`)) return;
+    try {
+      await api.delete(`/employees/${id}`);
+      toast.success('Karyawan berhasil dihapus');
+      loadData();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Gagal menghapus karyawan');
+    }
+  };
+
+  const handleEditDepartment = (dept) => {
+    setEditDeptData(dept);
+    setShowDeptForm(true);
+  };
+
+  const handleEditEmployee = (emp) => {
+    setEditEmpData(emp);
+    setShowEmpForm(true);
   };
 
   const statusBadge = (s) => {
@@ -536,15 +577,39 @@ export default function Campaigns() {
         document.body
       )}
 
+      {showDeptForm && (
+        <DepartmentModal 
+          editData={editDeptData}
+          onClose={() => { setShowDeptForm(false); setEditDeptData(null); }} 
+          onSuccess={loadData} 
+        />
+      )}
+
+      {showEmpForm && (
+        <EmployeeModal 
+          departments={departments}
+          editData={editEmpData}
+          onClose={() => { setShowEmpForm(false); setEditEmpData(null); }} 
+          onSuccess={loadData} 
+        />
+      )}
+
       <div className="campaign-canvas-wrapper">
         <CampaignCanvas 
           campaigns={campaigns}
           departments={departments}
+          employees={employees}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onLaunch={handleLaunch}
           onGenerate={handleGenerate}
           onNewCampaign={openNewForm}
+          onNewDepartment={() => setShowDeptForm(true)}
+          onNewEmployee={() => setShowEmpForm(true)}
+          onEditDepartment={handleEditDepartment}
+          onDeleteDepartment={handleDeleteDepartment}
+          onEditEmployee={handleEditEmployee}
+          onDeleteEmployee={handleDeleteEmployee}
           onReload={loadData}
         />
       </div>

@@ -25,6 +25,8 @@ class DepartmentUpdate(BaseModel):
     description: str | None = None
     ui_position_x: float | None = None
     ui_position_y: float | None = None
+    emp_ui_position_x: float | None = None
+    emp_ui_position_y: float | None = None
 
 
 class DepartmentResponse(BaseModel):
@@ -34,6 +36,8 @@ class DepartmentResponse(BaseModel):
     employee_count: int = 0
     ui_position_x: float | None = None
     ui_position_y: float | None = None
+    emp_ui_position_x: float | None = None
+    emp_ui_position_y: float | None = None
     created_at: str
 
 
@@ -65,6 +69,8 @@ async def list_departments(
             employee_count=count,
             ui_position_x=dept.ui_position_x,
             ui_position_y=dept.ui_position_y,
+            emp_ui_position_x=dept.emp_ui_position_x,
+            emp_ui_position_y=dept.emp_ui_position_y,
             created_at=dept.created_at.isoformat(),
         )
         for dept, count in rows
@@ -114,6 +120,8 @@ async def get_department(
         employee_count=employee_count,
         ui_position_x=dept.ui_position_x,
         ui_position_y=dept.ui_position_y,
+        emp_ui_position_x=dept.emp_ui_position_x,
+        emp_ui_position_y=dept.emp_ui_position_y,
         created_at=dept.created_at.isoformat(),
     )
 
@@ -144,10 +152,18 @@ async def update_department(
         dept.ui_position_x = data.ui_position_x
     if data.ui_position_y is not None:
         dept.ui_position_y = data.ui_position_y
+    if data.emp_ui_position_x is not None:
+        dept.emp_ui_position_x = data.emp_ui_position_x
+    if data.emp_ui_position_y is not None:
+        dept.emp_ui_position_y = data.emp_ui_position_y
+        
     # special case for resetting position to null
     if data.ui_position_x == -9999.0 and data.ui_position_y == -9999.0:
         dept.ui_position_x = None
         dept.ui_position_y = None
+    if data.emp_ui_position_x == -9999.0 and data.emp_ui_position_y == -9999.0:
+        dept.emp_ui_position_x = None
+        dept.emp_ui_position_y = None
 
     await db.flush()
     return {"id": dept.id, "name": dept.name, "description": dept.description}

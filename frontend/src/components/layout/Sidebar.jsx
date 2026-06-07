@@ -31,9 +31,6 @@ const navItems = [
   { path: '/dashboard/templates', labelKey: 'templates', icon: HiOutlineEnvelopeOpen },
   { path: '/dashboard/osint', labelKey: 'osint', icon: HiOutlineGlobeAlt },
   { path: '/dashboard/intel', labelKey: 'intel', icon: HiOutlineShieldCheck },
-  { path: '/dashboard/employees', labelKey: 'employees', icon: HiOutlineUserGroup },
-  { path: '/dashboard/departments', labelKey: 'departments', icon: HiOutlineBuildingOffice2 },
-  // { path: '/dashboard/reports', labelKey: 'reports', icon: HiOutlineChartBarSquare },
   { path: '/dashboard/api-keys', labelKey: 'api_keys', icon: HiOutlineKey },
 ];
 
