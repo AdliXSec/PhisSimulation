@@ -1,15 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HiOutlineXMark, HiOutlineUser, HiOutlineEnvelope, HiOutlineBriefcase, HiOutlinePencil } from 'react-icons/hi2';
+import { HiOutlineXMark, HiOutlineUser, HiOutlineEnvelope, HiOutlineBriefcase, HiOutlinePencil, HiOutlineUserGroup, HiOutlineMagnifyingGlass } from 'react-icons/hi2';
 import api from '../../services/api';
 
 export default function EmployeeSidebar({ departmentId, departmentName, employees, onClose, onEdit, onDelete }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Reset search query when department changes
+  useEffect(() => {
+    setSearchQuery('');
+  }, [departmentId]);
 
   if (!departmentId) return null;
 
-  const deptEmployees = (employees || []).filter(e => e.department_id === parseInt(departmentId) || e.department_id === departmentId);
+  const deptEmployees = (employees || []).filter(e => {
+    const isMatchDept = e.department_id === parseInt(departmentId) || e.department_id === departmentId;
+    if (!isMatchDept) return false;
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    return (
+      (e.name && e.name.toLowerCase().includes(query)) ||
+      (e.email && e.email.toLowerCase().includes(query)) ||
+      (e.position && e.position.toLowerCase().includes(query))
+    );
+  });
 
   return (
     <div className={`campaign-sidebar ${departmentId ? 'open' : ''}`}>
@@ -30,10 +47,25 @@ export default function EmployeeSidebar({ departmentId, departmentName, employee
       </div>
 
       <div className="sidebar-content" style={{ overflowY: 'auto', padding: '24px' }}>
-        <div style={{ marginBottom: '20px' }}>
-          <span className="badge badge-info" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>
-            {t('admin_dashboard.departments.total_target', 'Total')}: {deptEmployees.length} {t('admin_dashboard.departments.people', 'orang')}
-          </span>
+        <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <span className="badge badge-info" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>
+              {t('admin_dashboard.departments.total_target', 'Total')}: {deptEmployees.length} {t('admin_dashboard.departments.people', 'orang')}
+            </span>
+          </div>
+          
+          {/* Search Input */}
+          <div style={{ position: 'relative' }}>
+            <HiOutlineMagnifyingGlass size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input 
+              type="text" 
+              className="input" 
+              placeholder="Cari nama, email, atau jabatan..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ paddingLeft: '38px', width: '100%', background: 'rgba(255,255,255,0.02)' }}
+            />
+          </div>
         </div>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -41,7 +73,7 @@ export default function EmployeeSidebar({ departmentId, departmentName, employee
             <div className="empty-state" style={{ background: 'rgba(255,255,255,0.02)', padding: '32px 16px', borderRadius: '8px' }}>
               <HiOutlineUserGroup size={40} style={{ color: 'var(--text-muted)' }} />
               <p style={{ marginTop: '8px', color: 'var(--text-secondary)' }}>
-                {t('admin_dashboard.departments.empty_employees', 'Tidak ada karyawan di departemen ini.')}
+                {searchQuery ? 'Tidak ada karyawan yang cocok dengan pencarian.' : t('admin_dashboard.departments.empty_employees', 'Tidak ada karyawan di departemen ini.')}
               </p>
             </div>
           ) : (

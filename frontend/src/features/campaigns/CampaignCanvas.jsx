@@ -48,18 +48,35 @@ export default function CampaignCanvas({ campaigns, departments, employees, onEd
     const newNodes = [];
     const newEdges = [];
 
-    // Departments at the bottom
-    const deptY = 300;
-    const deptSpacing = 200;
-    const startXDept = (departments.length - 1) * -100;
+    // Base configurations for grid wrapping
+    const itemsPerRow = 4;
+
+    // Campaigns at the top
+    const campStartY = 50;
+    const campXSpacing = 300;
+    const campYSpacing = 200;
+    const maxCampRow = campaigns.length > 0 ? Math.floor((campaigns.length - 1) / itemsPerRow) : 0;
+    const campStartX = -((Math.min(campaigns.length, itemsPerRow) - 1) * campXSpacing) / 2;
+
+    // Departments below campaigns
+    // Ensure departments start far enough below the last row of campaigns
+    const deptStartY = campStartY + (maxCampRow + 1) * campYSpacing + 100;
+    const deptXSpacing = 350;
+    const deptYSpacing = 350; // Extra spacing because employee groups sit below departments
+    const deptStartX = -((Math.min(departments.length, itemsPerRow) - 1) * deptXSpacing) / 2;
+
     const deptMap = {};
 
     departments.forEach((d, i) => {
       deptMap[d.id] = true;
       const id = `dept-${d.id}`;
+      
+      const col = i % itemsPerRow;
+      const row = Math.floor(i / itemsPerRow);
+
       const pos = {
-        x: d.ui_position_x != null ? d.ui_position_x : startXDept + i * deptSpacing,
-        y: d.ui_position_y != null ? d.ui_position_y : deptY
+        x: d.ui_position_x != null ? d.ui_position_x : deptStartX + col * deptXSpacing,
+        y: d.ui_position_y != null ? d.ui_position_y : deptStartY + row * deptYSpacing
       };
 
       newNodes.push({
@@ -95,16 +112,14 @@ export default function CampaignCanvas({ campaigns, departments, employees, onEd
       }
     });
 
-    // Campaigns at the top
-    const campY = 50;
-    const campSpacing = 250;
-    const startXCamp = -(campaigns.length * campSpacing) / 2;
-
     campaigns.forEach((c, i) => {
       const id = `camp-${c.id}`;
+      const col = i % itemsPerRow;
+      const row = Math.floor(i / itemsPerRow);
+
       const pos = {
-        x: c.ui_position_x != null ? c.ui_position_x : startXCamp + i * campSpacing,
-        y: c.ui_position_y != null ? c.ui_position_y : campY
+        x: c.ui_position_x != null ? c.ui_position_x : campStartX + col * campXSpacing,
+        y: c.ui_position_y != null ? c.ui_position_y : campStartY + row * campYSpacing
       };
 
       newNodes.push({
@@ -309,6 +324,7 @@ export default function CampaignCanvas({ campaigns, departments, employees, onEd
       <CampaignSidebar
         campaignId={selectedCampaignId}
         campaign={campaigns.find(x => x.id === selectedCampaignId)}
+        departments={departments}
         onClose={() => setSelectedCampaignId(null)}
         onEdit={onEdit}
         onDelete={onDelete}

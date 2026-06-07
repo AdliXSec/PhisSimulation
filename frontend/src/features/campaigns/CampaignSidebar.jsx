@@ -11,7 +11,7 @@ import html2pdf from 'html2pdf.js';
 import PrintableReport from './PrintableReport';
 import './CampaignSidebar.css';
 
-export default function CampaignSidebar({ campaignId, campaign, onClose, onEdit, onDelete, onLaunch, onGenerate }) {
+export default function CampaignSidebar({ campaignId, campaign, departments, onClose, onEdit, onDelete, onLaunch, onGenerate }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('info'); // 'info' or 'report'
   const [detail, setDetail] = useState(null);
@@ -237,6 +237,21 @@ export default function CampaignSidebar({ campaignId, campaign, onClose, onEdit,
               <span className="info-label">{t('admin_dashboard.campaigns.detail_created_at', 'Tanggal Dibuat')}</span>
               <span className="info-value">{new Date(detail.created_at).toLocaleDateString()}</span>
             </div>
+            {detail.target_departments && detail.target_departments.length > 0 && (
+              <div className="info-item" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+                <span className="info-label">Departements</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', width: '100%' }}>
+                  {detail.target_departments.map(deptId => {
+                    const deptName = departments?.find(d => d.id === deptId)?.name || `Dept ID: ${deptId}`;
+                    return (
+                      <span key={deptId} className="badge badge-outline" style={{ fontSize: '0.75rem', padding: '6px 12px' }}>
+                        {deptName}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="report-tab fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

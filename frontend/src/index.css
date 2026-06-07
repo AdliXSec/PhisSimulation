@@ -307,7 +307,6 @@ code {
 
 .card:hover {
   border-color: var(--border-hover);
-  box-shadow: var(--shadow-neon);
 }
 
 .card-glow {
@@ -439,8 +438,6 @@ code {
 
 .card-glow:hover {
   border-color: rgba(0, 240, 255, 0.2);
-  box-shadow: var(--shadow-neon);
-  transform: translateY(-2px);
 }
 
 /* ============================================
@@ -483,8 +480,6 @@ code {
 }
 
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 0 24px var(--neon-cyan-glow), 0 0 48px rgba(0, 240, 255, 0.15);
   filter: brightness(1.15);
 }
 
@@ -497,7 +492,6 @@ code {
 .btn-secondary:hover:not(:disabled) {
   background: rgba(0, 240, 255, 0.12);
   border-color: rgba(0, 240, 255, 0.3);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
 }
 
 .btn-danger {
@@ -506,8 +500,6 @@ code {
 }
 
 .btn-danger:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 0 16px var(--danger-soft);
 }
 
 .btn-ghost {

@@ -927,9 +927,8 @@ export default function LandingHome() {
                         border: '1px solid var(--border)',
                         backdropFilter: 'blur(10px)',
                         cursor: 'default',
-                        transform: hoveredFeature === i ? 'translateY(-6px)' : 'translateY(0)',
                         borderColor: hoveredFeature === i ? `${featuresVisuals[i].color}55` : 'var(--border)',
-                        boxShadow: hoveredFeature === i ? `0 10px 30px ${featuresVisuals[i].color}15` : 'var(--shadow-md)',
+                        boxShadow: 'var(--shadow-md)',
                         transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                         position: 'relative',
                         overflow: 'hidden'
