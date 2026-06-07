@@ -98,13 +98,13 @@ export default function CampaignSidebar({ campaignId, campaign, onClose, onEdit,
         setExporting(false);
         return;
       }
-      
+
       const opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     `Report_${detail?.name || 'Campaign'}.pdf`,
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 4, useCORS: true, backgroundColor: '#ffffff', logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        margin: [10, 10, 10, 10],
+        filename: `Report_${detail?.name || 'Campaign'}.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 4, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
       html2pdf().set(opt).from(element).save().then(() => {
@@ -176,7 +176,7 @@ export default function CampaignSidebar({ campaignId, campaign, onClose, onEdit,
       <div className="campaign-sidebar-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h2 className="sidebar-title">{loading ? t('common.loading', 'Memuat...') : detail?.name}</h2>
+            <h2 className="sidebar-title">{loading ? t('admin_dashboard.loading', 'Memuat...') : detail?.name}</h2>
             {!loading && detail && (
               <span className={statusBadge(detail.status)} style={{ marginTop: '8px', display: 'inline-block' }}>
                 {detail.status}
@@ -381,9 +381,9 @@ export default function CampaignSidebar({ campaignId, campaign, onClose, onEdit,
                           <td style={{ padding: '12px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{t.department || '-'}</td>
                           <td style={{ padding: '12px' }}>
                             <span className={`badge ${t.status === 'SUBMITTED' ? 'badge-danger' :
-                                t.status === 'CLICKED' ? 'badge-warning' :
-                                  t.status === 'OPENED' ? 'badge-info' :
-                                    t.status === 'SENT' ? 'badge-success' : 'badge-default'
+                              t.status === 'CLICKED' ? 'badge-warning' :
+                                t.status === 'OPENED' ? 'badge-info' :
+                                  t.status === 'SENT' ? 'badge-success' : 'badge-default'
                               }`} style={{ fontSize: '0.65rem' }}>{t.status}</span>
                           </td>
                           <td style={{ padding: '12px' }}>
@@ -466,12 +466,12 @@ export default function CampaignSidebar({ campaignId, campaign, onClose, onEdit,
 
       {/* Hidden Printable Report for PDF Export */}
       <div style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}>
-        <PrintableReport 
-          detail={detail} 
-          reportData={reportData} 
-          aiAnalysis={aiAnalysis} 
-          pieData={pieData} 
-          funnelData={funnelData} 
+        <PrintableReport
+          detail={detail}
+          reportData={reportData}
+          aiAnalysis={aiAnalysis}
+          pieData={pieData}
+          funnelData={funnelData}
         />
       </div>
 

@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState } from '@xyflow/react';
+import { ReactFlow, MiniMap, Controls, ControlButton, Background, useNodesState, useEdgesState } from '@xyflow/react';
+import { HiOutlineLockClosed, HiOutlineLockOpen } from 'react-icons/hi2';
 import '@xyflow/react/dist/style.css';
 import { CampaignNode, DepartmentNode } from './CanvasNodes';
 import CampaignSidebar from './CampaignSidebar';
@@ -19,6 +20,23 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [layoutKey, setLayoutKey] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+
+  useEffect(() => {
+    // Fetch initial lock status from database
+    api.get('/auth/me').then(res => {
+      setIsLocked(res.data.canvas_locked || false);
+    }).catch(err => console.error("Gagal mengambil status gembok:", err));
+  }, []);
+
+  const handleToggleLock = useCallback(() => {
+    const newVal = !isLocked;
+    setIsLocked(newVal);
+    api.put('/auth/me', { canvas_locked: newVal }).catch(err => {
+      console.error("Gagal menyimpan status gembok:", err);
+      setIsLocked(!newVal); // revert on error
+    });
+  }, [isLocked]);
 
   // Layout the graph whenever campaigns, departments or layoutKey change
   useEffect(() => {
@@ -163,9 +181,16 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
         fitViewOptions={{ maxZoom: 1, padding: 0.2 }}
         colorMode="dark"
         style={{ background: 'transparent' }}
+        nodesDraggable={!isLocked}
+        nodesConnectable={!isLocked}
+        elementsSelectable={!isLocked}
       >
         <Background color="rgba(0, 240, 255, 0.2)" gap={20} size={1.5} />
-        <Controls />
+        <Controls showInteractive={false}>
+          <ControlButton onClick={handleToggleLock} title={isLocked ? "Buka Kunci Canvas" : "Kunci Canvas"}>
+            {isLocked ? <HiOutlineLockClosed color="var(--neon-cyan)" /> : <HiOutlineLockOpen />}
+          </ControlButton>
+        </Controls>
       </ReactFlow>
 
       {/* Top Left Menu & Header */}

@@ -50,6 +50,7 @@ class UserResponse(BaseModel):
     email: str
     full_name: str | None
     role: str
+    canvas_locked: bool = False
 
 
 # ---- Endpoints ----
@@ -154,6 +155,7 @@ async def google_login(request: Request, login_data: GoogleLoginRequest, db: Asy
             "email": user.email,
             "full_name": user.full_name,
             "role": user.role,
+            "canvas_locked": user.canvas_locked,
         },
     )
 
@@ -194,6 +196,7 @@ async def login(request: Request, login_data: LoginRequest, db: AsyncSession = D
             "email": user.email,
             "full_name": user.full_name,
             "role": user.role,
+            "canvas_locked": user.canvas_locked,
         },
     )
 
@@ -240,6 +243,7 @@ async def register(request: Request, reg_data: RegisterRequest, db: AsyncSession
         email=user.email,
         full_name=user.full_name,
         role=user.role,
+        canvas_locked=user.canvas_locked,
     )
 
 
@@ -281,6 +285,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
         email=current_user.email,
         full_name=current_user.full_name,
         role=current_user.role,
+        canvas_locked=current_user.canvas_locked,
     )
 
 
@@ -288,6 +293,7 @@ class UserUpdateRequest(BaseModel):
     full_name: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+    canvas_locked: bool | None = None
 
 
 @router.put("/me", response_model=UserResponse)
@@ -310,6 +316,9 @@ async def update_me(
     if data.password:
         current_user.password_hash = hash_password(data.password)
 
+    if data.canvas_locked is not None:
+        current_user.canvas_locked = data.canvas_locked
+
     await db.flush()
     
     return UserResponse(
@@ -318,4 +327,5 @@ async def update_me(
         email=current_user.email,
         full_name=current_user.full_name,
         role=current_user.role,
+        canvas_locked=current_user.canvas_locked,
     )

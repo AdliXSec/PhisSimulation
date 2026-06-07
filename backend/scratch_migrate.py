@@ -10,21 +10,12 @@ from app.core.config import settings
 async def migrate():
     engine = create_async_engine(settings.DATABASE_URL)
     async with engine.begin() as conn:
-        print("Migrating campaigns...")
+        print("Migrating users...")
         try:
-            await conn.execute(text("ALTER TABLE campaigns ADD COLUMN ui_position_x FLOAT;"))
-            await conn.execute(text("ALTER TABLE campaigns ADD COLUMN ui_position_y FLOAT;"))
-            print("Successfully added columns to campaigns")
+            await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS canvas_locked BOOLEAN DEFAULT FALSE;"))
+            print("Successfully added columns to users")
         except Exception as e:
-            print(f"Error on campaigns (might already exist): {e}")
-            
-        print("Migrating departments...")
-        try:
-            await conn.execute(text("ALTER TABLE departments ADD COLUMN ui_position_x FLOAT;"))
-            await conn.execute(text("ALTER TABLE departments ADD COLUMN ui_position_y FLOAT;"))
-            print("Successfully added columns to departments")
-        except Exception as e:
-            print(f"Error on departments (might already exist): {e}")
+            print(f"Error on users: {e}")
 
     await engine.dispose()
     print("Done")
