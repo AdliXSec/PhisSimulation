@@ -1,0 +1,131 @@
+.printable-report {
+  background: #ffffff !important;
+  color: #111111 !important;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  width: 800px;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.printable-report-header {
+  border-bottom: 2px solid #eeeeee;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.printable-report-title h1 {
+  font-size: 24px;
+  color: #111111 !important;
+  margin: 0 0 5px 0;
+}
+
+.printable-report-title p {
+  font-size: 14px;
+  color: #555555 !important;
+  margin: 0;
+}
+
+.printable-report-section {
+  margin-bottom: 30px;
+}
+
+.printable-report-section h2 {
+  font-size: 18px;
+  color: #111111 !important;
+  border-bottom: 1px solid #eeeeee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.printable-stats-grid {
+  display: flex;
+  gap: 20px;
+}
+
+.printable-stat-box {
+  flex: 1;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.printable-stat-box h3 {
+  font-size: 12px;
+  color: #555555 !important;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+}
+
+.printable-stat-box p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #111111 !important;
+  margin: 0;
+}
+
+.printable-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.printable-table th, .printable-table td {
+  border: 1px solid #dddddd !important;
+  padding: 10px;
+  text-align: left;
+  font-size: 12px;
+  color: #111111 !important;
+}
+
+.printable-table th {
+  background-color: #f5f5f5 !important;
+  font-weight: bold;
+  color: #111111 !important;
+}
+
+.printable-markdown {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #111111 !important;
+}
+
+.printable-markdown * {
+  color: #111111 !important;
+}
+
+.printable-markdown h1 {
+  font-size: 20px;
+  color: #111111;
+  margin-top: 20px;
+}
+
+.printable-markdown h2 {
+  font-size: 18px;
+  color: #111111;
+  margin-top: 18px;
+  border: none;
+}
+
+.printable-markdown h3 {
+  font-size: 16px;
+  color: #111111;
+  margin-top: 15px;
+}
+
+.printable-markdown p {
+  margin-bottom: 10px;
+}
+
+.printable-markdown ul, .printable-markdown ol {
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+.printable-markdown li {
+  margin-bottom: 5px;
+}

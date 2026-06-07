@@ -6,7 +6,7 @@ import './DashboardLayout.css';
 
 export default function DashboardLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isDesktopOpen, setIsDesktopOpen] = useState(true);
+  const [isDesktopOpen, setIsDesktopOpen] = useState(false);
 
   return (
     <div className="dashboard-layout">

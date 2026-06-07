@@ -287,6 +287,15 @@
   left: 96px;
 }
 
+@media (max-width: 768px) {
+  .user-menu-popup, .user-menu-popup.minimized {
+    left: var(--space-xl);
+    right: var(--space-xl);
+    bottom: 80px;
+    width: auto;
+  }
+}
+
 .popup-menu-item {
   display: flex;
   align-items: center;

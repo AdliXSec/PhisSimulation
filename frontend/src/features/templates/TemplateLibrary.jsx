@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import LandingPageGallery from './LandingPageGallery';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
@@ -11,7 +12,9 @@ export default function TemplateLibrary() {
   const [loading, setLoading] = useState(true);
   const [previewTemplate, setPreviewTemplate] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [newTemplate, setNewTemplate] = useState({ name: '', description: '', email_subject: '', email_sender_name: '', email_body_html: '' });
+  const [activeTab, setActiveTab] = useState('email');
 
   useEffect(() => {
     loadTemplates();
@@ -41,6 +44,7 @@ export default function TemplateLibrary() {
 
   const handleSaveNew = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
       await api.post('/saved-templates', newTemplate);
       toast.success('Template email berhasil disimpan');
@@ -49,6 +53,8 @@ export default function TemplateLibrary() {
       loadTemplates();
     } catch (err) {
       toast.error('Gagal menyimpan template email');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -196,102 +202,130 @@ export default function TemplateLibrary() {
     document.body
   ) : null;
 
-  return (
-    <div className="fade-in">
-      <div className="page-header">
-        <div>
-          <h1>{t('admin_dashboard.templates.title')}</h1>
-          <p>{t('admin_dashboard.templates.desc')}</p>
-        </div>
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-          <HiOutlinePlus size={18} /> {t('admin_dashboard.templates.btn_add')}
-        </button>
-      </div>
-
-      <div className="card">
-        {loading ? (
-          <div className="loading-center"><div className="spinner"></div></div>
-        ) : templates.length === 0 ? (
-          <div className="empty-state">
-            <HiOutlineEnvelopeOpen size={48} style={{ color: 'var(--border)' }} />
-            <h3>{t('admin_dashboard.templates.empty_title')}</h3>
-            <p>{t('admin_dashboard.templates.empty_desc')}</p>
-          </div>
-        ) : (
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>{t('admin_dashboard.templates.table_name')}</th>
-                  <th>{t('admin_dashboard.templates.table_subject')}</th>
-                  <th>{t('admin_dashboard.templates.table_sender')}</th>
-                  <th>{t('admin_dashboard.templates.table_date')}</th>
-                  <th>{t('admin_dashboard.templates.table_actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {templates.map(tmpl => (
-                  <tr key={tmpl.id}>
-                    <td style={{ fontWeight: 500, color: 'var(--neon-cyan)' }}>{tmpl.name}</td>
-                    <td>
-                      <span className="truncate-mobile" title={tmpl.email_subject}>
-                        {tmpl.email_subject}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="truncate-mobile" title={tmpl.email_sender_name}>
-                        {tmpl.email_sender_name}
-                      </span>
-                    </td>
-                    <td>{new Date(tmpl.created_at).toLocaleDateString(t('admin_dashboard.templates.table_date') === 'Date Saved' ? 'en-US' : 'id-ID')}</td>
-                    <td>
-                      <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
-                        <button
-                          className="btn-icon"
-                          onClick={() => setPreviewTemplate(tmpl)}
-                          title={t('admin_dashboard.templates.action_preview')}
-                          style={{
-                            background: 'rgba(0, 240, 255, 0.1)',
-                            border: '1px solid rgba(0, 240, 255, 0.2)',
-                            color: 'var(--neon-cyan)',
-                            padding: '6px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center'
-                          }}
-                        >
-                          <HiOutlineEye size={18} />
-                        </button>
-                        <button
-                          className="btn-icon"
-                          onClick={() => handleDelete(tmpl.id, tmpl.name)}
-                          title={t('admin_dashboard.templates.action_delete')}
-                          style={{
-                            background: 'transparent',
-                            border: '1px solid transparent',
-                            color: 'var(--text-muted)',
-                            padding: '6px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center'
-                          }}
-                          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'rgba(255, 62, 62, 0.1)'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
-                        >
-                          <HiOutlineTrash size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {previewModal}
-      {addModal}
+  const TabsUI = (
+    <div className="sidebar-tabs" style={{ background: 'var(--bg-card)', padding: '6px', borderRadius: '12px', display: 'inline-flex', margin: 0 }}>
+      <button
+        className={`sidebar-tab ${activeTab === 'email' ? 'active' : ''}`}
+        onClick={() => setActiveTab('email')}
+        style={{ minWidth: '150px', justifyContent: 'center', padding: '8px 16px', fontSize: '0.9rem' }}
+      >
+        Email Templates
+      </button>
+      <button
+        className={`sidebar-tab ${activeTab === 'landing' ? 'active' : ''}`}
+        onClick={() => setActiveTab('landing')}
+        style={{ minWidth: '150px', justifyContent: 'center', padding: '8px 16px', fontSize: '0.9rem' }}
+      >
+        Landing Pages
+      </button>
     </div>
+  );
+
+  return (
+  <div className="fade-in">
+    <div className="page-header">
+      <div>
+        <h1>{t('admin_dashboard.templates.title', 'Template Gallery')}</h1>
+        <p>{t('admin_dashboard.templates.desc', 'Kelola template simulasi phishing Anda di sini.')}</p>
+      </div>
+    </div>
+
+    {activeTab === 'email' ? (
+      <>
+        <div className="tab-actions-header">
+          {TabsUI}
+          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+            <HiOutlinePlus size={18} /> {t('admin_dashboard.templates.btn_add')}
+          </button>
+        </div>
+        <div className="card">
+          {loading ? (
+            <div className="loading-center"><div className="spinner"></div></div>
+          ) : templates.length === 0 ? (
+            <div className="empty-state">
+              <HiOutlineEnvelopeOpen size={48} style={{ color: 'var(--border)' }} />
+              <h3>{t('admin_dashboard.templates.empty_title')}</h3>
+              <p>{t('admin_dashboard.templates.empty_desc')}</p>
+            </div>
+          ) : (
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>{t('admin_dashboard.templates.table_name')}</th>
+                    <th>{t('admin_dashboard.templates.table_subject')}</th>
+                    <th>{t('admin_dashboard.templates.table_sender')}</th>
+                    <th>{t('admin_dashboard.templates.table_date')}</th>
+                    <th>{t('admin_dashboard.templates.table_actions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {templates.map(tmpl => (
+                    <tr key={tmpl.id}>
+                      <td style={{ fontWeight: 500, color: 'var(--neon-cyan)' }}>{tmpl.name}</td>
+                      <td>
+                        <span className="truncate-mobile" title={tmpl.email_subject}>
+                          {tmpl.email_subject}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="truncate-mobile" title={tmpl.email_sender_name}>
+                          {tmpl.email_sender_name}
+                        </span>
+                      </td>
+                      <td>{new Date(tmpl.created_at).toLocaleDateString(t('admin_dashboard.templates.table_date') === 'Date Saved' ? 'en-US' : 'id-ID')}</td>
+                      <td>
+                        <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className="btn-icon"
+                            onClick={() => setPreviewTemplate(tmpl)}
+                            title={t('admin_dashboard.templates.action_preview')}
+                            style={{
+                              background: 'rgba(0, 240, 255, 0.1)',
+                              border: '1px solid rgba(0, 240, 255, 0.2)',
+                              color: 'var(--neon-cyan)',
+                              padding: '6px',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}
+                          >
+                            <HiOutlineEye size={18} />
+                          </button>
+                          <button
+                            className="btn-icon"
+                            onClick={() => handleDelete(tmpl.id, tmpl.name)}
+                            title={t('admin_dashboard.templates.action_delete')}
+                            style={{
+                              background: 'transparent',
+                              border: '1px solid transparent',
+                              color: 'var(--text-muted)',
+                              padding: '6px',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.background = 'rgba(255, 62, 62, 0.1)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}
+                          >
+                            <HiOutlineTrash size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </>
+    ) : (
+      <LandingPageGallery isTab={true} customLeftHeader={TabsUI} />
+    )}
+
+    {previewModal}
+    {addModal}
+  </div>
   );
 }

@@ -74,7 +74,7 @@
     display: flex;
   }
 
-  .main-content {
+  .main-content, .main-content.expanded {
     margin-left: 0;
     padding-top: var(--navbar-height);
   }

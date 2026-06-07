@@ -29,12 +29,11 @@ const navItems = [
   { path: '/dashboard', labelKey: 'dashboard', icon: HiOutlineHome },
   { path: '/dashboard/campaigns', labelKey: 'campaigns', icon: HiOutlineEnvelope },
   { path: '/dashboard/templates', labelKey: 'templates', icon: HiOutlineEnvelopeOpen },
-  { path: '/dashboard/landing-pages', labelKey: 'landing_pages', icon: HiOutlineDocumentText },
   { path: '/dashboard/osint', labelKey: 'osint', icon: HiOutlineGlobeAlt },
   { path: '/dashboard/intel', labelKey: 'intel', icon: HiOutlineShieldCheck },
   { path: '/dashboard/employees', labelKey: 'employees', icon: HiOutlineUserGroup },
   { path: '/dashboard/departments', labelKey: 'departments', icon: HiOutlineBuildingOffice2 },
-  { path: '/dashboard/reports', labelKey: 'reports', icon: HiOutlineChartBarSquare },
+  // { path: '/dashboard/reports', labelKey: 'reports', icon: HiOutlineChartBarSquare },
   { path: '/dashboard/api-keys', labelKey: 'api_keys', icon: HiOutlineKey },
 ];
 
@@ -51,10 +50,11 @@ export default function Sidebar({ isOpen, onClose, isDesktopOpen = true, onToggl
     const handleClickOutside = (e) => {
       if (isMenuOpen && popupRef.current && !popupRef.current.contains(e.target)) {
         setIsMenuOpen(false);
+        e.stopPropagation();
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside, true);
+    return () => document.removeEventListener('mousedown', handleClickOutside, true);
   }, [isMenuOpen]);
 
   const toggleLanguage = () => {
@@ -127,7 +127,7 @@ export default function Sidebar({ isOpen, onClose, isDesktopOpen = true, onToggl
             }}
           >
             <HiOutlineUser size={18} />
-            Profile Management
+            {t('admin_dashboard.profile.title')}
           </button>
           <div className="popup-divider"></div>
           <button className="popup-menu-item" onClick={toggleLanguage}>

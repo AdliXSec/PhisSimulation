@@ -4,6 +4,7 @@ import { ReactFlow, MiniMap, Controls, Background, useNodesState, useEdgesState 
 import '@xyflow/react/dist/style.css';
 import { CampaignNode, DepartmentNode } from './CanvasNodes';
 import CampaignSidebar from './CampaignSidebar';
+import DepartmentSidebar from './DepartmentSidebar';
 
 const nodeTypes = {
   campaign: CampaignNode,
@@ -15,6 +16,7 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [layoutKey, setLayoutKey] = useState(0);
 
   // Layout the graph whenever campaigns, departments or layoutKey change
@@ -95,8 +97,14 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
     if (node.type === 'campaign') {
       const campId = node.id.replace('camp-', '');
       setSelectedCampaignId(campId);
+      setSelectedDepartmentId(null);
+    } else if (node.type === 'department') {
+      const deptId = node.id.replace('dept-', '');
+      setSelectedDepartmentId(deptId);
+      setSelectedCampaignId(null);
     } else {
       setSelectedCampaignId(null);
+      setSelectedDepartmentId(null);
     }
   }, []);
 
@@ -120,7 +128,7 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
   };
 
   const onPaneClick = useCallback(() => {
-    setSelectedCampaignId(null);
+    // setSelectedCampaignId(null); // Disabled by user request: Sidebar should only close via X button
   }, []);
 
   return (
@@ -136,6 +144,7 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
         panOnScroll={true}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={{ maxZoom: 1, padding: 0.2 }}
         colorMode="dark"
         style={{ background: 'transparent' }}
       >
@@ -149,9 +158,9 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 4vw, var(--font-size-3xl))', fontWeight: 700, margin: 0, textTransform: 'uppercase', background: 'var(--gradient-text)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             {t('admin_dashboard.campaigns.title')}
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', margin: '4px 0 0 0', WebkitTextFillColor: 'unset' }}>
+          {/* <p style={{ color: 'var(--text-muted)', fontSize: 'var(--font-size-sm)', margin: '4px 0 0 0', WebkitTextFillColor: 'unset' }}>
             {t('admin_dashboard.campaigns.desc')}
-          </p>
+          </p> */}
         </div>
         <div style={{ display: 'flex', gap: '12px', pointerEvents: 'auto' }}>
           {onNewCampaign && (
@@ -165,7 +174,7 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
         </div>
       </div>
 
-      {/* Sidebar Overlay */}
+      {/* Campaign Sidebar Overlay */}
       <CampaignSidebar
         campaignId={selectedCampaignId}
         campaign={campaigns.find(x => x.id === selectedCampaignId)}
@@ -174,6 +183,13 @@ export default function CampaignCanvas({ campaigns, departments, onEdit, onDelet
         onDelete={onDelete}
         onLaunch={onLaunch}
         onGenerate={onGenerate}
+      />
+
+      {/* Department Sidebar Overlay */}
+      <DepartmentSidebar
+        departmentId={selectedDepartmentId}
+        departmentName={departments.find(x => x.id == selectedDepartmentId)?.name}
+        onClose={() => setSelectedDepartmentId(null)}
       />
     </div>
   );

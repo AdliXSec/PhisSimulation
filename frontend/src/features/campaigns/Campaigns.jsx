@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
@@ -229,20 +230,24 @@ export default function Campaigns() {
     <div className="fade-in">
       {/* Header moved to inside the canvas */}
 
-      {showForm && (
-        <div className="card-glow" style={{ marginBottom: 'var(--space-2xl)' }}>
-          <h3 style={{ marginBottom: 'var(--space-lg)', borderBottom: '1px solid var(--divider)', paddingBottom: 'var(--space-sm)' }}>
-            {editId ? t('admin_dashboard.campaigns.form.title_edit') : t('admin_dashboard.campaigns.form.title_new')}
-          </h3>
+      {showForm && createPortal(
+        <div className="modal-overlay" onClick={() => setShowForm(false)}>
+          <div className="modal-container card-glow" onClick={e => e.stopPropagation()} style={{ padding: 0, marginBottom: 0 }}>
+            <div className="modal-header">
+              <h3 style={{ borderBottom: 'none', marginBottom: 0, paddingBottom: 0 }}>
+                {editId ? t('admin_dashboard.campaigns.form.title_edit') : t('admin_dashboard.campaigns.form.title_new')}
+              </h3>
+              <button type="button" className="modal-close" onClick={() => setShowForm(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              {/* Wizard Stepper */}
+              <StepWizard 
+                steps={editId ? WIZARD_STEPS.slice(0, 2) : WIZARD_STEPS} 
+                currentStep={step} 
+                onStepClick={(i) => { if (i <= step) setStep(i); }}
+              />
 
-          {/* Wizard Stepper */}
-          <StepWizard 
-            steps={editId ? WIZARD_STEPS.slice(0, 2) : WIZARD_STEPS} 
-            currentStep={step} 
-            onStepClick={(i) => { if (i <= step) setStep(i); }}
-          />
-
-          <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit}>
             {/* ===== STEP 1: Informasi Dasar ===== */}
             {step === 0 && (
               <div className="wizard-content" key="step-0">
@@ -525,7 +530,10 @@ export default function Campaigns() {
               </div>
             )}
           </form>
-        </div>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       <div className="campaign-canvas-wrapper">

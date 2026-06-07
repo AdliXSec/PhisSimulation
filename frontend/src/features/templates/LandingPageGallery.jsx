@@ -5,7 +5,7 @@ import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { HiOutlineDocumentText, HiOutlineTrash, HiOutlineEye, HiXMark, HiOutlinePlus } from 'react-icons/hi2';
 
-export default function LandingPageGallery() {
+export default function LandingPageGallery({ isTab = false, customLeftHeader = null }) {
   const { t } = useTranslation();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -215,16 +215,27 @@ export default function LandingPageGallery() {
   ) : null;
 
   return (
-    <div className="fade-in">
-      <div className="page-header">
-        <div>
-          <h1>{t('admin_dashboard.landing_pages.title', 'Galeri Landing Page')}</h1>
-          <p>{t('admin_dashboard.landing_pages.subtitle', 'Kelola template landing page phishing (HTML kustom & default).')}</p>
+    <div className={!isTab ? "fade-in" : ""}>
+      {!isTab && (
+        <div className="page-header">
+          <div>
+            <h1>{t('admin_dashboard.landing_pages.title', 'Galeri Landing Page')}</h1>
+            <p>{t('admin_dashboard.landing_pages.subtitle', 'Kelola template landing page phishing (HTML kustom & default).')}</p>
+          </div>
+          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+            <HiOutlinePlus size={18} /> {t('admin_dashboard.landing_pages.btn_add', 'Tambah Template')}
+          </button>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-          <HiOutlinePlus size={18} /> {t('admin_dashboard.landing_pages.btn_add', 'Tambah Template')}
-        </button>
-      </div>
+      )}
+
+      {isTab && (
+        <div className="tab-actions-header">
+          {customLeftHeader}
+          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+            <HiOutlinePlus size={18} /> {t('admin_dashboard.landing_pages.btn_add', 'Tambah Template')}
+          </button>
+        </div>
+      )}
 
       <div className="card">
         {loading ? (

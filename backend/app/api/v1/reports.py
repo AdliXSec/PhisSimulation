@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
-from app.core.database import get_db
+from app.core.database import get_db, async_session
 from app.api.deps import get_current_user, get_language
 from app.models.user import User
 from app.models.campaign import Campaign
@@ -13,6 +13,32 @@ from app.models.employee_risk import EmployeeRiskProfile
 from app.models.department import Department
 from app.models.campaign_template import CampaignTemplate
 from app.services.ai_service import generate_campaign_analysis
+
+
+async def process_ai_analysis_bg(campaign_id: str, stats_summary: str, lang: str):
+    """Background task to generate AI analysis for a campaign."""
+    async with async_session() as db:
+        campaign = None
+        try:
+            result = await db.execute(select(Campaign).where(Campaign.id == campaign_id))
+            campaign = result.scalar_one_or_none()
+            if not campaign:
+                print(f"Background task failed: Campaign {campaign_id} not found")
+                return
+
+            print(f"Starting AI analysis generation for campaign {campaign_id}")
+            analysis = await generate_campaign_analysis(stats_summary, lang)
+            print(f"AI analysis generation complete for campaign {campaign_id}")
+            
+            # Save to database for persistence
+            campaign.ai_analysis = analysis
+            await db.commit()
+        except Exception as e:
+            print(f"Error in background AI analysis: {e}")
+            # If we fail, write a failure marker
+            if campaign:
+                campaign.ai_analysis = "_FAILED_"
+                await db.commit()
 
 
 router = APIRouter()
@@ -208,6 +234,7 @@ async def get_campaign_report(
 @router.post("/campaigns/{campaign_id}/ai-analysis")
 async def get_ai_analysis(
     campaign_id: str,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
     lang: str = Depends(get_language),
@@ -238,11 +265,11 @@ async def get_ai_analysis(
         f"Data Diserahkan: {stats.get('SUBMITTED', 0)}"
     )
 
-    try:
-        analysis = await generate_campaign_analysis(stats_summary, lang)
-        # Save to database for persistence
-        campaign.ai_analysis = analysis
-        await db.flush()
-        return {"analysis": analysis}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gagal generate analisis: {str(e)}")
+    # Set magic string so frontend knows it's generating
+    campaign.ai_analysis = "_GENERATING_AI_"
+    await db.commit()
+
+    # Schedule background task
+    background_tasks.add_task(process_ai_analysis_bg, str(campaign.id), stats_summary, lang)
+
+    return {"message": "Analisis AI sedang diproses di latar belakang", "status": "GENERATING"}

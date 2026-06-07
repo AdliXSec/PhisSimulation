@@ -160,7 +160,7 @@ export default function Dashboard() {
         <Link to="/dashboard/campaigns" className="btn btn-primary" style={{ flex: '1 1 200px', padding: '12px', justifyContent: 'center' }}>
           <HiOutlinePlus size={20} /> {t('admin_dashboard.quick_actions.new_campaign')}
         </Link>
-        <Link to="/dashboard/reports" className="btn btn-secondary" style={{ flex: '1 1 200px', padding: '12px', justifyContent: 'center' }}>
+        <Link to="/dashboard/campaigns" className="btn btn-secondary" style={{ flex: '1 1 200px', padding: '12px', justifyContent: 'center' }}>
           <HiOutlineChartBarSquare size={20} /> {t('admin_dashboard.quick_actions.view_report')}
         </Link>
       </div>
@@ -226,7 +226,7 @@ export default function Dashboard() {
           </div>
           <HiOutlineChevronRight size={18} />
         </Link>
-        <Link to="/dashboard/reports" className="nav-card">
+        <Link to="/dashboard/campaigns" className="nav-card">
           <div className="nav-card-content">
             <h4>{t('admin_dashboard.nav_cards.reports.title')}</h4>
             <p>{t('admin_dashboard.nav_cards.reports.desc')}</p>

@@ -26,7 +26,7 @@ async def _set_cache(key: str, data: dict, expire: int = 86400):
 
 async def _call_openrouter(system_prompt: str, user_prompt: str) -> str:
     """Make a request to OpenRouter API with DeepSeek V3.2."""
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=300.0) as client:
         response = await client.post(
             settings.OPENROUTER_API_URL,
             headers={
